@@ -11,6 +11,7 @@ function AuthCallbackContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!searchParams) return;
     const provider = searchParams.get("provider");
     const code = searchParams.get("code");
     const errorParam = searchParams.get("error");

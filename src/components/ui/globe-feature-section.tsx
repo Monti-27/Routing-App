@@ -129,7 +129,7 @@ export function Globe({
       width: width * 2,
       height: width * 2,
       onRender,
-    })
+    } as any)
 
     setTimeout(() => (canvasRef.current!.style.opacity = "1"))
     return () => globe.destroy()

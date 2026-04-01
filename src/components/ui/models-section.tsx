@@ -290,7 +290,7 @@ export default function ModelsPage() {
                 <p className="text-xs text-gray-400">credits/month</p>
               </div>
               <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">
-                <p className="text-2xl font-bold text-white">{plan.burst || plan.requestsPerHour / 2}</p>
+                <p className="text-2xl font-bold text-white">{(plan as any).burst || plan.requestsPerHour / 2}</p>
                 <p className="text-xs text-gray-400">burst</p>
               </div>
               <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">

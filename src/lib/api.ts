@@ -114,7 +114,7 @@ async function fetchApi<T>(
     headers,
   });
 
-  if (response.status === 401 && !options.headers?.["Authorization"]) {
+  if (response.status === 401 && !(options.headers as Record<string, string>)?.["Authorization"]) {
     if (!isRefreshing) {
       isRefreshing = true;
       try {

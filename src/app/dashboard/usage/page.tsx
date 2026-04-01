@@ -61,7 +61,7 @@ export default function UsagePage() {
         if (usageData.models && typeof usageData.models === "object") {
           for (const [modelName, metrics] of Object.entries(usageData.models)) {
             const m = metrics as Record<string, number>;
-            const isImageModel = m.is_image_model === 1 || m.is_image_model === true;
+            const isImageModel = Boolean(m.is_image_model);
             const modelRequests = m.image_requests || m.requests || 0;
             const input = m.input_tokens || 0;
             const output = m.output_tokens || 0;
@@ -117,7 +117,7 @@ export default function UsagePage() {
         setLoading(false);
       }
     }
-    fetchUsage();
+    fetchData();
   }, [period]);
 
   const maxRequests = Math.max(...chartData.map((d) => d.requests), 1);

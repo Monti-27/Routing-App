@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react"
 
 interface TimelineContentProps {
   children: React.ReactNode
-  as?: keyof JSX.IntrinsicElements
+  as?: keyof React.JSX.IntrinsicElements
   animationNum?: number
   timelineRef?: React.RefObject<HTMLElement | null>
   customVariants?: {
@@ -35,7 +35,7 @@ export function TimelineContent({
   className = "",
   ...props
 }: TimelineContentProps) {
-  const ref = useRef<HTMLElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   const defaultVariants = {
     visible: (i: number) => ({
@@ -56,7 +56,7 @@ export function TimelineContent({
 
   const variants = customVariants || defaultVariants
 
-  const Component = motion[as as keyof typeof motion] || motion.div
+  const Component = motion[as as keyof typeof motion] as typeof motion.div || motion.div
 
   return (
     <Component
