@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0.141 0.005 285.823;
+  --foreground: 0.985 0 0;
+  --primary: 0.985 0 0;
+  --primary-foreground: 0.21 0.006 285.885;
+  --secondary: 0.274 0.006 286.033;
+  --secondary-foreground: 0.985 0 0;
+  --muted: 0.274 0.006 286.033;
+  --muted-foreground: 0.552 0.016 285.938;
+  --accent: 0.274 0.006 286.033;
+  --accent-foreground: 0.985 0 0;
+  --border: 0.274 0.006 286.033;
+  --card: 0.18 0.005 286;
+  --card-foreground: 0.985 0 0;
+  --radius: 0.625rem;
+  --gradient-color: #8350e8;
+  --sparkles-color: #8350e8;
+}
+
+.dark {
+  --gradient-color: #8350e8;
+  --sparkles-color: #ffffff;
+}
+
+.light {
+  --background: 1 0 0;
+  --foreground: 0.141 0.005 285.823;
+  --primary: 0.21 0.006 285.885;
+  --primary-foreground: 0.985 0 0;
+  --secondary: 0.967 0.001 286.375;
+  --secondary-foreground: 0.141 0.005 285.823;
+  --muted: 0.967 0.001 286.375;
+  --muted-foreground: 0.552 0.016 285.938;
+  --accent: 0.967 0.001 286.375;
+  --accent-foreground: 0.141 0.005 285.823;
+  --border: 0.92 0.004 286.32;
+  --card: 1 0 0;
+  --card-foreground: 0.141 0.005 285.823;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+  }
+  
+  .gradient-blur {
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.4 0.15 280), transparent);
+  }
+}

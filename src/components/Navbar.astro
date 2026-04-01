@@ -1,0 +1,67 @@
+---
+const navItems = [
+  { label: 'Features', href: '/#features' },
+  { label: 'Models', href: '/models' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Docs', href: '/docs' },
+];
+---
+
+<nav class="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-8">
+        <a href="/" class="flex items-center gap-2">
+          <img src="/transparent_white_logo.PNG" alt="routing.run" class="h-8" />
+        </a>
+        <div class="hidden md:flex items-center gap-6">
+          {navItems.map((item) => (
+            <a
+              href={item.href}
+              class="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a
+          href="https://app.routing.run"
+          class="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
+        >
+          Sign In
+        </a>
+        <a
+          href="https://app.routing.run"
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+        >
+          Get API Key
+        </a>
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-muted-foreground hover:text-foreground">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden pb-4">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+</script>
