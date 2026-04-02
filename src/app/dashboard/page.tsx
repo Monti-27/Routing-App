@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Bot,
   Clock,
+  Shield,
 } from "lucide-react";
 
 interface UsageData {
@@ -355,6 +356,25 @@ export default function DashboardPage() {
                   View docs →
                 </a>
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-green-500/20 bg-green-500/5">
+        <CardContent className="pt-4">
+          <div className="flex items-start gap-3">
+            <div className="rounded-lg bg-green-500/20 p-2">
+              <Shield className="h-5 w-5 text-green-500" />
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-green-500">Privacy First</h4>
+              <p className="text-xs text-muted-foreground mt-1">
+                We do not store your prompts or request content. Only usage metadata (tokens used, model, provider, latency) is stored for dashboard display and management. 
+                <a href="https://github.com/RoutingRun/Route-Backend" target="_blank" rel="noopener noreferrer" className="text-green-500 hover:underline ml-1">
+                  View source code →
+                </a>
+              </p>
             </div>
           </div>
         </CardContent>

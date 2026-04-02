@@ -56,7 +56,6 @@ const plans = [
     credits: 5,
     models: [
       "route/minimax-m2.5",
-      "route/minimax-m2.5-highspeed",
       "route/kimi-k2.5",
       "route/minimax-m2.7",
       "route/nemotron-3-super-120b",
@@ -78,7 +77,6 @@ const plans = [
     credits: 30,
     models: [
       "route/minimax-m2.5",
-      "route/minimax-m2.5-highspeed",
       "route/kimi-k2.5",
       "route/minimax-m2.7",
       "route/nemotron-3-super-120b",
@@ -111,6 +109,7 @@ const plans = [
       "route/minimax-m2.5-highspeed",
       "route/kimi-k2.5",
       "route/minimax-m2.7",
+      "route/minimax-m2.7-highspeed",
       "route/grok-4-fast",
       "route/nemotron-3-super-120b",
       "route/trinity-large-preview",

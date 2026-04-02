@@ -26,7 +26,7 @@ interface Model {
   context_length: string;
   input_price: number;
   output_price: number;
-  tiers: ("free" | "pro" | "max")[];
+  tiers: ("free" | "lite" | "pro" | "max")[];
   gradient: "purple" | "amber" | "coral";
   logo?: string;
 }
@@ -58,7 +58,7 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 0.33,
     output_price: 1.32,
-    tiers: ["free", "pro"],
+    tiers: ["lite", "pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-minimax.png",
   },
@@ -70,7 +70,7 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 0.33,
     output_price: 1.32,
-    tiers: ["max"],
+    tiers: ["pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-minimax.png",
   },
@@ -82,7 +82,7 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 0.193,
     output_price: 1.238,
-    tiers: ["free"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-minimax.png",
   },
@@ -94,7 +94,7 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 0.193,
     output_price: 1.238,
-    tiers: ["free"],
+    tiers: ["pro"],
     gradient: "purple",
     logo: "/model-logos/route-minimax.png",
   },
@@ -106,7 +106,7 @@ const allModels: Model[] = [
     context_length: "256K",
     input_price: 0.462,
     output_price: 2.42,
-    tiers: ["free"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-kimi.png",
   },
@@ -130,7 +130,7 @@ const allModels: Model[] = [
     context_length: "2000K",
     input_price: 2.20,
     output_price: 6.60,
-    tiers: ["pro", "max"],
+    tiers: ["max"],
     gradient: "amber",
     logo: "/model-logos/route-xai.png",
   },
@@ -142,7 +142,7 @@ const allModels: Model[] = [
     context_length: "2000K",
     input_price: 2.20,
     output_price: 6.60,
-    tiers: ["pro", "max"],
+    tiers: ["max"],
     gradient: "coral",
     logo: "/model-logos/route-xai.png",
   },
@@ -154,7 +154,7 @@ const allModels: Model[] = [
     context_length: "262K",
     input_price: 0.11,
     output_price: 0.55,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-nvidia.svg",
   },
@@ -166,7 +166,7 @@ const allModels: Model[] = [
     context_length: "131K",
     input_price: 0.00,
     output_price: 0.00,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-arcee.png",
   },
@@ -178,7 +178,7 @@ const allModels: Model[] = [
     context_length: "128K",
     input_price: 0.143,
     output_price: 0.935,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-zai.svg",
   },
@@ -190,7 +190,7 @@ const allModels: Model[] = [
     context_length: "256K",
     input_price: 0.055,
     output_price: 0.22,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-nvidia.svg",
   },
@@ -202,7 +202,7 @@ const allModels: Model[] = [
     context_length: "262K",
     input_price: 0.242,
     output_price: 1.10,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-qwen.png",
   },
@@ -214,7 +214,7 @@ const allModels: Model[] = [
     context_length: "131K",
     input_price: 0.043,
     output_price: 0.209,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-openai.svg",
   },
@@ -226,19 +226,19 @@ const allModels: Model[] = [
     context_length: "131K",
     input_price: 1.10,
     output_price: 1.10,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-nous.png",
   },
   {
-    id: "route/llama-3.2-3b-instruct",
+id: "route/llama-3.2-3b-instruct",
     name: "Llama 3.2 3B Instruct",
-    description: "Compact instruct-tuned Llama model",
-    provider: "openrouter",
-    context_length: "131K",
+    description: "Meta's efficient 3B instruction-tuned model",
+    provider: "meta",
+    context_length: "200K",
     input_price: 0.056,
     output_price: 0.374,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-meta.png",
   },
@@ -250,7 +250,7 @@ const allModels: Model[] = [
     context_length: "131K",
     input_price: 0.088,
     output_price: 0.176,
-    tiers: ["free", "pro"],
+    tiers: ["free", "lite", "pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-google.png",
   },
@@ -262,7 +262,7 @@ const allModels: Model[] = [
     context_length: "1000K",
     input_price: 0.00,
     output_price: 0.00,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-qwen.png",
   },
@@ -274,7 +274,7 @@ const allModels: Model[] = [
     context_length: "262K",
     input_price: 0.099,
     output_price: 1.21,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-qwen.png",
   },
@@ -286,7 +286,7 @@ const allModels: Model[] = [
     context_length: "80K",
     input_price: 0.792,
     output_price: 2.53,
-    tiers: ["pro"],
+    tiers: ["lite", "pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
   },
@@ -298,7 +298,7 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-zai.svg",
   },
@@ -310,7 +310,7 @@ const allModels: Model[] = [
     context_length: "128K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-zai.svg",
   },
@@ -322,7 +322,7 @@ const allModels: Model[] = [
     context_length: "128K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
   },
@@ -334,7 +334,7 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-zai.svg",
   },
@@ -346,7 +346,7 @@ const allModels: Model[] = [
     context_length: "128K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-zai.svg",
   },
@@ -358,7 +358,7 @@ const allModels: Model[] = [
     context_length: "163K",
     input_price: 0.286,
     output_price: 0.418,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "coral",
     logo: "/model-logos/route-deepseek.png",
   },
@@ -370,7 +370,7 @@ const allModels: Model[] = [
     context_length: "262K",
     input_price: 0.132,
     output_price: 0.825,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-qwen.png",
   },
@@ -382,7 +382,7 @@ const allModels: Model[] = [
     context_length: "40K",
     input_price: 0.088,
     output_price: 0.264,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "amber",
     logo: "/model-logos/route-qwen.png",
   },
@@ -454,7 +454,7 @@ const allModels: Model[] = [
     context_length: "N/A",
     input_price: 0.00,
     output_price: 0.05,
-    tiers: ["pro"],
+    tiers: ["pro", "max"],
     gradient: "purple",
     logo: "/model-logos/route-minimax.png",
   },
@@ -462,12 +462,14 @@ const allModels: Model[] = [
 
 const tierColors = {
   free: "bg-brand-amber/20 text-brand-amber",
+  lite: "bg-brand-blue/20 text-brand-blue",
   pro: "bg-brand-coral/20 text-brand-coral",
   max: "bg-brand-purple/20 text-brand-purple",
 };
 
 const tierBgColors = {
   free: "bg-brand-amber",
+  lite: "bg-brand-blue",
   pro: "bg-brand-coral",
   max: "bg-brand-purple",
 };
@@ -482,6 +484,7 @@ const iconBgClasses = {
   purple: "bg-brand-purple/20 text-brand-purple",
   amber: "bg-brand-amber/20 text-brand-amber",
   coral: "bg-brand-coral/20 text-brand-coral",
+  blue: "bg-brand-blue/20 text-brand-blue",
 };
 
 const tierRequestsPerHour = {
@@ -618,14 +621,14 @@ function ModelSection({
 }: {
   title: string;
   description: string;
-  tier: "free" | "pro" | "max";
+  tier: "free" | "lite" | "pro" | "max";
   models: Model[];
   viewMode: "grid" | "list";
 }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-lg ${iconBgClasses[tier === "free" ? "amber" : tier === "pro" ? "coral" : "purple"]} flex items-center justify-center`}>
+        <div className={`w-8 h-8 rounded-lg ${iconBgClasses[tier === "free" ? "amber" : tier === "lite" ? "blue" : tier === "pro" ? "coral" : "purple"]} flex items-center justify-center`}>
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
@@ -687,11 +690,12 @@ function ModelSection({
 }
 
 export default function ModelsPage() {
-  const [activeTab, setActiveTab] = useState<"all" | "free" | "pro" | "max">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "free" | "lite" | "pro" | "max">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const freeModels = allModels.filter((m) => m.tiers.includes("free") && !m.tiers.includes("pro") && !m.tiers.includes("max"));
-  const proModels = allModels.filter((m) => m.tiers.includes("pro") && !m.tiers.includes("max"));
+  const freeModels = allModels.filter((m) => m.tiers.includes("free"));
+  const liteModels = allModels.filter((m) => m.tiers.includes("lite"));
+  const proModels = allModels.filter((m) => m.tiers.includes("pro"));
   const maxModels = allModels.filter((m) => m.tiers.includes("max"));
 
   return (
@@ -713,7 +717,7 @@ export default function ModelsPage() {
         </Tabs>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="border-amber-500/20 bg-amber-500/5">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-amber-500">Free Tier</CardTitle>
@@ -722,6 +726,16 @@ export default function ModelsPage() {
             <div className="text-2xl font-bold">{tierRequestsPerHour.free}</div>
             <p className="text-xs text-muted-foreground">requests/hour</p>
             <p className="text-xs text-muted-foreground mt-2">{freeModels.length} models</p>
+          </CardContent>
+        </Card>
+        <Card className="border-blue-500/20 bg-blue-500/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-blue-500">Lite Tier</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{tierRequestsPerHour.lite}</div>
+            <p className="text-xs text-muted-foreground">requests/hour</p>
+            <p className="text-xs text-muted-foreground mt-2">{liteModels.length} models</p>
           </CardContent>
         </Card>
         <Card className="border-coral-500/20 bg-coral-500/5">
@@ -757,9 +771,10 @@ export default function ModelsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-        <TabsList className="grid grid-cols-4 w-fit">
+        <TabsList className="grid grid-cols-5 w-fit">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="free">Free</TabsTrigger>
+          <TabsTrigger value="lite">Lite</TabsTrigger>
           <TabsTrigger value="pro">Pro</TabsTrigger>
           <TabsTrigger value="max">Max</TabsTrigger>
         </TabsList>
@@ -772,6 +787,16 @@ export default function ModelsPage() {
             description="Available to all users with rate limits"
             tier="free"
             models={freeModels}
+            viewMode={viewMode}
+          />
+        )}
+
+        {(activeTab === "all" || activeTab === "lite") && (
+          <ModelSection
+            title="Lite Models"
+            description="Additional models for Lite plan users"
+            tier="lite"
+            models={liteModels}
             viewMode={viewMode}
           />
         )}
