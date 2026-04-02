@@ -9,4 +9,4 @@ node_modules/
 
 # TypeScript build info
 *.tsbuildinfo
-next-env.d.ts
+next-env.d.ts.npmrc
