@@ -21,21 +21,17 @@ export default function LoginPage() {
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (isAuthenticated && !authLoading) {
       router.push("/dashboard");
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
 
-  if (authLoading) {
+  if (authLoading || isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <SpinnerIcon className="size-8 animate-spin text-muted-foreground" />
       </div>
     );
-  }
-
-  if (isAuthenticated) {
-    return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +50,8 @@ export default function LoginPage() {
 
   const handleGithubOAuth = async () => {
     setIsOAuthLoading("github");
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/oauth/github`;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+    window.location.href = `${apiUrl}/auth/oauth/github`;
   };
 
   return (
