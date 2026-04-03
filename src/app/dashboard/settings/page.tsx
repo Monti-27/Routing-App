@@ -13,15 +13,8 @@ import { Loader2, Coins } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
 
-const CREDITS_PACKAGES = [
-  { amount: 5, price: 5.00 },
-  { amount: 10, price: 9.50 },
-  { amount: 25, price: 22.00 },
-  { amount: 50, price: 40.00 },
-];
-
 export default function SettingsPage() {
-  const { user, isLoading: authLoading, isAuthenticated, refreshUser } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated, refreshUser, logout } = useAuth();
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -295,7 +288,7 @@ export default function SettingsPage() {
                 Add an extra layer of security to your account.
               </p>
             </div>
-            <Button variant="outline">Enable</Button>
+            <Button variant="outline" disabled>Coming Soon</Button>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
@@ -305,7 +298,7 @@ export default function SettingsPage() {
                 Change your account password.
               </p>
             </div>
-            <Button variant="outline">Change Password</Button>
+            <Button variant="outline" disabled>Coming Soon</Button>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
@@ -315,7 +308,7 @@ export default function SettingsPage() {
                 Manage your active sessions across devices.
               </p>
             </div>
-            <Button variant="outline">View Sessions</Button>
+            <Button variant="outline" onClick={() => { logout(); router.push("/auth/login"); }}>Logout All Devices</Button>
           </div>
         </CardContent>
       </Card>
