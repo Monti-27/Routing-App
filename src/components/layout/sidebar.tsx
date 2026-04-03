@@ -67,9 +67,8 @@ export function Sidebar() {
     : user?.email?.[0]?.toUpperCase() ?? "U";
 
   return (
-    <div className="flex h-full w-[280px] flex-col border-r bg-sidebar">
-      {/* Logo */}
-      <div className="flex h-14 shrink-0 items-center border-b px-4">
+    <div className="fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col border-r bg-sidebar">
+      <div className="flex h-14 items-center border-b px-6">
         <Link href="/dashboard" className="flex items-center gap-2">
           <img
             src="/logo_trans_black.png"
@@ -79,8 +78,7 @@ export function Sidebar() {
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+      <nav className="flex flex-1 flex-col gap-1 p-4">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -106,13 +104,12 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User profile */}
-      <div className="border-t p-3">
+      <div className="border-t p-4">
         <Link
           href="/dashboard/settings"
-          className="flex items-center gap-3 rounded-lg bg-muted/50 p-3 transition-all hover:bg-sidebar-accent/50"
+          className="flex items-center gap-3 rounded-lg bg-muted/50 p-4 hover:bg-sidebar-accent/50 transition-all"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground text-sm font-medium">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground text-sm font-medium">
             {initials}
           </div>
           <div className="flex-1 min-w-0">
@@ -123,7 +120,7 @@ export function Sidebar() {
               {user?.email || "user@example.com"}
             </p>
           </div>
-          <User className="h-4 w-4 text-muted-foreground shrink-0" />
+          <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         </Link>
       </div>
     </div>
