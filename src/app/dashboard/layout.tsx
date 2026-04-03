@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -10,12 +10,24 @@ import { Header } from "@/components/layout/header";
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/auth/login");
     }
   }, [isLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
 
   if (isLoading) {
     return (
@@ -34,11 +46,59 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      <div className="pl-[280px]">
-        <Header user={user} />
+      {/* Mobile sidebar overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Desktop sidebar - always visible */}
+      <div className="hidden lg:block fixed inset-y-0 left-0 w-[280px]">
+        <Sidebar />
+      </div>
+
+      {/* Mobile sidebar - slides in from left */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-200 ease-in-out lg:hidden
+          ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <Sidebar />
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-[280px]">
+        {/* Sticky header */}
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 -ml-2 rounded-md hover:bg-accent lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          {/* Logo - hidden on mobile since we have hamburger */}
+          <div className="hidden lg:flex items-center gap-2">
+            <img
+              src="/logo_trans_black.png"
+              alt="Routing.run"
+              className="h-6 w-auto object-contain"
+            />
+            <span className="font-semibold">Dashboard</span>
+          </div>
+
+          <div className="flex-1" />
+
+          <Header user={user} />
+        </header>
+
+        {/* Page content */}
         <main
-          className="p-6 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin"
+          className="p-4 lg:p-6 min-h-[calc(100vh-56px)] lg:min-h-[calc(100vh-64px)] overflow-y-auto"
           tabIndex={0}
           role="main"
         >
