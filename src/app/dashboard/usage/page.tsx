@@ -241,11 +241,11 @@ export default function UsagePage() {
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
+            <Card className="flex flex-col">
+              <CardHeader className="shrink-0">
                 <CardTitle>Usage by Model</CardTitle>
               </CardHeader>
-              <CardContent className="max-h-[400px] overflow-y-auto">
+              <CardContent className="flex-1 min-h-0 overflow-y-auto">
                 <div className="space-y-3">
                   {modelUsage.length > 0 ? modelUsage.map((model) => (
                     <div key={model.model} className="space-y-1.5">
@@ -274,11 +274,11 @@ export default function UsagePage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
+            <Card className="flex flex-col">
+              <CardHeader className="shrink-0">
                 <CardTitle>Provider Performance</CardTitle>
               </CardHeader>
-              <CardContent className="max-h-[400px] overflow-y-auto">
+              <CardContent className="flex-1 min-h-0 overflow-y-auto">
                 <div className="space-y-3">
                   {modelUsage.slice(0, 5).map((model, i) => (
                     <div
