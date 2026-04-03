@@ -43,22 +43,21 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - fixed on mobile, static on desktop */}
       <div
         className={`
-          fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col border-r bg-sidebar
-          transform transition-transform duration-200 ease-in-out
-          lg:translate-x-0 lg:static lg:z-auto
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:static"}
+          fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-200 ease-in-out
+          lg:static lg:z-auto lg:transform-none
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
         <Sidebar />
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col lg:pl-[280px]">
+      <div className="flex flex-col lg:pl-[280px]">
         {/* Header */}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
           {/* Mobile hamburger */}
           <button
             onClick={() => setSidebarOpen(true)}
@@ -72,7 +71,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
             <img
               src="/logo_trans_black.png"
               alt="Routing.run"
-              className="h-7 w-auto object-contain"
+              className="h-6 w-auto object-contain"
             />
             <span className="font-semibold">Dashboard</span>
           </div>
@@ -85,7 +84,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           {children}
         </main>
       </div>
