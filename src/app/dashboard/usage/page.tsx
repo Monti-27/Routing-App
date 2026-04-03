@@ -245,22 +245,22 @@ export default function UsagePage() {
               <CardHeader>
                 <CardTitle>Usage by Model</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="max-h-[400px] overflow-y-auto">
+                <div className="space-y-3">
                   {modelUsage.length > 0 ? modelUsage.map((model) => (
-                    <div key={model.model} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium">{model.model}</span>
-                        <div className="flex items-center gap-4">
-                          <span className="text-muted-foreground">
-                            {(model.tokens / 1000).toFixed(1)}K tokens
+                    <div key={model.model} className="space-y-1.5">
+                      <div className="flex items-center justify-between text-sm gap-2">
+                        <span className="font-medium truncate max-w-[200px]" title={model.model}>{model.model}</span>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-muted-foreground text-xs">
+                            {(model.tokens / 1000).toFixed(1)}K
                           </span>
-                          <span className="font-medium">${(model.cost * costMultiplier).toFixed(2)}</span>
+                          <span className="font-medium text-xs">${(model.cost * costMultiplier).toFixed(2)}</span>
                         </div>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-secondary">
+                      <div className="h-1.5 w-full rounded-full bg-secondary">
                         <div
-                          className="h-2 rounded-full bg-brand-coral transition-all"
+                          className="h-1.5 rounded-full bg-brand-coral transition-all"
                           style={{
                             width: `${Math.max((model.requests / (modelUsage[0]?.requests || 1)) * 100, 2)}%`,
                           }}
