@@ -1,30 +1,26 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-function AuthCallbackContent() {
+function AuthCallbackContent({ provider }: { provider: string }) {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!pathname) return;
-    const provider = pathname.split("/").pop();
-    if (!provider || !searchParams) return;
-    const code = searchParams.get("code");
-    const errorParam = searchParams.get("error");
+    const code = searchParams?.get("code");
+    const errorParam = searchParams?.get("error");
 
     if (errorParam) {
       setError(errorParam);
       return;
     }
 
-    if (!code || !provider) {
-      setError("Missing callback parameters");
+    if (!code) {
+      setError("Missing code parameter");
       return;
     }
 
@@ -53,7 +49,7 @@ function AuthCallbackContent() {
     }
 
     handleCallback();
-  }, [pathname, searchParams, router]);
+  }, [provider, searchParams, router]);
 
   if (error) {
     return (
@@ -87,7 +83,26 @@ function AuthCallbackContent() {
   );
 }
 
-export default function AuthCallbackPage() {
+export default function AuthCallbackPage({ params }: { params: Promise<{ provider: string }> }) {
+  const [provider, setProvider] = useState<string>("");
+
+  useEffect(() => {
+    params.then(p => setProvider(p.provider));
+  }, [params]);
+
+  if (!provider) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6 text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-brand-amber" />
+            <h2 className="text-xl font-bold mb-2">Loading...</h2>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -99,7 +114,7 @@ export default function AuthCallbackPage() {
         </Card>
       </div>
     }>
-      <AuthCallbackContent />
+      <AuthCallbackContent provider={provider} />
     </Suspense>
   );
 }
