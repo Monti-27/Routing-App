@@ -33,7 +33,8 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         );
 
         if (!response.ok) {
-          throw new Error("OAuth callback failed");
+          const errorData = await response.text();
+          throw new Error(`OAuth callback failed: ${response.status} - ${errorData}`);
         }
 
         const data = await response.json();
@@ -45,7 +46,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
         router.push("/dashboard");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Authentication failed");
+        setError(err instanceof Error ? err.message : `Authentication failed: ${String(err)}`);
       }
     }
 
