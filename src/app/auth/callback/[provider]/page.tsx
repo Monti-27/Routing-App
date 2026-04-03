@@ -12,6 +12,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
   useEffect(() => {
     const code = searchParams?.get("code");
+    const state = searchParams?.get("state");
     const errorParam = searchParams?.get("error");
 
     if (errorParam) {
@@ -19,8 +20,8 @@ function AuthCallbackContent({ provider }: { provider: string }) {
       return;
     }
 
-    if (!code) {
-      setError("Missing code parameter");
+    if (!code || !state) {
+      setError("Missing code or state parameter");
       return;
     }
 
@@ -28,7 +29,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const response = await fetch(
-          `${apiUrl}/auth/callback/${provider}?code=${code}`
+          `${apiUrl}/auth/callback/${provider}?code=${code}&state=${state}`
         );
 
         if (!response.ok) {
