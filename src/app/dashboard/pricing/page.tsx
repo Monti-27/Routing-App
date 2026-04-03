@@ -73,7 +73,6 @@ const staticModelPricing: ModelPricing[] = [
   { model: "route/hermes-3-llama-3.1-405b", display_name: "Hermes-3-Llama-3.1-405B", tier: "free", input_per_million: 1.10, output_per_million: 1.10 },
   { model: "route/llama-3.2-3b-instruct", display_name: "Llama-3.2-3B-Instruct", tier: "free", input_per_million: 0.056, output_per_million: 0.374 },
   { model: "route/gemma-3-27b-it", display_name: "Gemma-3-27B-IT", tier: "free", input_per_million: 0.088, output_per_million: 0.176 },
-  { model: "route/mimo-v2-flash", display_name: "Mimo-V2-Flash", tier: "free", input_per_million: 0.099, output_per_million: 0.319 },
 
   // Lite tier models (includes free models)
   { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "lite", input_per_million: 0.193, output_per_million: 1.238 },
@@ -87,7 +86,6 @@ const staticModelPricing: ModelPricing[] = [
   { model: "route/gemma-3-27b-it", display_name: "Gemma-3-27B-IT", tier: "lite", input_per_million: 0.088, output_per_million: 0.176 },
   { model: "route/minimax-m2.7", display_name: "MiniMax-M2.7", tier: "lite", input_per_million: 0.33, output_per_million: 1.32 },
   { model: "route/glm-5", display_name: "GLM-5", tier: "lite", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/mimo-v2-flash", display_name: "Mimo-V2-Flash", tier: "lite", input_per_million: 0.099, output_per_million: 0.319 },
 
   // Pro tier models (includes lite and free models)
   { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "pro", input_per_million: 0.193, output_per_million: 1.238 },
@@ -117,9 +115,6 @@ const staticModelPricing: ModelPricing[] = [
   { model: "route/qwen3-next-80b", display_name: "Qwen3-Next-80B", tier: "pro", input_per_million: 0.099, output_per_million: 1.21 },
   { model: "route/grok-4-fast", display_name: "Grok-4-Fast", tier: "pro", input_per_million: 0.22, output_per_million: 0.55 },
   { model: "route/minimax-image-1", display_name: "MiniMax-Image-1", tier: "pro", input_per_million: 0.00, output_per_million: 0.05 },
-  { model: "route/mimo-v2-flash", display_name: "Mimo-V2-Flash", tier: "pro", input_per_million: 0.099, output_per_million: 0.319 },
-  { model: "route/mimo-v2-pro", display_name: "Mimo-V2-Pro", tier: "pro", input_per_million: 1.10, output_per_million: 3.30 },
-  { model: "route/mimo-v2-omni", display_name: "Mimo-V2-Omni", tier: "pro", input_per_million: 0.44, output_per_million: 2.20 },
 
   // Max tier models (all models)
   { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "max", input_per_million: 0.193, output_per_million: 1.238 },
