@@ -13,6 +13,13 @@ import { Loader2, Coins } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
 
+const CREDITS_PACKAGES = [
+  { amount: 5, price: 5.00 },
+  { amount: 10, price: 9.50 },
+  { amount: 25, price: 22.00 },
+  { amount: 50, price: 40.00 },
+];
+
 export default function SettingsPage() {
   const { user, isLoading: authLoading, isAuthenticated, refreshUser, logout } = useAuth();
   const router = useRouter();
