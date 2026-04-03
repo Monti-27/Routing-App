@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 function AuthCallbackContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!searchParams) return;
-    const provider = searchParams.get("provider");
+    const provider = pathname.split("/").pop();
     const code = searchParams.get("code");
     const errorParam = searchParams.get("error");
 
@@ -28,8 +28,9 @@ function AuthCallbackContent() {
 
     async function handleCallback() {
       try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/callback/${provider}?code=${code}`
+          `${apiUrl}/auth/callback/${provider}?code=${code}`
         );
 
         if (!response.ok) {
@@ -50,7 +51,7 @@ function AuthCallbackContent() {
     }
 
     handleCallback();
-  }, [searchParams, router]);
+  }, [pathname, searchParams, router]);
 
   if (error) {
     return (
