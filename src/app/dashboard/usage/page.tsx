@@ -123,8 +123,8 @@ export default function UsagePage() {
   const maxRequests = Math.max(...chartData.map((d) => d.requests), 1);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Usage Analytics</h2>
           <p className="text-muted-foreground">
@@ -278,20 +278,20 @@ export default function UsagePage() {
               <CardHeader>
                 <CardTitle>Provider Performance</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="max-h-[400px] overflow-y-auto">
+                <div className="space-y-3">
                   {modelUsage.slice(0, 5).map((model, i) => (
                     <div
                       key={model.model}
-                      className="flex items-center justify-between rounded-lg border p-3"
+                      className="flex items-center justify-between rounded-lg border p-2.5 gap-2"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
                         <div
-                          className={`h-2 w-2 rounded-full ${
+                          className={`h-2 w-2 rounded-full shrink-0 ${
                             i === 0 ? "bg-green-500" : i === 1 ? "bg-green-500" : "bg-yellow-500"
                           }`}
                         />
-                        <span className="font-medium">{model.model}</span>
+                        <span className="font-medium text-sm truncate max-w-[150px]" title={model.model}>{model.model}</span>
                       </div>
                       <div className="flex items-center gap-6">
                         <div className="text-right">
