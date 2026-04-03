@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,11 +12,15 @@ import { GithubLogoIcon, SpinnerIcon } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 
+type Step = "credentials" | "otp";
+
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const [step, setStep] = useState<Step>("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
 
@@ -34,15 +38,41 @@ export default function LoginPage() {
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      router.push("/dashboard");
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+      const response = await fetch(`${apiUrl}/auth/login/init`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
+
+      toast.success("OTP sent to your email");
+      setStep("otp");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await login(email, otp);
+      router.push("/dashboard");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Verification failed");
     } finally {
       setIsLoading(false);
     }
@@ -60,29 +90,27 @@ export default function LoginPage() {
         <div className="mb-8 space-y-1 px-6 text-left">
           <h1 className="font-medium text-2xl text-foreground">Welcome back</h1>
           <p className="text-muted-foreground text-sm">
-            Sign in to your account to continue
+            {step === "credentials" ? "Sign in to your account" : "Enter the code from your email"}
           </p>
         </div>
 
         <div className="relative px-6">
           <div className="relative z-10">
             <div className="space-y-6">
-              <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2">
-                <Button
-                  className="relative w-full"
-                  disabled={isOAuthLoading !== null}
-                  onClick={handleGithubOAuth}
-                  size="lg"
-                  type="button"
-                  variant="secondary"
-                >
-                  <GithubLogoIcon className="size-4" />
-                  GitHub
-                  {isOAuthLoading === "github" && (
-                    <SpinnerIcon className="ml-2 size-4 animate-spin" />
-                  )}
-                </Button>
-              </div>
+              <Button
+                className="relative w-full"
+                disabled={isOAuthLoading !== null}
+                onClick={handleGithubOAuth}
+                size="lg"
+                type="button"
+                variant="secondary"
+              >
+                <GithubLogoIcon className="size-4" />
+                GitHub
+                {isOAuthLoading === "github" && (
+                  <SpinnerIcon className="ml-2 size-4 animate-spin" />
+                )}
+              </Button>
 
               <div className="relative flex w-full items-center justify-center gap-3">
                 <Separator className="flex-1 opacity-70" />
@@ -92,52 +120,94 @@ export default function LoginPage() {
                 <Separator className="flex-1 opacity-70" />
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-3">
-                  <Label className="font-medium text-foreground" htmlFor="email">
-                    Email<span className="text-primary">*</span>
-                  </Label>
-                  <Input
-                    autoComplete="email"
-                    id="email"
-                    name="email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    type="email"
-                    value={email}
-                  />
-                </div>
-                <div className="space-y-3">
-                  <Label className="font-medium text-foreground" htmlFor="password">
-                    Password<span className="text-primary">*</span>
-                  </Label>
-                  <Input
-                    autoComplete="current-password"
-                    id="password"
-                    name="password"
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                    type="password"
-                    value={password}
-                  />
-                </div>
-                <Button
-                  className="w-full"
-                  disabled={isLoading}
-                  type="submit"
-                >
-                  {isLoading ? (
-                    <>
-                      <SpinnerIcon className="mr-2 size-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign in"
-                  )}
-                </Button>
-              </form>
+              {step === "credentials" ? (
+                <form onSubmit={handleCredentialsSubmit} className="space-y-5">
+                  <div className="space-y-3">
+                    <Label className="font-medium text-foreground" htmlFor="email">
+                      Email<span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      autoComplete="email"
+                      id="email"
+                      name="email"
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      type="email"
+                      value={email}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="font-medium text-foreground" htmlFor="password">
+                      Password<span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      autoComplete="current-password"
+                      id="password"
+                      name="password"
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                      type="password"
+                      value={password}
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={isLoading}
+                    type="submit"
+                  >
+                    {isLoading ? (
+                      <>
+                        <SpinnerIcon className="mr-2 size-4 animate-spin" />
+                        Sending code...
+                      </>
+                    ) : (
+                      "Continue"
+                    )}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleOtpSubmit} className="space-y-5">
+                  <div className="space-y-3">
+                    <Label className="font-medium text-foreground" htmlFor="otp">
+                      Verification Code<span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      id="otp"
+                      name="otp"
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter 6-digit code"
+                      required
+                      type="text"
+                      maxLength={6}
+                      value={otp}
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={isLoading}
+                    type="submit"
+                  >
+                    {isLoading ? (
+                      <>
+                        <SpinnerIcon className="mr-2 size-4 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      "Verify & Sign In"
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setStep("credentials")}
+                  >
+                    Use different email
+                  </Button>
+                </form>
+              )}
             </div>
           </div>
         </div>

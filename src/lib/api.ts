@@ -194,10 +194,10 @@ async function fetchApi<T>(
 
 export const api = {
   auth: {
-    login: async (email: string, password: string): Promise<{ user: User }> => {
-      const loginResponse = await fetchApi<TokenResponse & { user: User }>("/auth/login", {
+    login: async (email: string, otp: string): Promise<{ user: User }> => {
+      const loginResponse = await fetchApi<TokenResponse & { user: User }>("/auth/login/verify", {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, otp }),
       });
       if (typeof window !== "undefined") {
         localStorage.setItem("token", loginResponse.access_token);
@@ -206,16 +206,30 @@ export const api = {
       return { user: loginResponse.user };
     },
 
-    register: async (email: string, password: string, name?: string): Promise<{ user: User }> => {
-      const loginResponse = await fetchApi<TokenResponse & { user: User }>("/auth/signup", {
+    register: async (email: string, otp: string, password: string, name?: string): Promise<{ user: User }> => {
+      const loginResponse = await fetchApi<TokenResponse & { user: User }>("/auth/signup/verify", {
         method: "POST",
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, otp, password, name }),
       });
       if (typeof window !== "undefined") {
         localStorage.setItem("token", loginResponse.access_token);
         localStorage.setItem("refresh_token", loginResponse.refresh_token);
       }
       return { user: loginResponse.user };
+    },
+
+    sendSignupOtp: async (email: string): Promise<void> => {
+      await fetchApi<{ message: string }>("/auth/signup/init", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      });
+    },
+
+    sendLoginOtp: async (email: string, password: string): Promise<void> => {
+      await fetchApi<{ message: string }>("/auth/login/init", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
     },
 
     logout: () => {
