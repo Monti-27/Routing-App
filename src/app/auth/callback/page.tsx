@@ -14,7 +14,7 @@ function AuthCallbackContent() {
   useEffect(() => {
     if (!pathname) return;
     const provider = pathname.split("/").pop();
-    if (!provider) return;
+    if (!provider || !searchParams) return;
     const code = searchParams.get("code");
     const errorParam = searchParams.get("error");
 
