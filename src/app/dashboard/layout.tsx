@@ -32,38 +32,51 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
       const mainEl = mainContentRef.current;
       if (!mainEl) return;
 
-      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "PageDown" || e.key === "PageUp" || e.key === "Home" || e.key === "End") {
-        const { scrollTop, scrollHeight, clientHeight } = mainEl;
-        const isAtTop = scrollTop === 0;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      const isScrollable = mainEl.scrollHeight > mainEl.clientHeight;
+      if (!isScrollable) return;
 
-        if (e.key === "ArrowDown" && !isAtBottom) {
-          e.preventDefault();
-          mainEl.scrollTop += 50;
-        } else if (e.key === "ArrowUp" && !isAtTop) {
-          e.preventDefault();
-          mainEl.scrollTop -= 50;
-        } else if (e.key === "PageDown" && !isAtBottom) {
-          e.preventDefault();
-          mainEl.scrollTop += clientHeight;
-        } else if (e.key === "PageUp" && !isAtTop) {
-          e.preventDefault();
-          mainEl.scrollTop -= clientHeight;
-        } else if (e.key === "Home") {
-          e.preventDefault();
-          mainEl.scrollTop = 0;
-        } else if (e.key === "End") {
-          e.preventDefault();
-          mainEl.scrollTop = scrollHeight;
-        }
+      const { scrollTop, scrollHeight, clientHeight } = mainEl;
+      const isAtTop = scrollTop <= 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+      let handled = false;
+
+      if (e.key === "ArrowDown" && !isAtBottom) {
+        e.preventDefault();
+        mainEl.scrollTo({ top: scrollTop + 50, behavior: "smooth" });
+        handled = true;
+      } else if (e.key === "ArrowUp" && !isAtTop) {
+        e.preventDefault();
+        mainEl.scrollTo({ top: scrollTop - 50, behavior: "smooth" });
+        handled = true;
+      } else if (e.key === "PageDown" && !isAtBottom) {
+        e.preventDefault();
+        mainEl.scrollTo({ top: scrollTop + clientHeight, behavior: "smooth" });
+        handled = true;
+      } else if (e.key === "PageUp" && !isAtTop) {
+        e.preventDefault();
+        mainEl.scrollTo({ top: scrollTop - clientHeight, behavior: "smooth" });
+        handled = true;
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        mainEl.scrollTo({ top: 0, behavior: "smooth" });
+        handled = true;
+      } else if (e.key === "End") {
+        e.preventDefault();
+        mainEl.scrollTo({ top: scrollHeight, behavior: "smooth" });
+        handled = true;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, []);
 
   if (isLoading) {

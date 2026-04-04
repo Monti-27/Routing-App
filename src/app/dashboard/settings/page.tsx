@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,6 @@ export default function SettingsPage() {
   const [isPayg, setIsPayg] = useState(false);
   const [isAddingCredits, setIsAddingCredits] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -90,39 +89,6 @@ export default function SettingsPage() {
       router.push("/auth/login");
     }
   }, [authLoading, isAuthenticated, router]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (scrollRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-        const isAtTop = scrollTop === 0;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-
-        if (e.key === "ArrowDown" && !isAtBottom) {
-          e.preventDefault();
-          scrollRef.current.scrollTop += 50;
-        } else if (e.key === "ArrowUp" && !isAtTop) {
-          e.preventDefault();
-          scrollRef.current.scrollTop -= 50;
-        } else if (e.key === "PageDown" && !isAtBottom) {
-          e.preventDefault();
-          scrollRef.current.scrollTop += clientHeight;
-        } else if (e.key === "PageUp" && !isAtTop) {
-          e.preventDefault();
-          scrollRef.current.scrollTop -= clientHeight;
-        } else if (e.key === "Home") {
-          e.preventDefault();
-          scrollRef.current.scrollTop = 0;
-        } else if (e.key === "End") {
-          e.preventDefault();
-          scrollRef.current.scrollTop = scrollHeight;
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -222,7 +188,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-120px)]" ref={scrollRef}>
+    <>
     <div className="space-y-6 pr-4">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
@@ -597,6 +563,6 @@ export default function SettingsPage() {
         </Card>
       </div>
     )}
-    </ScrollArea>
+    </>
   );
 }
