@@ -42,11 +42,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${ltSuperior.variable} ${ltSuperiorMono.variable} h-full overflow-hidden`}
+      className={`${ltSuperior.variable} ${ltSuperiorMono.variable} h-full`}
       lang="en"
       suppressHydrationWarning
     >
-      <body className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground antialiased">
+      <body className="flex h-full min-h-0 flex-col bg-background text-foreground antialiased">
         <Script
           src="https://cdn.databuddy.cc/databuddy.js"
           data-client-id="6eac3218-8169-4ae2-bb34-e88a303fac76"
@@ -61,7 +61,7 @@ export default function RootLayout({
         />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               {children}
             </main>
           </AuthProvider>
