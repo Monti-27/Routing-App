@@ -192,6 +192,8 @@ async function fetchApi<T>(
   return response.json();
 }
 
+export { fetchApi };
+
 export const api = {
   auth: {
     login: async (email: string, otp: string): Promise<{ user: User }> => {
