@@ -31,6 +31,11 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   }, [mobileMenuOpen]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const mainEl = mainContentRef.current;
+    if (!mainEl) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
@@ -40,9 +45,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
       ) {
         return;
       }
-
-      const mainEl = mainContentRef.current;
-      if (!mainEl) return;
 
       const { scrollTop, scrollHeight, clientHeight } = mainEl;
       const isAtTop = scrollTop <= 0;
@@ -71,7 +73,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, []);
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
