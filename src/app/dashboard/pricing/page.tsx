@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 import {
   Rocket,
   Zap,
@@ -163,6 +164,7 @@ const plans = [
     badge: "bg-zinc-600",
     requestsPerHour: 5,
     credits: 5,
+    checkoutUrl: "/auth/register",
     features: [
       "5 requests per hour",
       "Basic model access",
@@ -179,6 +181,7 @@ const plans = [
     badge: "bg-blue-600",
     requestsPerHour: 40,
     credits: 30,
+    checkoutUrl: "https://whop.com/tropic-6587/routing-lite/",
     popular: false,
     features: [
       "40 requests per hour",
@@ -196,6 +199,7 @@ const plans = [
     badge: "bg-indigo-600",
     requestsPerHour: 100,
     credits: 60,
+    checkoutUrl: "https://whop.com/tropic-6587/routing-pro/",
     popular: true,
     features: [
       "100 requests per hour",
@@ -213,6 +217,7 @@ const plans = [
     badge: "bg-violet-600",
     requestsPerHour: 250,
     credits: 150,
+    checkoutUrl: "https://whop.com/tropic-6587/routing-max/",
     features: [
       "250 requests per hour",
       "All models access",
@@ -231,6 +236,15 @@ const tierGroups = [
 
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+
+  const getCheckoutUrl = (baseUrl: string) => {
+    if (!baseUrl.startsWith("http")) return baseUrl;
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return isAuthenticated && user?.email 
+      ? `${baseUrl}${separator}email=${encodeURIComponent(user.email)}`
+      : baseUrl;
+  };
 
   return (
     <div className="w-full px-4 py-12 md:py-20">
@@ -317,11 +331,12 @@ export default function PricingPage() {
                   </ul>
                 </div>
 
-                <Button 
+                <Button
                   className={cn("w-full", plan.popular ? "" : "variantoutline")}
                   variant={plan.popular ? "default" : "outline"}
+                  onClick={() => window.open(getCheckoutUrl(plan.checkoutUrl), "_blank")}
                 >
-                  Get Started
+                  {plan.id === "free" ? "Get Started" : "Buy Now"}
                 </Button>
               </CardContent>
             </Card>
