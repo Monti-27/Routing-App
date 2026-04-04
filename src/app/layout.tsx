@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import Script from "next/script";
 
 const ltSuperior = localFont({
   src: [
@@ -46,6 +47,18 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground antialiased">
+        <Script
+          src="https://cdn.databuddy.cc/databuddy.js"
+          data-client-id="6eac3218-8169-4ae2-bb34-e88a303fac76"
+          data-track-hash-changes="true"
+          data-track-attributes="true"
+          data-track-outgoing-links="true"
+          data-track-interactions="true"
+          data-track-web-vitals="true"
+          data-track-errors="true"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
