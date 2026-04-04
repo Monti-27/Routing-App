@@ -34,9 +34,16 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated) return;
 
     const mainEl = mainContentRef.current;
-    if (!mainEl) return;
+    if (!mainEl) {
+      console.log("mainEl not found");
+      return;
+    }
+
+    console.log("keyboard handler attached", mainEl, mainEl.scrollHeight, mainEl.clientHeight);
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      console.log("key pressed:", e.key, "target:", e.target);
+
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
@@ -47,15 +54,18 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
       }
 
       const { scrollTop, scrollHeight, clientHeight } = mainEl;
+      console.log("scroll state:", { scrollTop, scrollHeight, clientHeight });
       const isAtTop = scrollTop <= 0;
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
 
       if (e.key === "ArrowDown" && !isAtBottom) {
         e.preventDefault();
         mainEl.scrollTop += 50;
+        console.log("scrolling down");
       } else if (e.key === "ArrowUp" && !isAtTop) {
         e.preventDefault();
         mainEl.scrollTop -= 50;
+        console.log("scrolling up");
       } else if (e.key === "PageDown" && !isAtBottom) {
         e.preventDefault();
         mainEl.scrollTop += clientHeight;
