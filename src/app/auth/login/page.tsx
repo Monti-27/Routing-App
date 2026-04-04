@@ -23,12 +23,39 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       router.push("/dashboard");
     }
   }, [isAuthenticated, authLoading, router]);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    setIsLoading(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+      await fetch(`${apiUrl}/auth/login/init`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      toast.success("OTP resent to your email");
+      setResendCooldown(60);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (authLoading || isAuthenticated) {
     return (
@@ -57,6 +84,7 @@ export default function LoginPage() {
 
       toast.success("OTP sent to your email");
       setStep("otp");
+      setResendCooldown(60);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -198,14 +226,25 @@ export default function LoginPage() {
                       "Verify & Sign In"
                     )}
                   </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="w-full"
-                    onClick={() => setStep("credentials")}
-                  >
-                    Use different email
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={handleResendOtp}
+                      disabled={isLoading || resendCooldown > 0}
+                    >
+                      {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="flex-1"
+                      onClick={() => setStep("credentials")}
+                    >
+                      Use different email
+                    </Button>
+                  </div>
                 </form>
               )}
             </div>
