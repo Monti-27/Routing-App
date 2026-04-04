@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Menu, X } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -11,7 +11,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const mainContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -30,47 +29,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
     };
   }, [mobileMenuOpen]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement ||
-        (e.target as HTMLElement)?.isContentEditable
-      ) {
-        return;
-      }
-
-      const html = document.documentElement;
-      const { scrollTop, scrollHeight, clientHeight } = html;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        window.scrollBy(0, 50);
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        window.scrollBy(0, -50);
-      } else if (e.key === "PageDown") {
-        e.preventDefault();
-        window.scrollBy(0, clientHeight);
-      } else if (e.key === "PageUp") {
-        e.preventDefault();
-        window.scrollBy(0, -clientHeight);
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        window.scrollTo(0, 0);
-      } else if (e.key === "End") {
-        e.preventDefault();
-        window.scrollTo(0, scrollHeight);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown, true);
-    return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [isAuthenticated]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -88,7 +46,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile sidebar overlay */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -96,12 +53,10 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Desktop sidebar - always visible */}
       <div className="hidden lg:block fixed inset-y-0 left-0 w-[280px]">
         <Sidebar />
       </div>
 
-      {/* Mobile sidebar - slides in from left */}
       <div
         className={`
           fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-200 ease-in-out lg:hidden
@@ -111,11 +66,8 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         <Sidebar />
       </div>
 
-      {/* Main content */}
       <div className="lg:pl-[280px]">
-        {/* Sticky header */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="p-2 -ml-2 rounded-md hover:bg-accent lg:hidden"
@@ -123,7 +75,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
             <Menu className="h-5 w-5" />
           </button>
 
-          {/* Logo - hidden on mobile since we have hamburger */}
           <div className="hidden lg:flex items-center gap-2">
             <img
               src="/logo_trans_black.png"
@@ -138,13 +89,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
           <Header user={user} />
         </header>
 
-        {/* Page content */}
-        <main
-          ref={mainContentRef}
-          className="p-4 lg:p-6 min-h-[calc(100vh-56px)] lg:min-h-[calc(100vh-64px)] overflow-y-auto"
-          tabIndex={0}
-          role="main"
-        >
+        <main className="p-4 lg:p-6 min-h-[calc(100vh-56px)] lg:min-h-[calc(100vh-64px)] overflow-y-auto">
           {children}
         </main>
       </div>
