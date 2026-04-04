@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -11,6 +11,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -28,6 +29,42 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
       document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const mainEl = mainContentRef.current;
+      if (!mainEl) return;
+
+      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "PageDown" || e.key === "PageUp" || e.key === "Home" || e.key === "End") {
+        const { scrollTop, scrollHeight, clientHeight } = mainEl;
+        const isAtTop = scrollTop === 0;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+        if (e.key === "ArrowDown" && !isAtBottom) {
+          e.preventDefault();
+          mainEl.scrollTop += 50;
+        } else if (e.key === "ArrowUp" && !isAtTop) {
+          e.preventDefault();
+          mainEl.scrollTop -= 50;
+        } else if (e.key === "PageDown" && !isAtBottom) {
+          e.preventDefault();
+          mainEl.scrollTop += clientHeight;
+        } else if (e.key === "PageUp" && !isAtTop) {
+          e.preventDefault();
+          mainEl.scrollTop -= clientHeight;
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          mainEl.scrollTop = 0;
+        } else if (e.key === "End") {
+          e.preventDefault();
+          mainEl.scrollTop = scrollHeight;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   if (isLoading) {
     return (
@@ -98,6 +135,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
         {/* Page content */}
         <main
+          ref={mainContentRef}
           className="p-4 lg:p-6 min-h-[calc(100vh-56px)] lg:min-h-[calc(100vh-64px)] overflow-y-auto"
           tabIndex={0}
           role="main"
