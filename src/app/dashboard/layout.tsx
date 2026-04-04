@@ -32,46 +32,40 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
         return;
       }
 
       const mainEl = mainContentRef.current;
       if (!mainEl) return;
 
-      const isScrollable = mainEl.scrollHeight > mainEl.clientHeight;
-      if (!isScrollable) return;
-
       const { scrollTop, scrollHeight, clientHeight } = mainEl;
       const isAtTop = scrollTop <= 0;
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
 
-      let handled = false;
-
       if (e.key === "ArrowDown" && !isAtBottom) {
         e.preventDefault();
-        mainEl.scrollTo({ top: scrollTop + 50, behavior: "smooth" });
-        handled = true;
+        mainEl.scrollTop += 50;
       } else if (e.key === "ArrowUp" && !isAtTop) {
         e.preventDefault();
-        mainEl.scrollTo({ top: scrollTop - 50, behavior: "smooth" });
-        handled = true;
+        mainEl.scrollTop -= 50;
       } else if (e.key === "PageDown" && !isAtBottom) {
         e.preventDefault();
-        mainEl.scrollTo({ top: scrollTop + clientHeight, behavior: "smooth" });
-        handled = true;
+        mainEl.scrollTop += clientHeight;
       } else if (e.key === "PageUp" && !isAtTop) {
         e.preventDefault();
-        mainEl.scrollTo({ top: scrollTop - clientHeight, behavior: "smooth" });
-        handled = true;
+        mainEl.scrollTop -= clientHeight;
       } else if (e.key === "Home") {
         e.preventDefault();
-        mainEl.scrollTo({ top: 0, behavior: "smooth" });
-        handled = true;
+        mainEl.scrollTop = 0;
       } else if (e.key === "End") {
         e.preventDefault();
-        mainEl.scrollTo({ top: scrollHeight, behavior: "smooth" });
-        handled = true;
+        mainEl.scrollTop = scrollHeight;
       }
     };
 
