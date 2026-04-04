@@ -33,17 +33,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const mainEl = mainContentRef.current;
-    if (!mainEl) {
-      console.log("mainEl not found");
-      return;
-    }
-
-    console.log("keyboard handler attached", mainEl, mainEl.scrollHeight, mainEl.clientHeight);
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log("key pressed:", e.key, "target:", e.target);
-
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
@@ -53,31 +43,27 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const { scrollTop, scrollHeight, clientHeight } = mainEl;
-      console.log("scroll state:", { scrollTop, scrollHeight, clientHeight });
-      const isAtTop = scrollTop <= 0;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+      const html = document.documentElement;
+      const { scrollTop, scrollHeight, clientHeight } = html;
 
-      if (e.key === "ArrowDown" && !isAtBottom) {
+      if (e.key === "ArrowDown") {
         e.preventDefault();
-        mainEl.scrollTop += 50;
-        console.log("scrolling down");
-      } else if (e.key === "ArrowUp" && !isAtTop) {
+        window.scrollBy(0, 50);
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        mainEl.scrollTop -= 50;
-        console.log("scrolling up");
-      } else if (e.key === "PageDown" && !isAtBottom) {
+        window.scrollBy(0, -50);
+      } else if (e.key === "PageDown") {
         e.preventDefault();
-        mainEl.scrollTop += clientHeight;
-      } else if (e.key === "PageUp" && !isAtTop) {
+        window.scrollBy(0, clientHeight);
+      } else if (e.key === "PageUp") {
         e.preventDefault();
-        mainEl.scrollTop -= clientHeight;
+        window.scrollBy(0, -clientHeight);
       } else if (e.key === "Home") {
         e.preventDefault();
-        mainEl.scrollTop = 0;
+        window.scrollTo(0, 0);
       } else if (e.key === "End") {
         e.preventDefault();
-        mainEl.scrollTop = scrollHeight;
+        window.scrollTo(0, scrollHeight);
       }
     };
 
