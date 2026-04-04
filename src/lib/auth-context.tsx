@@ -21,19 +21,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
+    const refreshToken = localStorage.getItem("refresh_token");
+    
+    if (token && refreshToken) {
       api.auth
         .me()
         .then((userData) => {
           setUser(userData);
         })
-        .catch(() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("refresh_token");
+        .catch((error) => {
+          console.error("Failed to fetch user:", error);
         })
         .finally(() => {
           setIsLoading(false);
         });
+    } else if (!token && !refreshToken) {
+      setIsLoading(false);
     } else {
       setIsLoading(false);
     }

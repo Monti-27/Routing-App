@@ -146,15 +146,22 @@ async function fetchApi<T>(
             }
 
             return retryResponse.json();
+          } else if (refreshResponse.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            window.location.href = "/auth/login";
+            throw new Error("Session expired");
           }
+        } else {
+          localStorage.removeItem("token");
+          localStorage.removeItem("refresh_token");
+          window.location.href = "/auth/login";
+          throw new Error("No refresh token");
         }
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh_token");
-        window.location.href = "/auth/login";
-      } catch {
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh_token");
-        window.location.href = "/auth/login";
+      } catch (e) {
+        if (e instanceof Error && e.message === "Session expired") {
+          throw e;
+        }
       } finally {
         isRefreshing = false;
       }
