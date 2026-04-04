@@ -14,6 +14,7 @@ import {
   User,
   Bot,
   Activity,
+  MessageSquare,
 } from "lucide-react";
 
 const navigation = [
@@ -21,6 +22,11 @@ const navigation = [
     name: "Overview",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Playground",
+    href: "/dashboard/playground",
+    icon: MessageSquare,
   },
   {
     name: "API Keys",

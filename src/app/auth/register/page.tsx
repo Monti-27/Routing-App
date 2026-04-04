@@ -99,11 +99,30 @@ export default function RegisterPage() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
-      await fetch(`${apiUrl}/auth/signup/init`, {
+      const response = await fetch(`${apiUrl}/auth/signup/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
       });
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        let errorMessage = "Failed to send verification code";
+        
+        if (contentType && contentType.includes("application/json")) {
+          try {
+            const error = await response.json();
+            errorMessage = error.message || error.detail || error.error || "Failed to send verification code";
+          } catch {
+            errorMessage = `Server error (${response.status})`;
+          }
+        } else {
+          errorMessage = `Server error (${response.status})`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
       setStep("otp");
       toast.success("Verification code sent to your email");
       setResendCooldown(60);

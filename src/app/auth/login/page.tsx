@@ -78,8 +78,21 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Login failed");
+        const contentType = response.headers.get("content-type");
+        let errorMessage = "Login failed";
+        
+        if (contentType && contentType.includes("application/json")) {
+          try {
+            const error = await response.json();
+            errorMessage = error.message || error.detail || error.error || "Login failed";
+          } catch {
+            errorMessage = `Server error (${response.status})`;
+          }
+        } else {
+          errorMessage = `Server error (${response.status})`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       toast.success("OTP sent to your email");
