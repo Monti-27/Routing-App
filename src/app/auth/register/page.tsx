@@ -95,6 +95,15 @@ export default function RegisterPage() {
       return;
     }
 
+    const hasUpperCase = /[A-Z]/.test(formData.password);
+    const hasLowerCase = /[a-z]/.test(formData.password);
+    const hasNumbers = /\d/.test(formData.password);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      toast.error("Password must contain uppercase, lowercase, and numbers");
+      return;
+    }
+
     setIsLoading(true);
 
     try {

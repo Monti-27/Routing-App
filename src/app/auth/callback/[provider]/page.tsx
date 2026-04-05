@@ -5,18 +5,25 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
+const ALLOWED_OAUTH_PROVIDERS = ["github"];
+
 function AuthCallbackContent({ provider }: { provider: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!ALLOWED_OAUTH_PROVIDERS.includes(provider)) {
+      setError("Invalid OAuth provider");
+      return;
+    }
+
     const code = searchParams?.get("code");
     const state = searchParams?.get("state");
     const errorParam = searchParams?.get("error");
 
     if (errorParam) {
-      setError(errorParam);
+      setError("OAuth authorization was denied");
       return;
     }
 
@@ -28,13 +35,15 @@ function AuthCallbackContent({ provider }: { provider: string }) {
     async function handleCallback() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+        const encodedProvider = encodeURIComponent(provider);
+        const encodedCode = encodeURIComponent(code || "");
+        const encodedState = encodeURIComponent(state || "");
         const response = await fetch(
-          `${apiUrl}/auth/callback/${provider}?code=${code}&state=${state}`
+          `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`
         );
 
         if (!response.ok) {
-          const errorData = await response.text();
-          throw new Error(`OAuth callback failed: ${response.status} - ${errorData}`);
+          throw new Error("Authentication failed");
         }
 
         const data = await response.json();
@@ -45,8 +54,8 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         }
 
         router.push("/dashboard");
-      } catch (err) {
-        setError(err instanceof Error ? err.message : `Authentication failed: ${String(err)}`);
+      } catch {
+        setError("Authentication failed. Please try again.");
       }
     }
 

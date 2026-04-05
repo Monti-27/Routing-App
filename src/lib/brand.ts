@@ -36,8 +36,7 @@ export async function fetchBrandLogo(url: string): Promise<string | null> {
       return logos[0].url;
     }
     return null;
-  } catch (error) {
-    console.error("Failed to fetch brand logo:", error);
+  } catch {
     return null;
   }
 }
@@ -52,8 +51,7 @@ export async function getBrandData(url: string): Promise<BrandData | null> {
       return data.data as BrandData;
     }
     return null;
-  } catch (error) {
-    console.error("Failed to fetch brand data:", error);
+  } catch {
     return null;
   }
 }

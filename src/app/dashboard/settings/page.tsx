@@ -113,21 +113,14 @@ export default function SettingsPage() {
     setSelectedPackage(null);
   };
 
-  const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
-      return;
-    }
-
+const handleChangePassword = async () => {
     setIsChangingPassword(true);
     try {
-      await fetchApi(`${process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run"}/v1/user/password`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+      const token = localStorage.getItem("token");
+      await fetch(`${API_URL}/v1/user/password`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
       });
       toast.success("Password changed successfully");
@@ -145,9 +138,11 @@ export default function SettingsPage() {
   const handleDeleteAllKeys = async () => {
     setIsDeletingKeys(true);
     try {
-      await fetchApi(`${process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run"}/v1/user/keys/revoke-all`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+      const token = localStorage.getItem("token");
+      await fetch(`${API_URL}/v1/user/keys/revoke-all`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       toast.success("All API keys deleted successfully");
       setShowDeleteKeysModal(false);
@@ -161,9 +156,11 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     setIsDeletingAccount(true);
     try {
-      await fetchApi(`${process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run"}/v1/user`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+      const token = localStorage.getItem("token");
+      await fetch(`${API_URL}/v1/user`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       toast.success("Account deleted successfully");
       logout();

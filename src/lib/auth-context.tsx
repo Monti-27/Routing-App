@@ -29,8 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .then((userData) => {
           setUser(userData);
         })
-        .catch((error) => {
-          console.error("Failed to fetch user:", error);
+        .catch(() => {
         })
         .finally(() => {
           setIsLoading(false);
@@ -61,8 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const userData = await api.auth.me();
       setUser(userData);
-    } catch (error) {
-      console.error("Failed to refresh user:", error);
+    } catch {
     }
   };
 

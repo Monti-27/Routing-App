@@ -89,19 +89,22 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 		return null;
 	}
 
+	const sanitizedId = id.replace(/[^a-zA-Z0-9-_]/g, '_');
+
 	return (
 		<style
 			dangerouslySetInnerHTML={{
 				__html: Object.entries(THEMES)
 					.map(
 						([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+${prefix} [data-chart=${sanitizedId}] {
 ${colorConfig
 	.map(([key, itemConfig]) => {
+		const safeKey = key.replace(/[^a-zA-Z0-9-_]/g, '_');
 		const color =
 			itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
 			itemConfig.color;
-		return color ? `  --color-${key}: ${color};` : null;
+		return color ? `  --color-${safeKey}: ${color};` : null;
 	})
 	.join('\n')}
 }

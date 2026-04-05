@@ -24,8 +24,7 @@ export class ChartErrorBoundary extends Component<
 		return { hasError: true };
 	}
 
-	componentDidCatch(error: Error, info: ErrorInfo) {
-		console.error("[ChartErrorBoundary]", error.message, info.componentStack);
+	componentDidCatch() {
 	}
 
 	render() {
