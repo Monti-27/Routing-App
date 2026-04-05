@@ -115,11 +115,13 @@ async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
   const csrfToken = getCsrfToken();
   const isMutation = ["POST", "PUT", "DELETE", "PATCH"].includes(options.method || "");
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(isMutation && csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
     ...options.headers,
   };
@@ -141,6 +143,13 @@ async function fetchApi<T>(
 
         if (refreshResponse.ok) {
           const data = await refreshResponse.json();
+          if (typeof window !== "undefined") {
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("refresh_token", data.refresh_token);
+            if (data.csrf_token) {
+              localStorage.setItem("csrf_token", data.csrf_token);
+            }
+          }
           onTokenRefreshed(data.access_token);
           
           const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -148,6 +157,7 @@ async function fetchApi<T>(
             credentials: "include",
             headers: {
               ...headers,
+              Authorization: `Bearer ${data.access_token}`,
               "X-CSRF-Token": data.csrf_token || "",
             },
           });
