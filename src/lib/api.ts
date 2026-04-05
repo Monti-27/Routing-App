@@ -136,9 +136,12 @@ async function fetchApi<T>(
     if (!isRefreshing) {
       isRefreshing = true;
       try {
+        const refreshToken = localStorage.getItem("refresh_token");
         const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
           method: "POST",
           credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
         });
 
         if (refreshResponse.ok) {
