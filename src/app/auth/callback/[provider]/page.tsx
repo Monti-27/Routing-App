@@ -21,14 +21,15 @@ function AuthCallbackContent({ provider }: { provider: string }) {
     const hash = window.location.hash;
     console.log("[DEBUG] Full URL:", window.location.href);
     console.log("[DEBUG] Hash:", hash);
+    console.log("[DEBUG] SearchParams:", searchParams?.toString());
 
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const accessToken = params.get("access_token");
       const refreshToken = params.get("refresh_token");
       const csrfToken = params.get("csrf_token");
-      console.log("[DEBUG] accessToken:", accessToken ? "present" : "missing");
-      console.log("[DEBUG] refreshToken:", refreshToken ? "present" : "missing");
+      console.log("[DEBUG] Parsed from hash - accessToken:", accessToken ? "present" : "missing");
+      console.log("[DEBUG] Parsed from hash - refreshToken:", refreshToken ? "present" : "missing");
 
       if (accessToken && refreshToken) {
         localStorage.setItem("access_token", accessToken);
@@ -36,9 +37,11 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         if (csrfToken) {
           localStorage.setItem("csrf_token", csrfToken);
         }
+        console.log("[DEBUG] Tokens stored, redirecting to dashboard");
         router.push("/dashboard");
         return;
       }
+      console.log("[DEBUG] Hash present but tokens missing - falling through");
     }
 
     const code = searchParams?.get("code");
@@ -60,6 +63,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
     async function handleCallback() {
       try {
+        console.log("[DEBUG] Making fetch to API...");
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const encodedProvider = encodeURIComponent(provider);
         const encodedCode = encodeURIComponent(code || "");
@@ -68,9 +72,10 @@ function AuthCallbackContent({ provider }: { provider: string }) {
           `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`,
           { credentials: "include" }
         );
+        console.log("[DEBUG] Fetch response status:", response.status);
 
         if (!response.ok) {
-          throw new Error("Authentication failed");
+          throw new Error(`Authentication failed with status ${response.status}`);
         }
 
         const data = await response.json();
