@@ -19,11 +19,16 @@ function AuthCallbackContent({ provider }: { provider: string }) {
     }
 
     const hash = window.location.hash;
+    console.log("[DEBUG] Full URL:", window.location.href);
+    console.log("[DEBUG] Hash:", hash);
+
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const accessToken = params.get("access_token");
       const refreshToken = params.get("refresh_token");
       const csrfToken = params.get("csrf_token");
+      console.log("[DEBUG] accessToken:", accessToken ? "present" : "missing");
+      console.log("[DEBUG] refreshToken:", refreshToken ? "present" : "missing");
 
       if (accessToken && refreshToken) {
         localStorage.setItem("access_token", accessToken);
@@ -39,6 +44,8 @@ function AuthCallbackContent({ provider }: { provider: string }) {
     const code = searchParams?.get("code");
     const state = searchParams?.get("state");
     const errorParam = searchParams?.get("error");
+    console.log("[DEBUG] code:", code ? "present" : "missing");
+    console.log("[DEBUG] state:", state ? "present" : "missing");
 
     if (errorParam) {
       setError("OAuth authorization was denied");
@@ -47,6 +54,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
     if (!code || !state) {
       setError("Missing code or state parameter");
+      console.log("[DEBUG] Missing code or state - ending up in error state");
       return;
     }
 
