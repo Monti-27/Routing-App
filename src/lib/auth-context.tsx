@@ -9,21 +9,29 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, otp: string) => Promise<void>;
   register: (email: string, otp: string, password: string, name?: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const refreshToken = localStorage.getItem("refresh_token");
+    const accessToken = getCookie("access_token");
+    const refreshToken = getCookie("refresh_token");
     
-    if (token && refreshToken) {
+    if (accessToken && refreshToken) {
       api.auth
         .me()
         .then((userData) => {
@@ -34,8 +42,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoading(false);
         });
-    } else if (!token && !refreshToken) {
-      setIsLoading(false);
     } else {
       setIsLoading(false);
     }
@@ -51,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
-  const logout = () => {
-    api.auth.logout();
+  const logout = async () => {
+    await api.auth.logout();
     setUser(null);
   };
 

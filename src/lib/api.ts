@@ -1,5 +1,15 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
 
+const CSRF_TOKEN_COOKIE = "csrf_token";
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+}
+
 interface ApiKey {
   id: string;
   key_prefix: string;
@@ -97,66 +107,60 @@ function onTokenRefreshed(token: string) {
   refreshSubscribers = [];
 }
 
+function getCsrfToken(): string | null {
+  return getCookie(CSRF_TOKEN_COOKIE);
+}
+
 async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const csrfToken = getCsrfToken();
+  const isMutation = ["POST", "PUT", "DELETE", "PATCH"].includes(options.method || "");
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(isMutation && csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
     ...options.headers,
   };
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
+    credentials: "include",
     headers,
   });
 
-  if (response.status === 401 && !(options.headers as Record<string, string>)?.["Authorization"]) {
+  if (response.status === 401) {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
-        const refreshToken = localStorage.getItem("refresh_token");
-        if (refreshToken) {
-          const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refresh_token: refreshToken }),
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+        });
+
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          onTokenRefreshed(data.access_token);
+          
+          const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            credentials: "include",
+            headers: {
+              ...headers,
+              "X-CSRF-Token": data.csrf_token || "",
+            },
           });
 
-          if (refreshResponse.ok) {
-            const data = await refreshResponse.json();
-            localStorage.setItem("token", data.access_token);
-            localStorage.setItem("refresh_token", data.refresh_token);
-            onTokenRefreshed(data.access_token);
-            
-            const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
-              ...options,
-              headers: {
-                ...headers,
-                Authorization: `Bearer ${data.access_token}`,
-              },
-            });
-
-            if (!retryResponse.ok) {
-              const error = await retryResponse.json().catch(() => ({ message: "An error occurred" }));
-              throw new ApiError(error.message || "An error occurred", retryResponse.status);
-            }
-
-            return retryResponse.json();
-          } else if (refreshResponse.status === 401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("refresh_token");
-            window.location.href = "/auth/login";
-            throw new Error("Session expired");
+          if (!retryResponse.ok) {
+            const error = await retryResponse.json().catch(() => ({ message: "An error occurred" }));
+            throw new ApiError(error.message || "An error occurred", retryResponse.status);
           }
-        } else {
-          localStorage.removeItem("token");
-          localStorage.removeItem("refresh_token");
+
+          return retryResponse.json();
+        } else if (refreshResponse.status === 401) {
           window.location.href = "/auth/login";
-          throw new Error("No refresh token");
+          throw new Error("Session expired");
         }
       } catch (e) {
         if (e instanceof Error && e.message === "Session expired") {
@@ -171,6 +175,7 @@ async function fetchApi<T>(
           try {
             const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
               ...options,
+              credentials: "include",
               headers: {
                 ...headers,
                 Authorization: `Bearer ${newToken}`,
@@ -208,10 +213,6 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ email, otp }),
       });
-      if (typeof window !== "undefined") {
-        localStorage.setItem("token", loginResponse.access_token);
-        localStorage.setItem("refresh_token", loginResponse.refresh_token);
-      }
       return { user: loginResponse.user };
     },
 
@@ -220,10 +221,6 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ email, otp, password, name }),
       });
-      if (typeof window !== "undefined") {
-        localStorage.setItem("token", loginResponse.access_token);
-        localStorage.setItem("refresh_token", loginResponse.refresh_token);
-      }
       return { user: loginResponse.user };
     },
 
@@ -241,11 +238,10 @@ export const api = {
       });
     },
 
-    logout: () => {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("refresh_token");
-      }
+    logout: async (): Promise<void> => {
+      await fetchApi<{ message: string }>("/auth/logout", {
+        method: "POST",
+      });
     },
 
     me: async (): Promise<User> => {
