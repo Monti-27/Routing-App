@@ -18,6 +18,24 @@ function AuthCallbackContent({ provider }: { provider: string }) {
       return;
     }
 
+    const hash = window.location.hash;
+    if (hash) {
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+      const csrfToken = params.get("csrf_token");
+
+      if (accessToken && refreshToken) {
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("refresh_token", refreshToken);
+        if (csrfToken) {
+          localStorage.setItem("csrf_token", csrfToken);
+        }
+        router.push("/dashboard");
+        return;
+      }
+    }
+
     const code = searchParams?.get("code");
     const state = searchParams?.get("state");
     const errorParam = searchParams?.get("error");
@@ -39,7 +57,8 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         const encodedCode = encodeURIComponent(code || "");
         const encodedState = encodeURIComponent(state || "");
         const response = await fetch(
-          `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`
+          `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`,
+          { credentials: "include" }
         );
 
         if (!response.ok) {
@@ -49,8 +68,11 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         const data = await response.json();
 
         if (typeof window !== "undefined") {
-          localStorage.setItem("token", data.access_token);
+          localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("refresh_token", data.refresh_token);
+          if (data.csrf_token) {
+            localStorage.setItem("csrf_token", data.csrf_token);
+          }
         }
 
         router.push("/dashboard");

@@ -19,8 +19,16 @@ function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  if (parts.length === 2) return parts.pop()?.split(";")?.shift() || null;
   return null;
+}
+
+function getAccessToken(): string | null {
+  return getCookie("access_token") || localStorage.getItem("access_token");
+}
+
+function getRefreshToken(): string | null {
+  return getCookie("refresh_token") || localStorage.getItem("refresh_token");
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -28,8 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const accessToken = getCookie("access_token");
-    const refreshToken = getCookie("refresh_token");
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
     
     if (accessToken && refreshToken) {
       api.auth

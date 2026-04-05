@@ -213,6 +213,10 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ email, otp }),
       });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("access_token", loginResponse.access_token);
+        localStorage.setItem("refresh_token", loginResponse.refresh_token);
+      }
       return { user: loginResponse.user };
     },
 
@@ -221,6 +225,10 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ email, otp, password, name }),
       });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("access_token", loginResponse.access_token);
+        localStorage.setItem("refresh_token", loginResponse.refresh_token);
+      }
       return { user: loginResponse.user };
     },
 
