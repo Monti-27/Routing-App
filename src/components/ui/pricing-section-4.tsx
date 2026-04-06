@@ -62,6 +62,9 @@ const plans = [
     features: [
       "Everything in Lite",
       "GLM-4.5-Air & variants",
+      "GLM-4.7 & GLM-4.7-Flash",
+      "GLM-5-Highspeed (100 tps)",
+      "Kimi-K2.5-Highspeed (100 tps)",
       "Qwen3-Coder & Coder-Next",
       "MiniMax-Image-1 generation",
       "Grok-4-Fast & Grok-4.20-Beta",
