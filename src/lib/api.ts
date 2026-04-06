@@ -172,6 +172,11 @@ async function fetchApi<T>(
 
           return retryResponse.json();
         } else if (refreshResponse.status === 401) {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("csrf_token");
+          }
           window.location.href = "/auth/login";
           throw new Error("Session expired");
         }
@@ -260,9 +265,17 @@ export const api = {
     },
 
     logout: async (): Promise<void> => {
-      await fetchApi<{ message: string }>("/auth/logout", {
-        method: "POST",
-      });
+      try {
+        await fetchApi<{ message: string }>("/auth/logout", {
+          method: "POST",
+        });
+      } finally {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("csrf_token");
+        }
+      }
     },
 
     me: async (): Promise<User> => {

@@ -46,6 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
         })
         .catch(() => {
+          if (typeof window !== "undefined") {
+            window.location.href = "/auth/login";
+          }
         })
         .finally(() => {
           setIsLoading(false);
