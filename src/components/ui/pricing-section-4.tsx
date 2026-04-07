@@ -64,6 +64,7 @@ const plans = [
       "GLM-4.5-Air & variants",
       "GLM-4.7 & GLM-4.7-Flash",
       "GLM-5-Highspeed (100 tps)",
+      "MiniMax-M2.7-Highspeed (~100 tps)",
       "Kimi-K2.5-Highspeed (100 tps)",
       "Qwen3-Coder & Coder-Next",
       "MiniMax-Image-1 generation",
