@@ -33,6 +33,12 @@ interface PlanData {
   requests_used_today: number;
 }
 
+interface UserData {
+  plan_tier: string;
+  is_upgraded: boolean;
+  upgrade_expires_at: string | null;
+}
+
 const PLAN_LIMITS: Record<string, number> = {
   free: 50,
   lite: 400,
@@ -84,21 +90,28 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [plan, setPlan] = useState<PlanData | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [usageData, requestsData] = await Promise.all([
+        const [usageData, requestsData, userInfo] = await Promise.all([
           api.usage.get("monthly"),
           api.requests.get(),
+          api.auth.me(),
         ]);
         setUsage(usageData);
         setPlan({
           plan_tier: requestsData.plan_tier,
           requests_per_day: requestsData.requests_limit_today,
           requests_used_today: requestsData.requests_used_today,
+        });
+        setUserData({
+          plan_tier: userInfo.plan_tier,
+          is_upgraded: userInfo.is_upgraded,
+          upgrade_expires_at: userInfo.upgrade_expires_at,
         });
         setError(null);
       } catch (err) {
@@ -109,6 +122,18 @@ export default function DashboardPage() {
     }
     fetchData();
   }, []);
+
+  function formatUpgradeExpiry(dateStr: string | null): string {
+    if (!dateStr) return "";
+    const expires = new Date(dateStr);
+    const now = new Date();
+    const diffMs = expires.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return "Expired";
+    if (diffDays === 1) return "1 day left";
+    if (diffDays < 30) return `${diffDays} days left`;
+    return expires.toLocaleDateString();
+  }
 
   const totalTokens = usage
     ? usage.total_input_tokens + usage.total_output_tokens
@@ -161,9 +186,16 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">
-          Welcome back, {user?.name?.split(" ")[0] || "User"}
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold tracking-tight">
+            Welcome back, {user?.name?.split(" ")[0] || "User"}
+          </h2>
+          {userData?.is_upgraded && userData?.upgrade_expires_at && (
+            <Badge variant="secondary" className="bg-green-500/20 text-green-500 border-green-500/30">
+              Upgrade: {formatUpgradeExpiry(userData.upgrade_expires_at)}
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground mt-1">
           Here&apos;s your API usage overview.
         </p>
@@ -226,6 +258,11 @@ export default function DashboardPage() {
               <div className="text-2xl font-bold">{formatNumber(dailyLimit)}</div>
             )}
             <p className="text-xs text-muted-foreground mt-1">requests/day</p>
+            {userData?.is_upgraded && userData?.upgrade_expires_at && (
+              <p className="text-xs text-green-500 mt-2 font-medium">
+                Upgrade: {formatUpgradeExpiry(userData.upgrade_expires_at)}
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

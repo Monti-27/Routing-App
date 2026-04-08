@@ -34,6 +34,8 @@ interface User {
   plan_tier: string;
   email_verified: boolean;
   credits: number;
+  is_upgraded: boolean;
+  upgrade_expires_at: string | null;
 }
 
 interface CreditsResponse {
