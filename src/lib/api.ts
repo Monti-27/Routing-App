@@ -44,6 +44,13 @@ interface CreditsResponse {
   payg_enabled: boolean;
 }
 
+interface RequestsResponse {
+  requests_used_today: number;
+  requests_limit_today: number;
+  requests_remaining: number;
+  plan_tier: string;
+}
+
 interface ProviderStatus {
   name: string;
   status: string;
@@ -327,6 +334,12 @@ export const api = {
     },
   },
 
+  requests: {
+    get: async (): Promise<RequestsResponse> => {
+      return fetchApi<RequestsResponse>("/v1/user/requests");
+    },
+  },
+
   status: {
     get: async (): Promise<StatusResponse> => {
       return fetchApi<StatusResponse>("/v1/status");
@@ -340,4 +353,4 @@ export const api = {
   },
 };
 
-export type { ApiKey, UsageResponse, User, CreditsResponse, StatusResponse, ProviderStatus, ModelStatus, IncidentReport };
+export type { ApiKey, UsageResponse, User, CreditsResponse, RequestsResponse, StatusResponse, ProviderStatus, ModelStatus, IncidentReport };

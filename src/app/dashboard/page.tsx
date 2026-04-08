@@ -90,15 +90,15 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [usageData, creditsData] = await Promise.all([
+        const [usageData, requestsData] = await Promise.all([
           api.usage.get("monthly"),
-          api.credits.get(),
+          api.requests.get(),
         ]);
         setUsage(usageData);
         setPlan({
-          plan_tier: creditsData.plan_tier,
-          requests_per_day: PLAN_LIMITS[creditsData.plan_tier?.toLowerCase()] || 50,
-          requests_used_today: 0,
+          plan_tier: requestsData.plan_tier,
+          requests_per_day: requestsData.requests_limit_today,
+          requests_used_today: requestsData.requests_used_today,
         });
         setError(null);
       } catch (err) {

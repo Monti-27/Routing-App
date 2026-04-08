@@ -26,7 +26,7 @@ interface Model {
   context_length: string;
   input_price: number;
   output_price: number;
-  tiers: ("free" | "lite" | "pro" | "max")[];
+  tiers: ("free" | "lite" | "premium" | "max")[];
   gradient: "purple" | "amber" | "coral";
   logo?: string;
 }
@@ -37,43 +37,14 @@ const providerLogos: Record<string, string> = {
   "zai": "/model-logos/route-zai.svg",
   "openrouter": "/model-logos/route-nvidia.svg",
   "nvidia": "/model-logos/route-nvidia.svg",
-  "arcee": "/model-logos/route-arcee.png",
   "qwen": "/model-logos/route-qwen.png",
-  "openai": "/model-logos/route-openai.svg",
-  "nous": "/model-logos/route-nous.png",
-  "meta": "/model-logos/route-meta.png",
-  "google": "/model-logos/route-google.svg",
   "kimi": "/model-logos/route-kimi.png",
   "deepseek": "/model-logos/route-deepseek.png",
-  "xiaomi": "/model-logos/route-xiaomi.png",
-  "xai": "/model-logos/route-xai.png",
+  "chutes": "/model-logos/route-deepseek.png",
+  "crof": "/model-logos/route-zai.svg",
 };
 
 const allModels: Model[] = [
-  {
-    id: "route/minimax-m2.7",
-    name: "MiniMax M2.7",
-    description: "High-performance reasoning model with 200K context",
-    provider: "minimax",
-    context_length: "200K",
-    input_price: 0.33,
-    output_price: 1.32,
-    tiers: ["lite", "pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-minimax.png",
-  },
-  {
-    id: "route/minimax-m2.7-highspeed",
-    name: "MiniMax M2.7 Highspeed",
-    description: "Same as M2.7 with faster output ~100 tokens/sec, ideal for high-throughput applications",
-    provider: "minimax",
-    context_length: "200K",
-    input_price: 0.33,
-    output_price: 1.32,
-    tiers: ["pro", "max"],
-    gradient: "coral",
-    logo: "/model-logos/route-minimax.png",
-  },
   {
     id: "route/minimax-m2.5",
     name: "MiniMax M2.5",
@@ -82,20 +53,44 @@ const allModels: Model[] = [
     context_length: "200K",
     input_price: 0.193,
     output_price: 1.238,
-    tiers: ["free", "lite", "pro", "max"],
+    tiers: ["free", "lite", "premium", "max"],
     gradient: "amber",
+    logo: "/model-logos/route-minimax.png",
+  },
+  {
+    id: "route/minimax-m2.7",
+    name: "MiniMax M2.7",
+    description: "High-performance reasoning model with 200K context",
+    provider: "minimax",
+    context_length: "200K",
+    input_price: 0.33,
+    output_price: 1.32,
+    tiers: ["lite", "premium", "max"],
+    gradient: "purple",
     logo: "/model-logos/route-minimax.png",
   },
   {
     id: "route/minimax-m2.5-highspeed",
     name: "MiniMax M2.5 Highspeed",
-    description: "Same as M2.5 with faster output ~70 tokens/sec, ideal for real-time applications",
+    description: "Same as M2.5 with faster output ~70 tokens/sec",
     provider: "minimax",
     context_length: "200K",
     input_price: 0.193,
     output_price: 1.238,
-    tiers: ["pro"],
-    gradient: "purple",
+    tiers: ["premium"],
+    gradient: "coral",
+    logo: "/model-logos/route-minimax.png",
+  },
+  {
+    id: "route/minimax-m2.7-highspeed",
+    name: "MiniMax M2.7 Highspeed",
+    description: "M2.7 with faster output ~100 tokens/sec",
+    provider: "minimax",
+    context_length: "200K",
+    input_price: 0.33,
+    output_price: 1.32,
+    tiers: ["premium", "max"],
+    gradient: "coral",
     logo: "/model-logos/route-minimax.png",
   },
   {
@@ -106,7 +101,7 @@ const allModels: Model[] = [
     context_length: "256K",
     input_price: 0.462,
     output_price: 2.42,
-    tiers: ["free", "lite", "pro", "max"],
+    tiers: ["free", "lite", "premium", "max"],
     gradient: "coral",
     logo: "/model-logos/route-kimi.png",
   },
@@ -118,177 +113,9 @@ const allModels: Model[] = [
     context_length: "256K",
     input_price: 0.6468,
     output_price: 3.388,
-    tiers: ["pro", "max"],
+    tiers: ["premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-kimi.png",
-  },
-  {
-    id: "route/grok-4-fast",
-    name: "Grok-4 Fast",
-    description: "Fast xAI model with strong reasoning capabilities",
-    provider: "xai",
-    context_length: "2000K",
-    input_price: 0.22,
-    output_price: 0.55,
-    tiers: ["pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-xai.png",
-  },
-  {
-    id: "route/grok-4.20-beta",
-    name: "Grok-4.20 Beta",
-    description: "Latest Grok-4 beta with improved reasoning",
-    provider: "xai",
-    context_length: "2000K",
-    input_price: 2.20,
-    output_price: 6.60,
-    tiers: ["max"],
-    gradient: "amber",
-    logo: "/model-logos/route-xai.png",
-  },
-  {
-    id: "route/grok-4.20-multi-agent-beta",
-    name: "Grok-4.20 Multi-Agent Beta",
-    description: "Multi-agent capable Grok-4 beta",
-    provider: "xai",
-    context_length: "2000K",
-    input_price: 2.20,
-    output_price: 6.60,
-    tiers: ["max"],
-    gradient: "coral",
-    logo: "/model-logos/route-xai.png",
-  },
-  {
-    id: "route/nemotron-3-super-120b",
-    name: "Nemotron-3 Super 120B",
-    description: "Powerful 120B parameter model for complex tasks",
-    provider: "openrouter",
-    context_length: "262K",
-    input_price: 0.11,
-    output_price: 0.55,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-nvidia.svg",
-  },
-  {
-    id: "route/trinity-large-preview",
-    name: "Trinity Large Preview",
-    description: "Next-gen large model preview",
-    provider: "openrouter",
-    context_length: "131K",
-    input_price: 0.00,
-    output_price: 0.00,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "amber",
-    logo: "/model-logos/route-arcee.png",
-  },
-  {
-    id: "route/glm-4.5-air",
-    name: "GLM-4.5 Air",
-    description: "Efficient GLM model with air configuration",
-    provider: "zai",
-    context_length: "128K",
-    input_price: 0.143,
-    output_price: 0.935,
-    tiers: ["pro", "max"],
-    gradient: "coral",
-    logo: "/model-logos/route-zai.svg",
-  },
-  {
-    id: "route/nemotron-3-nano-30b",
-    name: "Nemotron-3 Nano 30B",
-    description: "Compact 30B model for efficient inference",
-    provider: "openrouter",
-    context_length: "256K",
-    input_price: 0.055,
-    output_price: 0.22,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "amber",
-    logo: "/model-logos/route-nvidia.svg",
-  },
-  {
-    id: "route/qwen3-coder",
-    name: "Qwen3 Coder",
-    description: "Specialized code generation model",
-    provider: "openrouter",
-    context_length: "262K",
-    input_price: 0.242,
-    output_price: 1.10,
-    tiers: ["pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-qwen.png",
-  },
-  {
-    id: "route/gpt-oss-120b",
-    name: "GPT-OSS 120B",
-    description: "Open source 120B GPT model",
-    provider: "openrouter",
-    context_length: "131K",
-    input_price: 0.043,
-    output_price: 0.209,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "amber",
-    logo: "/model-logos/route-openai.svg",
-  },
-  {
-    id: "route/hermes-3-llama-3.1-405b",
-    name: "Hermes-3 Llama 3.1 405B",
-    description: "Large 405B model based on Llama architecture",
-    provider: "openrouter",
-    context_length: "131K",
-    input_price: 1.10,
-    output_price: 1.10,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "coral",
-    logo: "/model-logos/route-nous.png",
-  },
-  {
-id: "route/llama-3.2-3b-instruct",
-    name: "Llama 3.2 3B Instruct",
-    description: "Meta's efficient 3B instruction-tuned model",
-    provider: "meta",
-    context_length: "200K",
-    input_price: 0.056,
-    output_price: 0.374,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-meta.png",
-  },
-  {
-    id: "route/gemma-3-27b-it",
-    name: "Gemma-3 27B Instruct",
-    description: "Google's instruct-tuned Gemma model",
-    provider: "openrouter",
-    context_length: "131K",
-    input_price: 0.088,
-    output_price: 0.176,
-    tiers: ["free", "lite", "pro", "max"],
-    gradient: "amber",
-    logo: "/model-logos/route-google.png",
-  },
-  {
-    id: "route/qwen3.6-plus-preview",
-    name: "Qwen3.6 Plus Preview",
-    description: "Enhanced Qwen preview with plus capabilities",
-    provider: "openrouter",
-    context_length: "1000K",
-    input_price: 0.00,
-    output_price: 0.00,
-    tiers: ["pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-qwen.png",
-  },
-  {
-    id: "route/qwen3-next-80b",
-    name: "Qwen3 Next 80B",
-    description: "Next generation Qwen 80B model",
-    provider: "openrouter",
-    context_length: "262K",
-    input_price: 0.099,
-    output_price: 1.21,
-    tiers: ["pro", "max"],
-    gradient: "coral",
-    logo: "/model-logos/route-qwen.png",
   },
   {
     id: "route/glm-5",
@@ -298,79 +125,31 @@ id: "route/llama-3.2-3b-instruct",
     context_length: "80K",
     input_price: 0.792,
     output_price: 2.53,
-    tiers: ["lite", "pro", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
   },
   {
-    id: "route/glm-5-turbo",
-    name: "GLM-5 Turbo",
-    description: "Faster inference with slightly reduced capabilities",
-    provider: "zai",
-    context_length: "200K",
-    input_price: 1.32,
-    output_price: 4.40,
-    tiers: ["pro", "max"],
+    id: "route/glm-5.1",
+    name: "GLM-5.1",
+    description: "Enhanced GLM with improved capabilities",
+    provider: "crof",
+    context_length: "128K",
+    input_price: 1.00,
+    output_price: 3.00,
+    tiers: ["lite", "premium", "max"],
     gradient: "amber",
-    logo: "/model-logos/route-zai.svg",
-  },
-  {
-    id: "route/glm-4.5-airx",
-    name: "GLM-4.5 AirX",
-    description: "Efficient GLM model with air configuration",
-    provider: "zai",
-    context_length: "128K",
-    input_price: 1.32,
-    output_price: 4.40,
-    tiers: ["pro", "max"],
-    gradient: "coral",
-    logo: "/model-logos/route-zai.svg",
-  },
-  {
-    id: "route/glm-4.5-flash",
-    name: "GLM-4.5 Flash",
-    description: "Fast and efficient GLM model",
-    provider: "zai",
-    context_length: "128K",
-    input_price: 1.32,
-    output_price: 4.40,
-    tiers: ["pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-zai.svg",
-  },
-  {
-    id: "route/glm-4.7-flashx",
-    name: "GLM-4.7 FlashX",
-    description: "Enhanced flash model with improved capabilities",
-    provider: "zai",
-    context_length: "200K",
-    input_price: 1.32,
-    output_price: 4.40,
-    tiers: ["pro", "max"],
-    gradient: "amber",
-    logo: "/model-logos/route-zai.svg",
-  },
-  {
-    id: "route/glm-4.6v-flashx",
-    name: "GLM-4.6V FlashX",
-    description: "Multimodal flash model with vision capabilities",
-    provider: "zai",
-    context_length: "128K",
-    input_price: 1.32,
-    output_price: 4.40,
-    tiers: ["pro", "max"],
-    gradient: "coral",
     logo: "/model-logos/route-zai.svg",
   },
   {
     id: "route/glm-4.7",
     name: "GLM-4.7",
     description: "Latest GLM with enhanced reasoning capabilities",
-    provider: "zai",
+    provider: "crof",
     context_length: "200K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-zai.svg",
   },
@@ -378,11 +157,11 @@ id: "route/llama-3.2-3b-instruct",
     id: "route/glm-4.7-flash",
     name: "GLM-4.7 Flash",
     description: "Fast GLM-4.7 with excellent performance",
-    provider: "zai",
+    provider: "crof",
     context_length: "200K",
     input_price: 1.32,
     output_price: 4.40,
-    tiers: ["pro", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
   },
@@ -390,58 +169,70 @@ id: "route/llama-3.2-3b-instruct",
     id: "route/glm-5-highspeed",
     name: "GLM-5 Highspeed",
     description: "GLM-5 with faster output ~100 tokens/sec",
-    provider: "zai",
+    provider: "crof",
     context_length: "200K",
     input_price: 1.1088,
     output_price: 3.542,
-    tiers: ["pro", "max"],
+    tiers: ["max"],
     gradient: "coral",
     logo: "/model-logos/route-zai.svg",
+  },
+  {
+    id: "route/qwen3.5-9b",
+    name: "Qwen3.5 9B",
+    description: "Efficient 9B model for versatile tasks",
+    provider: "crof",
+    context_length: "32K",
+    input_price: 0.20,
+    output_price: 0.60,
+    tiers: ["lite", "premium", "max"],
+    gradient: "purple",
+    logo: "/model-logos/route-qwen.png",
+  },
+  {
+    id: "route/qwen3.5-397b-a17b",
+    name: "Qwen3.5 397B A17B",
+    description: "Large 397B parameter model",
+    provider: "crof",
+    context_length: "256K",
+    input_price: 1.10,
+    output_price: 3.30,
+    tiers: ["lite", "premium", "max"],
+    gradient: "amber",
+    logo: "/model-logos/route-qwen.png",
+  },
+  {
+    id: "route/qwen3.6-plus-preview",
+    name: "Qwen3.6 Plus Preview",
+    description: "Enhanced Qwen preview with plus capabilities",
+    provider: "openrouter",
+    context_length: "1000K",
+    input_price: 0.00,
+    output_price: 0.00,
+    tiers: ["lite", "premium", "max"],
+    gradient: "purple",
+    logo: "/model-logos/route-qwen.png",
   },
   {
     id: "route/deepseek-v3.2",
     name: "DeepSeek V3.2",
     description: "Advanced reasoning model",
-    provider: "deepseek (chutes → openrouter)",
+    provider: "crof",
     context_length: "163K",
-    input_price: 0.286,
-    output_price: 0.418,
-    tiers: ["pro", "max"],
+    input_price: 0.4928,
+    output_price: 0.7392,
+    tiers: ["lite", "premium", "max"],
     gradient: "coral",
     logo: "/model-logos/route-deepseek.png",
-  },
-  {
-    id: "route/qwen3-coder-next",
-    name: "Qwen3 Coder Next",
-    description: "Next-gen code generation and completion",
-    provider: "chutes",
-    context_length: "262K",
-    input_price: 0.132,
-    output_price: 0.825,
-    tiers: ["pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-qwen.png",
-  },
-  {
-    id: "route/qwen3-32b",
-    name: "Qwen3 32B",
-    description: "Balanced 32B parameter model for versatile tasks",
-    provider: "chutes",
-    context_length: "40K",
-    input_price: 0.088,
-    output_price: 0.264,
-    tiers: ["pro", "max"],
-    gradient: "amber",
-    logo: "/model-logos/route-qwen.png",
   },
   {
     id: "route/deepseek-v3.2-speciale",
     name: "DeepSeek V3.2 Speciale",
     description: "Special edition DeepSeek model with enhanced capabilities",
-    provider: "deepseek (openrouter)",
+    provider: "chutes",
     context_length: "163K",
-    input_price: 0.44,
-    output_price: 1.32,
+    input_price: 0.55,
+    output_price: 0.82,
     tiers: ["max"],
     gradient: "purple",
     logo: "/model-logos/route-deepseek.png",
@@ -450,7 +241,7 @@ id: "route/llama-3.2-3b-instruct",
     id: "route/deepseek-r1",
     name: "DeepSeek R1",
     description: "Advanced reasoning with chain-of-thought",
-    provider: "deepseek (chutes → openrouter)",
+    provider: "chutes",
     context_length: "163K",
     input_price: 0.495,
     output_price: 2.365,
@@ -458,67 +249,19 @@ id: "route/llama-3.2-3b-instruct",
     gradient: "amber",
     logo: "/model-logos/route-deepseek.png",
   },
-  {
-    id: "route/mimo-v2-omni",
-    name: "Xiaomi MiMo V2 Omni",
-    description: "Flagship Xiaomi multimodal model with full capabilities",
-    provider: "xiaomi (openrouter)",
-    context_length: "262K",
-    input_price: 0.44,
-    output_price: 2.20,
-    tiers: ["max"],
-    gradient: "purple",
-    logo: "/model-logos/route-xiaomi.png",
-  },
-  {
-    id: "route/mimo-v2-pro",
-    name: "Xiaomi MiMo V2 Pro",
-    description: "Professional tier Xiaomi multimodal model",
-    provider: "xiaomi (openrouter)",
-    context_length: "1048K",
-    input_price: 1.10,
-    output_price: 3.30,
-    tiers: ["max"],
-    gradient: "amber",
-    logo: "/model-logos/route-xiaomi.png",
-  },
-  {
-    id: "route/mimo-v2-flash",
-    name: "Xiaomi MiMo V2 Flash",
-    description: "Fast and efficient Xiaomi multimodal model",
-    provider: "xiaomi (openrouter)",
-    context_length: "262K",
-    input_price: 0.099,
-    output_price: 0.319,
-    tiers: ["max"],
-    gradient: "coral",
-    logo: "/model-logos/route-xiaomi.png",
-  },
-  {
-    id: "route/minimax-image-1",
-    name: "MiniMax Image Generation",
-    description: "High-quality AI image generation powered by MiniMax",
-    provider: "minimax",
-    context_length: "N/A",
-    input_price: 0.00,
-    output_price: 0.05,
-    tiers: ["pro", "max"],
-    gradient: "purple",
-    logo: "/model-logos/route-minimax.png",
-  },
 ];
 
 const tierColors = {
   free: "bg-brand-amber/20 text-brand-amber",
   lite: "bg-brand-blue/20 text-brand-blue",
-  pro: "bg-brand-coral/20 text-brand-coral",
+  premium: "bg-brand-coral/20 text-brand-coral",
   max: "bg-brand-purple/20 text-brand-purple",
 };
 
 const tierBgColors = {
   free: "bg-brand-amber",
   lite: "bg-brand-blue",
-  pro: "bg-brand-coral",
+  premium: "bg-brand-coral",
   max: "bg-brand-purple",
 };
 
@@ -535,11 +278,11 @@ const iconBgClasses = {
   blue: "bg-brand-blue/20 text-brand-blue",
 };
 
-const tierRequestsPerHour = {
-  free: 10,
-  lite: 40,
-  pro: 60,
-  max: 150,
+const tierRequestsPerDay = {
+  free: 50,
+  lite: 400,
+  premium: 1000,
+  max: 2500,
 };
 
 function CopyButton({ text }: { text: string }) {
@@ -593,8 +336,6 @@ function ModelAvatar({ name, gradient, logo }: { name: string; gradient: "purple
 }
 
 function ModelCard({ model }: { model: Model }) {
-  const isMaxOnly = model.tiers.length === 1 && model.tiers[0] === "max";
-
   return (
     <GlassCard hover gradient={model.gradient}>
       <div className="p-5 space-y-4">
@@ -669,14 +410,14 @@ function ModelSection({
 }: {
   title: string;
   description: string;
-  tier: "free" | "lite" | "pro" | "max";
+  tier: "free" | "lite" | "premium" | "max";
   models: Model[];
   viewMode: "grid" | "list";
 }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-lg ${iconBgClasses[tier === "free" ? "amber" : tier === "lite" ? "blue" : tier === "pro" ? "coral" : "purple"]} flex items-center justify-center`}>
+        <div className={`w-8 h-8 rounded-lg ${iconBgClasses[tier === "free" ? "amber" : tier === "lite" ? "blue" : tier === "premium" ? "coral" : "purple"]} flex items-center justify-center`}>
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
@@ -738,12 +479,12 @@ function ModelSection({
 }
 
 export default function ModelsPage() {
-  const [activeTab, setActiveTab] = useState<"all" | "free" | "lite" | "pro" | "max">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "free" | "lite" | "premium" | "max">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const freeModels = allModels.filter((m) => m.tiers.includes("free"));
   const liteModels = allModels.filter((m) => m.tiers.includes("lite"));
-  const proModels = allModels.filter((m) => m.tiers.includes("pro"));
+  const premiumModels = allModels.filter((m) => m.tiers.includes("premium"));
   const maxModels = allModels.filter((m) => m.tiers.includes("max"));
 
   return (
@@ -771,8 +512,8 @@ export default function ModelsPage() {
             <CardTitle className="text-sm font-medium text-amber-500">Free Tier</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerHour.free}</div>
-            <p className="text-xs text-muted-foreground">requests/hour</p>
+            <div className="text-2xl font-bold">{tierRequestsPerDay.free}</div>
+            <p className="text-xs text-muted-foreground">requests/day</p>
             <p className="text-xs text-muted-foreground mt-2">{freeModels.length} models</p>
           </CardContent>
         </Card>
@@ -781,19 +522,19 @@ export default function ModelsPage() {
             <CardTitle className="text-sm font-medium text-blue-500">Lite Tier</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerHour.lite}</div>
-            <p className="text-xs text-muted-foreground">requests/hour</p>
+            <div className="text-2xl font-bold">{tierRequestsPerDay.lite}</div>
+            <p className="text-xs text-muted-foreground">requests/day</p>
             <p className="text-xs text-muted-foreground mt-2">{liteModels.length} models</p>
           </CardContent>
         </Card>
         <Card className="border-coral-500/20 bg-coral-500/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-coral-500">Pro Tier</CardTitle>
+            <CardTitle className="text-sm font-medium text-coral-500">Premium Tier</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerHour.pro}</div>
-            <p className="text-xs text-muted-foreground">requests/hour</p>
-            <p className="text-xs text-muted-foreground mt-2">{proModels.length} exclusive models</p>
+            <div className="text-2xl font-bold">{tierRequestsPerDay.premium}</div>
+            <p className="text-xs text-muted-foreground">requests/day</p>
+            <p className="text-xs text-muted-foreground mt-2">{premiumModels.length} models</p>
           </CardContent>
         </Card>
         <Card className="border-purple-500/20 bg-purple-500/5">
@@ -801,9 +542,9 @@ export default function ModelsPage() {
             <CardTitle className="text-sm font-medium text-purple-500">Max Tier</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerHour.max}</div>
-            <p className="text-xs text-muted-foreground">requests/hour</p>
-            <p className="text-xs text-muted-foreground mt-2">{maxModels.length} premium models</p>
+            <div className="text-2xl font-bold">{tierRequestsPerDay.max}</div>
+            <p className="text-xs text-muted-foreground">requests/day</p>
+            <p className="text-xs text-muted-foreground mt-2">{maxModels.length} models</p>
           </CardContent>
         </Card>
         <Card className="border-white/10">
@@ -823,7 +564,7 @@ export default function ModelsPage() {
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="free">Free</TabsTrigger>
           <TabsTrigger value="lite">Lite</TabsTrigger>
-          <TabsTrigger value="pro">Pro</TabsTrigger>
+          <TabsTrigger value="premium">Premium</TabsTrigger>
           <TabsTrigger value="max">Max</TabsTrigger>
         </TabsList>
       </Tabs>
@@ -832,7 +573,7 @@ export default function ModelsPage() {
         {(activeTab === "all" || activeTab === "free") && (
           <ModelSection
             title="Free Models"
-            description="Available to all users with rate limits"
+            description="Available to all users"
             tier="free"
             models={freeModels}
             viewMode={viewMode}
@@ -849,20 +590,20 @@ export default function ModelsPage() {
           />
         )}
 
-        {(activeTab === "all" || activeTab === "pro") && (
+        {(activeTab === "all" || activeTab === "premium") && (
           <ModelSection
-            title="Pro Models"
-            description="Additional models for Pro plan users"
-            tier="pro"
-            models={proModels}
+            title="Premium Models"
+            description="Additional models for Premium plan users"
+            tier="premium"
+            models={premiumModels}
             viewMode={viewMode}
           />
         )}
 
         {(activeTab === "all" || activeTab === "max") && (
           <ModelSection
-            title="Max Models (🤫 Routing.run Exclusives)"
-            description="Extra Premium Models for Max plan - shhh don't tell anyone"
+            title="Max Models"
+            description="Extra models for Max plan users"
             tier="max"
             models={maxModels}
             viewMode={viewMode}
@@ -878,7 +619,7 @@ export default function ModelsPage() {
           <div className="space-y-2">
             <h3 className="font-semibold text-lg">Plan-Based Access</h3>
             <p className="text-muted-foreground">
-              Your plan determines which models you can access. Free tier gets 10 requests/hour, Pro gets 60/hour, and Max gets 150/hour. Xiaomi models and MiniMax Highspeed models are exclusive to Max plan. Upgrade anytime to unlock more models and higher limits.
+              Your plan determines which models you can access. Free tier gets 50 requests/day, Lite gets 400/day, Premium gets 1,000/day, and Max gets 2,500/day. Upgrade anytime to unlock more models and higher limits.
             </p>
           </div>
         </div>
