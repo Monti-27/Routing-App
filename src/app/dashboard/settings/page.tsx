@@ -29,8 +29,8 @@ const PLANS = [
     price: "$0",
     priceDetail: "forever",
     badge: "bg-zinc-600",
-    requestsPerHour: 5,
-    features: ["5 requests per hour", "Basic model access", "Standard routing", "Community support"],
+    requestsPerDay: 50,
+    features: ["50 requests per day", "Basic model access", "Standard routing", "Community support"],
   },
   {
     id: "lite",
@@ -38,17 +38,17 @@ const PLANS = [
     price: "$10",
     priceDetail: "/month",
     badge: "bg-blue-600",
-    requestsPerHour: 40,
-    features: ["40 requests per hour", "Extended model access", "Priority routing", "Email support"],
+    requestsPerDay: 400,
+    features: ["400 requests per day", "Extended model access", "Priority routing", "Email support"],
   },
   {
     id: "premium",
-    name: "Pro",
+    name: "Premium",
     price: "$20",
     priceDetail: "/month",
     badge: "bg-indigo-600",
-    requestsPerHour: 100,
-    features: ["100 requests per hour", "All Lite models + more", "Fastest routing", "Priority support"],
+    requestsPerDay: 1000,
+    features: ["1,000 requests per day", "All Lite models + more", "Fastest routing", "Priority support"],
   },
   {
     id: "max",
@@ -56,8 +56,8 @@ const PLANS = [
     price: "$50",
     priceDetail: "/month",
     badge: "bg-violet-600",
-    requestsPerHour: 250,
-    features: ["250 requests per hour", "All models access", "Fastest routing", "Dedicated support"],
+    requestsPerDay: 2500,
+    features: ["2,500 requests per day", "All models access", "Fastest routing", "Dedicated support"],
   },
 ];
 
@@ -341,7 +341,7 @@ const handleChangePassword = async () => {
                     <span className="text-muted-foreground text-sm">{plan.priceDetail}</span>
                   </div>
                   <div className="mt-2 text-xs text-muted-foreground">
-                    {plan.requestsPerHour} requests/hour
+                    {plan.requestsPerDay} requests/day
                   </div>
                   <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                     {plan.features.map((f) => (

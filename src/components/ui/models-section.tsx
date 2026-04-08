@@ -225,22 +225,14 @@ export default function ModelsPage() {
 
         {plans.map((plan) => (
           <div key={plan.id} className={cn(selectedPlan === plan.id ? "block" : "hidden")}>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
               <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">
                 <p className="text-2xl font-bold text-white">{plan.price}</p>
                 <p className="text-xs text-gray-400">per month</p>
               </div>
               <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">
-                <p className="text-2xl font-bold text-white">{plan.requestsPerHour}</p>
-                <p className="text-xs text-gray-400">requests/hour</p>
-              </div>
-              <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">
-                <p className="text-2xl font-bold text-white">${plan.credits}</p>
-                <p className="text-xs text-gray-400">credits/month</p>
-              </div>
-              <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">
-                <p className="text-2xl font-bold text-white">{(plan as any).burst || plan.requestsPerHour / 2}</p>
-                <p className="text-xs text-gray-400">burst</p>
+                <p className="text-2xl font-bold text-white">{plan.requestsPerDay}</p>
+                <p className="text-xs text-gray-400">requests/day</p>
               </div>
               <div className="bg-neutral-800/50 rounded-xl p-4 text-center border border-neutral-700">
                 <p className="text-2xl font-bold text-white">
