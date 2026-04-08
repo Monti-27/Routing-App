@@ -24,15 +24,21 @@ interface UsageData {
   total_output_tokens: number;
   total_cost: number;
   models: Record<string, { requests?: number; input_tokens?: number; output_tokens?: number }>;
+  daily_requests_used?: number;
 }
 
-interface CreditsData {
-  credits: number;
-  credits_monthly: number;
-  credits_used: number;
+interface PlanData {
   plan_tier: string;
-  payg_enabled: boolean;
+  requests_per_day: number;
+  requests_used_today: number;
 }
+
+const PLAN_LIMITS: Record<string, number> = {
+  free: 50,
+  lite: 400,
+  premium: 1000,
+  max: 2500,
+};
 
 function formatNumber(num: number): string {
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -77,22 +83,23 @@ function BarChart({ data, maxValue }: { data: { label: string; value: number }[]
 export default function DashboardPage() {
   const { user } = useAuth();
   const [usage, setUsage] = useState<UsageData | null>(null);
-  const [credits, setCredits] = useState<CreditsData | null>(null);
+  const [plan, setPlan] = useState<PlanData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [costMultiplier, setCostMultiplier] = useState(1.65);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [usageData, creditsData, settingsData] = await Promise.all([
+        const [usageData, creditsData] = await Promise.all([
           api.usage.get("monthly"),
           api.credits.get(),
-          api.settings.get(),
         ]);
         setUsage(usageData);
-        setCredits(creditsData);
-        setCostMultiplier(settingsData.cost_multiplier);
+        setPlan({
+          plan_tier: creditsData.plan_tier,
+          requests_per_day: PLAN_LIMITS[creditsData.plan_tier?.toLowerCase()] || 50,
+          requests_used_today: 0,
+        });
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load data");
@@ -107,8 +114,11 @@ export default function DashboardPage() {
     ? usage.total_input_tokens + usage.total_output_tokens
     : 0;
 
-  const creditsPercentage = credits && credits.credits_monthly > 0
-    ? Math.min(100, (Number(credits.credits_used) / Number(credits.credits_monthly)) * 100)
+  const dailyLimit = plan ? PLAN_LIMITS[plan.plan_tier?.toLowerCase()] || 50 : 50;
+  const requestsUsedToday = plan?.requests_used_today || usage?.daily_requests_used || 0;
+  const requestsRemaining = Math.max(0, dailyLimit - requestsUsedToday);
+  const requestsPercentage = dailyLimit > 0
+    ? Math.min(100, (requestsUsedToday / dailyLimit) * 100)
     : 0;
 
   const topModels = usage
@@ -190,14 +200,14 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Credits Left</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Requests Left</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {loading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold">{credits?.credits.toFixed(1) || "0"}</div>
+              <div className="text-2xl font-bold">{formatNumber(requestsRemaining)}</div>
             )}
           </CardContent>
         </Card>
@@ -206,16 +216,16 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Current Plan</CardTitle>
             <Badge variant="outline" className="text-xs">
-              {credits?.plan_tier?.toUpperCase() || "FREE"}
+              {plan?.plan_tier?.toUpperCase() || "FREE"}
             </Badge>
           </CardHeader>
           <CardContent>
             {loading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold">{formatNumber(credits?.credits_monthly || 0)}</div>
+              <div className="text-2xl font-bold">{formatNumber(dailyLimit)}</div>
             )}
-            <p className="text-xs text-muted-foreground mt-1">monthly credits</p>
+            <p className="text-xs text-muted-foreground mt-1">requests/day</p>
           </CardContent>
         </Card>
       </div>
@@ -224,8 +234,8 @@ export default function DashboardPage() {
         <Card className="lg:col-span-2">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold">Credits This Month</CardTitle>
-              <Badge variant="secondary">{creditsPercentage.toFixed(0)}% used</Badge>
+              <CardTitle className="text-base font-semibold"> Requests Today</CardTitle>
+              <Badge variant="secondary">{requestsPercentage.toFixed(0)}% used</Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -235,23 +245,23 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-3xl font-bold">{credits?.credits.toFixed(1) || "0"}</p>
-                    <p className="text-sm text-muted-foreground">credits remaining</p>
+                    <p className="text-3xl font-bold">{formatNumber(requestsRemaining)}</p>
+                    <p className="text-sm text-muted-foreground">requests remaining</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold">${((credits?.credits_used || 0) * costMultiplier).toFixed(2)}</p>
-                    <p className="text-sm text-muted-foreground">credits used</p>
+                    <p className="text-lg font-semibold">{formatNumber(requestsUsedToday)}</p>
+                    <p className="text-sm text-muted-foreground">requests used</p>
                   </div>
                 </div>
                 <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-zinc-600 rounded-full transition-all duration-500"
-                    style={{ width: `${creditsPercentage}%` }}
+                    style={{ width: `${requestsPercentage}%` }}
                   />
                 </div>
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{((credits?.credits || 0)).toFixed(1)} left</span>
-                  <span>{credits?.credits_monthly || 0} total</span>
+                  <span>{formatNumber(requestsRemaining)} left</span>
+                  <span>{dailyLimit} total</span>
                 </div>
               </div>
             )}
