@@ -38,6 +38,7 @@
   --color-destructive: var(--destructive);
   --color-destructive-brighter: var(--destructive-brighter);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -124,7 +125,7 @@
 }
 
 .angled-rectangle-gradient::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image: repeating-linear-gradient(
@@ -297,12 +298,20 @@
 
 /* Dotted background */
 @utility dotted-bg {
-  background-image: radial-gradient(circle at center, #06060616 1px, transparent 1px);
+  background-image: radial-gradient(
+    circle at center,
+    #06060616 1px,
+    transparent 1px
+  );
   background-size: 8px 8px;
 }
 
 .dark .dotted-bg {
-  background-image: radial-gradient(circle at center, #ffffff09 1px, transparent 1px);
+  background-image: radial-gradient(
+    circle at center,
+    #ffffff09 1px,
+    transparent 1px
+  );
   background-size: 8px 8px;
 }
 
@@ -311,53 +320,53 @@
    ========================================================================== */
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #27282D;
-  --card: #FFFFFF;
-  --card-foreground: #27282D;
-  --popover: #FFFFFF;
-  --popover-foreground: #27282D;
+  --background: #ffffff;
+  --foreground: #27282d;
+  --card: #ffffff;
+  --card-foreground: #27282d;
+  --popover: #ffffff;
+  --popover-foreground: #27282d;
 
-  --primary: #27282D;
-  --primary-foreground: #E7E8EB;
-  --brand-amber: #E3A514;
-  --brand-coral: #B74677;
-  --brand-purple: #453C7C;
+  --primary: #27282d;
+  --primary-foreground: #e7e8eb;
+  --brand-amber: #e3a514;
+  --brand-coral: #b74677;
+  --brand-purple: #453c7c;
 
-  --secondary: #EDEEF2;
-  --secondary-brighter: #F3F4F7;
-  --secondary-brightest: #FAFAFB;
-  --secondary-foreground: #453C7C;
+  --secondary: #edeef2;
+  --secondary-brighter: #f3f4f7;
+  --secondary-brightest: #fafafb;
+  --secondary-foreground: #453c7c;
 
-  --muted: #F4F4F6;
-  --muted-foreground: #71727A;
-  --accent: #ECEDF3;
-  --accent-disabled: #D5D6DE;
-  --accent-brighter: #F3F4F7;
-  --sidebar-accent-brighter: #F3F4F7;
-  --accent-foreground: #27282D;
-  --destructive: #DC2626;
-  --destructive-brighter: #E04040;
-  --destructive-foreground: #FFFFFF;
+  --muted: #f4f4f6;
+  --muted-foreground: #71727a;
+  --accent: #ecedf3;
+  --accent-disabled: #d5d6de;
+  --accent-brighter: #f3f4f7;
+  --sidebar-accent-brighter: #f3f4f7;
+  --accent-foreground: #27282d;
+  --destructive: #dc2626;
+  --destructive-brighter: #e04040;
+  --destructive-foreground: #ffffff;
 
   --border: #d1d3dc;
-  --input: #E4E5EA;
-  --ring: #453C7C;
+  --input: #e4e5ea;
+  --ring: #453c7c;
 
-  --chart-1: #6B5CA5;
-  --chart-2: #B74677;
-  --chart-3: #E3A514;
-  --chart-4: #2D9CDB;
-  --chart-5: #27AE60;
+  --chart-1: #6b5ca5;
+  --chart-2: #b74677;
+  --chart-3: #e3a514;
+  --chart-4: #2d9cdb;
+  --chart-5: #27ae60;
 
-  --sidebar: #FAFAFB;
-  --sidebar-foreground: #27282D;
-  --sidebar-primary: #453C7C;
-  --sidebar-primary-foreground: #E7E8EB;
-  --sidebar-accent: #EDEEF2;
-  --sidebar-accent-foreground: #27282D;
+  --sidebar: #fafafb;
+  --sidebar-foreground: #27282d;
+  --sidebar-primary: #453c7c;
+  --sidebar-primary-foreground: #e7e8eb;
+  --sidebar-accent: #edeef2;
+  --sidebar-accent-foreground: #27282d;
   --sidebar-border: #d1d3dc;
-  --sidebar-ring: #453C7C;
+  --sidebar-ring: #453c7c;
 
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -392,17 +401,17 @@
     0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
 
-  --success: #16A34A;
-  --success-foreground: #FFFFFF;
-  --warning: #CA8A04;
-  --warning-foreground: #27282D;
-  --info: #2563EB;
-  --info-foreground: #FFFFFF;
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --warning: #ca8a04;
+  --warning-foreground: #27282d;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
 
   --scrollbar-size: 8px;
   --scrollbar-track: transparent;
-  --scrollbar-thumb: #9D9EA6;
-  --scrollbar-thumb-hover: #71727A;
+  --scrollbar-thumb: #9d9ea6;
+  --scrollbar-thumb-hover: #71727a;
 
   --focus-ring: 0 0 0 2px var(--ring);
   --focus-ring-offset: 2px;
@@ -572,7 +581,6 @@
   .maplibregl-popup-tip {
     @apply hidden!;
   }
-
 }
 
 /* ==========================================================================
@@ -701,7 +709,8 @@
 
 /* Border Animations */
 @keyframes gradient-shift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -710,7 +719,8 @@
 }
 
 @keyframes border-slow {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -719,7 +729,8 @@
 }
 
 @keyframes border-medium {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -728,7 +739,8 @@
 }
 
 @keyframes border-fast {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -766,7 +778,8 @@
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

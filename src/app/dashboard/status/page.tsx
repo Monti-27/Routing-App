@@ -1,21 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, Bot, Clock, RefreshCw, Server } from "lucide-react";
+
+import {
+  PageHeader,
+  StatCard,
+  SubtleBadge,
+  SurfaceCard,
+} from "@/components/dashboard/page-ui";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
-import { useAuth } from "@/lib/auth-context";
-import {
-  Activity,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Clock,
-  RefreshCw,
-  Server,
-  Bot,
-} from "lucide-react";
 
 interface ProviderStatus {
   name: string;
@@ -48,122 +44,58 @@ interface StatusData {
   last_updated: string;
 }
 
-const providerLogos: Record<string, string> = {
-  "MiniMax": "/providers/minimax.png",
-  "OpenCode": "/providers/opencode.png",
-  "Zai": "/providers/zai.svg",
-  "OpenRouter": "/providers/openrouter.png",
-  "OpenRouter Xiaomi": "/providers/openrouter.png",
-  "OpenRouter DeepSeek": "/providers/openrouter.png",
-  "OpenRouter Grok": "/providers/openrouter.png",
-  "Chutes": "/providers/chutes.png",
-};
-
-const modelLogos: Record<string, string> = {
-  "minimax": "/model-logos/route-minimax.png",
-  "opencode": "/providers/opencode.png",
-  "zai": "/model-logos/route-zai.svg",
-  "openrouter": "/providers/openrouter.png",
-  "nvidia": "/model-logos/route-nvidia.svg",
-  "arcee": "/model-logos/route-arcee.png",
-  "qwen": "/model-logos/route-qwen.png",
-  "openai": "/model-logos/route-openai.svg",
-  "nous": "/model-logos/route-nous.png",
-  "meta": "/model-logos/route-meta.png",
-  "google": "/model-logos/route-google.svg",
-  "kimi": "/model-logos/route-kimi.png",
-  "deepseek": "/model-logos/route-deepseek.png",
-  "xiaomi": "/model-logos/route-xiaomi.png",
-  "chutes": "/providers/chutes.png",
-};
-
-const modelIdLogos: Record<string, string> = {
-  "route/nemotron-3-super-120b": "/model-logos/route-nvidia.svg",
-  "route/nemotron-3-nano-30b": "/model-logos/route-nvidia.svg",
-  "route/qwen3-coder": "/model-logos/route-qwen.png",
-  "route/qwen3-coder-next": "/model-logos/route-qwen.png",
-  "route/qwen3-32b": "/model-logos/route-qwen.png",
-  "route/gpt-oss-120b": "/model-logos/route-openai.svg",
-  "route/hermes-3-llama-3.1-405b": "/model-logos/route-nous.png",
-  "route/llama-3.2-3b-instruct": "/model-logos/route-meta.png",
-  "route/gemma-3-27b-it": "/model-logos/route-google.svg",
-  "route/qwen3.6-plus-preview": "/model-logos/route-qwen.png",
-  "route/qwen3-next-80b": "/model-logos/route-qwen.png",
-  "route/glm-4.5-air": "/model-logos/route-zai.svg",
-  "route/glm-5": "/model-logos/route-zai.svg",
-  "route/glm-5-turbo": "/model-logos/route-zai.svg",
-  "route/kimi-k2.5": "/model-logos/route-kimi.png",
-  "route/deepseek-v3.2": "/model-logos/route-deepseek.png",
-  "route/deepseek-v3.2-speciale": "/model-logos/route-deepseek.png",
-  "route/deepseek-r1": "/model-logos/route-deepseek.png",
-  "route/grok-4-fast": "/model-logos/route-xai.png",
-  "route/grok-4.20-beta": "/model-logos/route-xai.png",
-  "route/grok-4.20-multi-agent-beta": "/model-logos/route-xai.png",
-  "route/mimo-v2-omni": "/model-logos/route-xiaomi.png",
-  "route/mimo-v2-pro": "/model-logos/route-xiaomi.png",
-  "route/mimo-v2-flash": "/model-logos/route-xiaomi.png",
-  "route/minimax-image-1": "/model-logos/route-minimax.png",
-};
-
 const tierColors: Record<string, string> = {
-  free: "bg-zinc-600",
-  lite: "bg-blue-600",
-  pro: "bg-indigo-600",
-  max: "bg-violet-600",
+  free: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
+  lite: "bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
+  pro: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
+  max: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
 };
 
 function StatusBadge({ status }: { status: string }) {
-  if (status === "online" || status === "healthy" || status === "operational") {
+  if (["online", "healthy", "operational"].includes(status)) {
     return (
-      <Badge className="bg-green-600 hover:bg-green-700">
-        <CheckCircle className="h-3 w-3 mr-1" />
+      <Badge className="rounded-md bg-emerald-600 text-white hover:bg-emerald-600">
         Online
       </Badge>
     );
   }
   if (status === "degraded") {
     return (
-      <Badge className="bg-amber-600 hover:bg-amber-700">
-        <AlertTriangle className="h-3 w-3 mr-1" />
+      <Badge className="rounded-md bg-amber-500 text-white hover:bg-amber-500">
         Degraded
       </Badge>
     );
   }
-  if (status === "error" || status === "down") {
+  if (["error", "down"].includes(status)) {
     return (
-      <Badge className="bg-red-600 hover:bg-red-700">
-        <XCircle className="h-3 w-3 mr-1" />
+      <Badge className="rounded-md bg-red-600 text-white hover:bg-red-600">
         Offline
       </Badge>
     );
   }
-  return (
-    <Badge variant="secondary">
-      <Clock className="h-3 w-3 mr-1" />
-      Unknown
-    </Badge>
-  );
-}
-
-function getModelLogo(modelId: string, provider: string): string | undefined {
-  if (modelIdLogos[modelId]) {
-    return modelIdLogos[modelId];
-  }
-  const key = provider.toLowerCase();
-  return modelLogos[key];
+  return <Badge variant="outline">Unknown</Badge>;
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
-  if (severity === "error") {
-    return <Badge className="bg-red-600">Critical</Badge>;
-  }
-  if (severity === "warning") {
-    return <Badge className="bg-amber-600">Warning</Badge>;
-  }
-  if (severity === "info") {
-    return <Badge className="bg-blue-600">Info</Badge>;
-  }
-  return <Badge variant="secondary">{severity}</Badge>;
+  if (severity === "error")
+    return (
+      <Badge className="rounded-md bg-red-600 text-white hover:bg-red-600">
+        Critical
+      </Badge>
+    );
+  if (severity === "warning")
+    return (
+      <Badge className="rounded-md bg-amber-500 text-white hover:bg-amber-500">
+        Warning
+      </Badge>
+    );
+  if (severity === "info")
+    return (
+      <Badge className="rounded-md bg-sky-600 text-white hover:bg-sky-600">
+        Info
+      </Badge>
+    );
+  return <Badge variant="outline">{severity}</Badge>;
 }
 
 function formatTimeAgo(dateString: string): string {
@@ -178,7 +110,6 @@ function formatTimeAgo(dateString: string): string {
 }
 
 export default function StatusPage() {
-  const { user } = useAuth();
   const [status, setStatus] = useState<StatusData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -195,296 +126,254 @@ export default function StatusPage() {
         setLoading(false);
       }
     }
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 30000);
-    return () => clearInterval(interval);
+
+    void fetchStatus();
+    const interval = window.setInterval(fetchStatus, 30_000);
+    return () => window.clearInterval(interval);
   }, []);
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">System Status</h2>
-          <p className="text-muted-foreground">
-            Monitor the health of our API and models.
-          </p>
-        </div>
-        <Card className="border-destructive/50">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <XCircle className="h-12 w-12 text-destructive mb-4" />
-            <p className="text-lg font-medium">Failed to load status</p>
-            <p className="text-sm text-muted-foreground mt-1">{error}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const onlineProviders = status?.providers.filter(p => p.status === "online" || p.status === "healthy").length || 0;
+  const onlineProviders =
+    status?.providers.filter((provider) =>
+      ["online", "healthy"].includes(provider.status),
+    ).length || 0;
   const totalProviders = status?.providers.length || 0;
-  const onlineModels = status?.models.filter(m => m.status === "online" || m.status === "healthy").length || 0;
+  const onlineModels =
+    status?.models.filter((model) =>
+      ["online", "healthy"].includes(model.status),
+    ).length || 0;
   const totalModels = status?.models.length || 0;
-  const activeIncidents = status?.incidents.filter(i => i.status === "ongoing").length || 0;
+  const activeIncidents =
+    status?.incidents.filter((incident) => incident.status === "ongoing")
+      .length || 0;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">System Status</h2>
-        <p className="text-muted-foreground mt-1">
-          Monitor the health of our API, providers, and models.
-        </p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Status"
+        description="Provider health, model availability, and current incidents in one place."
+        meta={
+          status?.last_updated ? (
+            <SubtleBadge>
+              Last updated {formatTimeAgo(status.last_updated)}
+            </SubtleBadge>
+          ) : null
+        }
+      />
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Providers</CardTitle>
-            <Server className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold">{onlineProviders}</span>
-                <span className="text-muted-foreground">/ {totalProviders}</span>
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">providers online</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Models</CardTitle>
-            <Bot className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold">{onlineModels}</span>
-                <span className="text-muted-foreground">/ {totalModels}</span>
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">models operational</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Incidents</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold">{activeIncidents}</div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">open incidents</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Last Updated</CardTitle>
-            <RefreshCw className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-sm font-medium">
-                {status?.last_updated ? formatTimeAgo(status.last_updated) : "N/A"}
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">auto-refreshes every 30s</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {activeIncidents > 0 && (
-        <Card className="border-amber-500/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
-              <CardTitle className="text-base">Active Incidents</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {status?.incidents.filter(i => i.status === "ongoing").map((incident) => (
-              <div key={incident.id} className="flex items-start gap-4 p-4 rounded-lg bg-amber-500/10">
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium">{incident.title}</h4>
-                    <SeverityBadge severity={incident.severity} />
-                  </div>
-                  <p className="text-sm text-muted-foreground">{incident.description}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Started {formatTimeAgo(incident.created_at)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold">Providers</CardTitle>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <RefreshCw className="h-3 w-3" />
-              Auto-refresh
-            </div>
+      {error ? (
+        <SurfaceCard
+          title="Status unavailable"
+          description="The latest service health snapshot could not be loaded."
+        >
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-muted-foreground">
+            {error}
           </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {status?.providers.map((provider) => (
-                <div
-                  key={provider.name}
-                  className="flex items-center justify-between p-3 rounded-lg border"
-                >
-                  <div className="flex items-center gap-3">
-                    {providerLogos[provider.name] ? (
-                      <img
-                        src={providerLogos[provider.name]}
-                        alt={provider.name}
-                        className="w-8 h-8 object-contain"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                        <Server className="h-4 w-4" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium text-sm">{provider.name}</p>
-                      {provider.latency_ms && (
-                        <p className="text-xs text-muted-foreground">
-                          {provider.latency_ms}ms latency
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <StatusBadge status={provider.status} />
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold">Models by Tier</CardTitle>
-            <Badge variant="secondary">{totalModels} models</Badge>
+        </SurfaceCard>
+      ) : (
+        <>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              hint={`${totalProviders} tracked providers`}
+              icon={Server}
+              label="Providers online"
+              value={
+                loading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  `${onlineProviders}/${totalProviders}`
+                )
+              }
+            />
+            <StatCard
+              hint={`${totalModels} tracked models`}
+              icon={Bot}
+              label="Models online"
+              value={
+                loading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  `${onlineModels}/${totalModels}`
+                )
+              }
+            />
+            <StatCard
+              hint="Ongoing items requiring attention"
+              icon={AlertTriangle}
+              label="Active incidents"
+              value={
+                loading ? <Skeleton className="h-8 w-20" /> : activeIncidents
+              }
+            />
+            <StatCard
+              hint="Refreshes automatically every 30 seconds"
+              icon={RefreshCw}
+              label="Update cadence"
+              value={loading ? <Skeleton className="h-8 w-24" /> : "30s"}
+            />
           </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {["free", "lite", "pro", "max"].map((tier) => {
-                const tierModels = status?.models.filter(m => m.tier === tier) || [];
-                if (tierModels.length === 0) return null;
-                return (
-                  <div key={tier} className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Badge className={tierColors[tier]}>{tier.toUpperCase()}</Badge>
-                      <span className="text-sm text-muted-foreground">
-                        {tierModels.length} models
-                      </span>
-                    </div>
-                    <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-                      {tierModels.map((model) => (
-                        <div
-                          key={model.id}
-                          className="flex items-center gap-3 p-3 rounded-lg border"
-                        >
-                          {(() => {
-                            const logo = getModelLogo(model.id, model.provider);
-                            return logo ? (
-                              <img
-                                src={logo}
-                                alt={model.provider}
-                                className="w-8 h-8 object-contain shrink-0"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 rounded bg-muted flex items-center justify-center shrink-0">
-                                <Bot className="h-4 w-4 text-muted-foreground" />
-                              </div>
-                            );
-                          })()}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{model.name}</p>
-                            <p className="text-xs text-muted-foreground">{model.provider}</p>
+
+          {activeIncidents > 0 ? (
+            <SurfaceCard
+              title="Active incidents"
+              description="Issues currently affecting service quality or availability."
+            >
+              <div className="space-y-3">
+                {status?.incidents
+                  .filter((incident) => incident.status === "ongoing")
+                  .map((incident) => (
+                    <div
+                      className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-4"
+                      key={incident.id}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-foreground">
+                              {incident.title}
+                            </p>
+                            <SeverityBadge severity={incident.severity} />
                           </div>
-                          <StatusBadge status={model.status} />
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {incident.description}
+                          </p>
                         </div>
-                      ))}
+                        <SubtleBadge>
+                          Started {formatTimeAgo(incident.created_at)}
+                        </SubtleBadge>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {status?.incidents && status.incidents.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Incident History</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {status.incidents.map((incident) => (
-              <div
-                key={incident.id}
-                className={`p-4 rounded-lg border ${
-                  incident.status === "ongoing"
-                    ? "bg-amber-500/10 border-amber-500/30"
-                    : "bg-muted/50"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium">{incident.title}</h4>
-                      <SeverityBadge severity={incident.severity} />
-                      {incident.status === "resolved" && (
-                        <Badge className="bg-green-600">Resolved</Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{incident.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
-                      <span>Started {formatTimeAgo(incident.created_at)}</span>
-                      {incident.resolved_at && (
-                        <span>Resolved {formatTimeAgo(incident.resolved_at)}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  ))}
               </div>
-            ))}
-          </CardContent>
-        </Card>
+            </SurfaceCard>
+          ) : null}
+
+          <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+            <SurfaceCard
+              title="Providers"
+              description="Live provider status with observed latency."
+            >
+              <div className="space-y-3">
+                {loading
+                  ? Array.from({ length: 4 }).map((_, index) => (
+                      <Skeleton className="h-14 w-full" key={index} />
+                    ))
+                  : status?.providers.map((provider) => (
+                      <div
+                        className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3"
+                        key={provider.name}
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            {provider.name}
+                          </p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {provider.latency_ms
+                              ? `${provider.latency_ms}ms latency`
+                              : "Latency unavailable"}
+                          </p>
+                        </div>
+                        <StatusBadge status={provider.status} />
+                      </div>
+                    ))}
+              </div>
+            </SurfaceCard>
+
+            <SurfaceCard
+              title="Models by tier"
+              description="Availability across account tiers and current operational status."
+            >
+              <div className="space-y-6">
+                {loading
+                  ? Array.from({ length: 4 }).map((_, index) => (
+                      <Skeleton className="h-24 w-full" key={index} />
+                    ))
+                  : ["free", "lite", "pro", "max"].map((tier) => {
+                      const tierModels =
+                        status?.models.filter((model) => model.tier === tier) ||
+                        [];
+                      if (tierModels.length === 0) return null;
+
+                      return (
+                        <div className="space-y-3" key={tier}>
+                          <div className="flex items-center gap-2">
+                            <Badge className={tierColors[tier]}>
+                              {tier.toUpperCase()}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {tierModels.length} models
+                            </span>
+                          </div>
+                          <div className="space-y-2">
+                            {tierModels.map((model) => (
+                              <div
+                                className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3"
+                                key={model.id}
+                              >
+                                <div>
+                                  <p className="text-sm font-medium text-foreground">
+                                    {model.name}
+                                  </p>
+                                  <p className="mt-1 text-sm text-muted-foreground">
+                                    {model.provider}
+                                  </p>
+                                </div>
+                                <StatusBadge status={model.status} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+              </div>
+            </SurfaceCard>
+          </div>
+
+          {status?.incidents?.length ? (
+            <SurfaceCard
+              title="Incident history"
+              description="Recent resolved and active operational events."
+            >
+              <div className="space-y-3">
+                {status.incidents.map((incident) => (
+                  <div
+                    className="rounded-lg border border-border/70 px-4 py-4"
+                    key={incident.id}
+                  >
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-medium text-foreground">
+                            {incident.title}
+                          </p>
+                          <SeverityBadge severity={incident.severity} />
+                          {incident.status === "resolved" ? (
+                            <Badge className="rounded-md bg-emerald-600 text-white hover:bg-emerald-600">
+                              Resolved
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {incident.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>
+                          Started {formatTimeAgo(incident.created_at)}
+                        </span>
+                        {incident.resolved_at ? (
+                          <span>
+                            Resolved {formatTimeAgo(incident.resolved_at)}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SurfaceCard>
+          ) : null}
+        </>
       )}
     </div>
   );

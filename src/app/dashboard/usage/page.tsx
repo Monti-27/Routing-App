@@ -1,16 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
-  TrendingUp,
   Calendar,
   Download,
   Loader2,
+  TrendingUp,
 } from "lucide-react";
+
+import {
+  InlineMetric,
+  PageHeader,
+  StatCard,
+  SubtleBadge,
+  SurfaceCard,
+} from "@/components/dashboard/page-ui";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 
 type Period = "daily" | "hourly" | "monthly";
@@ -31,25 +38,29 @@ export default function UsagePage() {
   const [totalOutputTokens, setTotalOutputTokens] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
   const [modelUsage, setModelUsage] = useState<ModelUsage[]>([]);
-  const [chartData, setChartData] = useState<{ date: string; requests: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { date: string; requests: number }[]
+  >([]);
   const [costMultiplier, setCostMultiplier] = useState(1.65);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       setError(null);
+
       try {
         const [usageData, settingsData] = await Promise.all([
           api.usage.get(period),
           api.settings.get(),
         ]);
+
         setCostMultiplier(settingsData.cost_multiplier);
-        
+
         const requests = usageData.total_requests || 0;
         const inputTokens = usageData.total_input_tokens || 0;
         const outputTokens = usageData.total_output_tokens || 0;
         const cost = (usageData.total_cost || 0) * settingsData.cost_multiplier;
-        
+
         setTotalRequests(requests);
         setTotalInputTokens(inputTokens);
         setTotalOutputTokens(outputTokens);
@@ -57,299 +68,277 @@ export default function UsagePage() {
 
         const models: ModelUsage[] = [];
         const chart: { date: string; requests: number }[] = [];
-        
+
         if (usageData.models && typeof usageData.models === "object") {
           for (const [modelName, metrics] of Object.entries(usageData.models)) {
-            const m = metrics as Record<string, number>;
-            const isImageModel = Boolean(m.is_image_model);
-            const modelRequests = m.image_requests || m.requests || 0;
-            const input = m.input_tokens || 0;
-            const output = m.output_tokens || 0;
-            
-            let cost = m.cost || 0;
-            if (isImageModel && !m.cost) {
-              cost = 0;
-            } else if (!cost && (input > 0 || output > 0)) {
-              cost = ((input + output) / 1000) * 0.01;
+            const metricValues = metrics as Record<string, number>;
+            const isImageModel = Boolean(metricValues.is_image_model);
+            const modelRequests =
+              metricValues.image_requests || metricValues.requests || 0;
+            const input = metricValues.input_tokens || 0;
+            const output = metricValues.output_tokens || 0;
+
+            let modelCost = metricValues.cost || 0;
+            if (isImageModel && !metricValues.cost) {
+              modelCost = 0;
+            } else if (!modelCost && (input > 0 || output > 0)) {
+              modelCost = ((input + output) / 1000) * 0.01;
             }
-            
+
             models.push({
               model: modelName,
               requests: modelRequests,
               tokens: input + output,
-              cost: cost,
+              cost: modelCost,
             });
-            
+
             if (period === "daily" || period === "monthly") {
               chart.push({ date: modelName, requests: modelRequests });
             }
           }
         }
-        
+
         if (chart.length === 0) {
-          chart.push({ date: period === "hourly" ? "Now" : "Today", requests: requests });
+          chart.push({ date: period === "hourly" ? "Now" : "Today", requests });
         }
-        
+
         setModelUsage(models.sort((a, b) => b.requests - a.requests));
         setChartData(chart);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load usage");
-        setModelUsage([
-          { model: "GPT-4o", requests: 4821, tokens: 156200, cost: 3.24 },
-          { model: "Claude 3.5 Sonnet", requests: 3542, tokens: 128400, cost: 5.12 },
-          { model: "Gemini Pro", requests: 2104, tokens: 89400, cost: 1.78 },
-          { model: "Qwen Coder Next", requests: 1523, tokens: 67200, cost: 1.01 },
-          { model: "MiniMax", requests: 857, tokens: 38900, cost: 0.68 },
-        ]);
-        setTotalRequests(12847);
-        setTotalInputTokens(312400);
-        setTotalOutputTokens(174800);
-        setChartData([
-          { date: "Mon", requests: 1240 },
-          { date: "Tue", requests: 1890 },
-          { date: "Wed", requests: 2100 },
-          { date: "Thu", requests: 1650 },
-          { date: "Fri", requests: 2340 },
-          { date: "Sat", requests: 980 },
-          { date: "Sun", requests: 1120 },
-        ]);
       } finally {
         setLoading(false);
       }
     }
-    fetchData();
+
+    void fetchData();
   }, [period]);
 
-  const maxRequests = Math.max(...chartData.map((d) => d.requests), 1);
+  const maxRequests = Math.max(...chartData.map((entry) => entry.requests), 1);
+  const totalTokens = totalInputTokens + totalOutputTokens;
 
   return (
-    <div className="space-y-6 overflow-hidden">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Usage Analytics</h2>
-          <p className="text-muted-foreground">
-            Monitor your API usage, tokens, and costs.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Calendar className="mr-2 h-4 w-4" />
-            Last 30 days
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Usage"
+        description="Request volume, token spend, and estimated cost across the selected reporting window."
+        action={
+          <>
+            <Button size="sm" variant="outline">
+              <Calendar className="mr-2 h-4 w-4" />
+              Last 30 days
+            </Button>
+            <Button size="sm" variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+          </>
+        }
+      />
 
-      <div className="flex items-center gap-2">
-        {(["daily", "hourly", "monthly"] as Period[]).map((p) => (
+      <div className="flex flex-wrap items-center gap-2">
+        {(["daily", "hourly", "monthly"] as Period[]).map((value) => (
           <Button
-            key={p}
-            variant={period === p ? "default" : "outline"}
+            key={value}
+            onClick={() => setPeriod(value)}
             size="sm"
-            onClick={() => setPeriod(p)}
+            variant={period === value ? "default" : "outline"}
           >
-            {p.charAt(0).toUpperCase() + p.slice(1)}
+            {value.charAt(0).toUpperCase() + value.slice(1)}
           </Button>
         ))}
       </div>
 
       {loading ? (
-        <Card className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </Card>
+        <SurfaceCard
+          title="Loading usage"
+          description="Fetching your current analytics snapshot."
+        >
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        </SurfaceCard>
       ) : error ? (
-        <Card className="p-4 border-red-200 bg-red-50">
-          <p className="text-sm text-red-600">{error}</p>
-        </Card>
+        <SurfaceCard
+          title="Usage unavailable"
+          description="Analytics could not be loaded."
+        >
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-muted-foreground">
+            {error}
+          </div>
+        </SurfaceCard>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Requests
-                </CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{totalRequests.toLocaleString()}</div>
-                <div className="flex items-center gap-1 text-xs text-green-600">
-                  <TrendingUp className="h-3 w-3" />
-                  Active period
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total Tokens
-                </CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {(totalInputTokens + totalOutputTokens).toLocaleString()}
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  {totalInputTokens.toLocaleString()} in / {totalOutputTokens.toLocaleString()} out
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Est. Cost
-                </CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  ${totalCost.toFixed(2)}
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  Based on usage
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              hint="Requests recorded in the selected period"
+              icon={BarChart3}
+              label="Total Requests"
+              value={totalRequests.toLocaleString()}
+            />
+            <StatCard
+              hint={`${totalInputTokens.toLocaleString()} in / ${totalOutputTokens.toLocaleString()} out`}
+              icon={TrendingUp}
+              label="Total Tokens"
+              value={totalTokens.toLocaleString()}
+            />
+            <StatCard
+              hint={`Multiplier ${costMultiplier.toFixed(2)}x applied`}
+              label="Estimated Cost"
+              value={`$${totalCost.toFixed(2)}`}
+            />
+            <StatCard
+              badge={<SubtleBadge>{period.toUpperCase()}</SubtleBadge>}
+              hint="Average token volume per request"
+              label="Avg Tokens / Request"
+              value={
+                totalRequests > 0
+                  ? (totalTokens / totalRequests).toFixed(1)
+                  : "0"
+              }
+            />
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Request Volume</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end gap-2 h-[200px]">
-                {chartData.map((data, i) => (
-                  <div key={i} className="flex flex-1 flex-col items-center gap-2">
-                    <div className="flex w-full flex-col items-center">
-                      <span className="text-xs text-muted-foreground mb-1">
-                        {data.requests.toLocaleString()}
-                      </span>
+          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+            <SurfaceCard
+              title="Request distribution"
+              description="Relative request volume for the current reporting selection."
+            >
+              <div className="flex h-[280px] items-end gap-3">
+                {chartData.map((entry) => (
+                  <div
+                    className="flex min-w-0 flex-1 flex-col items-center gap-2"
+                    key={entry.date}
+                  >
+                    <span className="text-xs text-muted-foreground">
+                      {entry.requests.toLocaleString()}
+                    </span>
+                    <div className="flex h-[220px] w-full items-end rounded-lg bg-muted/60 px-2 pb-2">
                       <div
-                        className="w-full rounded-t-lg bg-brand-purple transition-all hover:bg-brand-coral"
-                        style={{ height: `${Math.max((data.requests / maxRequests) * 150, 4)}px` }}
+                        className="w-full rounded-md bg-foreground"
+                        style={{
+                          height: `${Math.max((entry.requests / maxRequests) * 100, 4)}%`,
+                        }}
                       />
                     </div>
-                    <span className="text-xs text-muted-foreground">{data.date}</span>
+                    <span className="w-full truncate text-center text-xs text-muted-foreground">
+                      {entry.date.replace("route/", "")}
+                    </span>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </SurfaceCard>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="flex flex-col">
-              <CardHeader className="shrink-0">
-                <CardTitle>Usage by Model</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 min-h-0 overflow-y-auto">
-                <div className="space-y-3">
-                  {modelUsage.length > 0 ? modelUsage.map((model) => (
-                    <div key={model.model} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-sm gap-2">
-                        <span className="font-medium truncate max-w-[200px]" title={model.model}>{model.model}</span>
-                        <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-muted-foreground text-xs">
-                            {(model.tokens / 1000).toFixed(1)}K
-                          </span>
-                          <span className="font-medium text-xs">${(model.cost * costMultiplier).toFixed(2)}</span>
+            <SurfaceCard
+              title="Token breakdown"
+              description="How prompt and completion volume are split."
+            >
+              <div className="space-y-3">
+                <InlineMetric
+                  label="Input tokens"
+                  value={totalInputTokens.toLocaleString()}
+                />
+                <InlineMetric
+                  label="Output tokens"
+                  value={totalOutputTokens.toLocaleString()}
+                />
+                <InlineMetric
+                  label="Input share"
+                  value={
+                    totalTokens > 0
+                      ? `${((totalInputTokens / totalTokens) * 100).toFixed(1)}%`
+                      : "0%"
+                  }
+                />
+                <InlineMetric
+                  label="Output share"
+                  value={
+                    totalTokens > 0
+                      ? `${((totalOutputTokens / totalTokens) * 100).toFixed(1)}%`
+                      : "0%"
+                  }
+                />
+              </div>
+            </SurfaceCard>
+          </div>
+
+          <div className="grid gap-6 xl:grid-cols-2">
+            <SurfaceCard
+              title="Usage by model"
+              description="Highest-volume models sorted by request count."
+            >
+              <div className="space-y-3">
+                {modelUsage.length > 0 ? (
+                  modelUsage.map((model) => (
+                    <div
+                      className="rounded-lg border border-border/70 px-4 py-3"
+                      key={model.model}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p
+                            className="truncate text-sm font-medium text-foreground"
+                            title={model.model}
+                          >
+                            {model.model}
+                          </p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {(model.tokens / 1000).toFixed(1)}K tokens
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-foreground">
+                            {model.requests.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            ${(model.cost * costMultiplier).toFixed(2)} est.
+                          </p>
                         </div>
                       </div>
-                      <div className="h-1.5 w-full rounded-full bg-secondary">
+                      <div className="mt-3 h-1.5 rounded-full bg-muted">
                         <div
-                          className="h-1.5 rounded-full bg-brand-coral transition-all"
+                          className="h-1.5 rounded-full bg-foreground"
                           style={{
                             width: `${Math.max((model.requests / (modelUsage[0]?.requests || 1)) * 100, 2)}%`,
                           }}
                         />
                       </div>
                     </div>
-                  )) : (
-                    <p className="text-sm text-muted-foreground">No model usage data</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="flex flex-col">
-              <CardHeader className="shrink-0">
-                <CardTitle>Provider Performance</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 min-h-0 overflow-y-auto">
-                <div className="space-y-3">
-                  {modelUsage.slice(0, 5).map((model, i) => (
-                    <div
-                      key={model.model}
-                      className="flex items-center justify-between rounded-lg border p-2.5 gap-2"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div
-                          className={`h-2 w-2 rounded-full shrink-0 ${
-                            i === 0 ? "bg-green-500" : i === 1 ? "bg-green-500" : "bg-yellow-500"
-                          }`}
-                        />
-                        <span className="font-medium text-sm truncate max-w-[150px]" title={model.model}>{model.model}</span>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <p className="text-sm font-medium">
-                            {model.requests.toLocaleString()}
-                          </p>
-                          <p className="text-xs text-muted-foreground">requests</p>
-                        </div>
-                        <Badge
-                          variant="secondary"
-                          className="bg-green-500/10 text-green-600"
-                        >
-                          Active
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Token Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">Input Tokens</p>
-                  <p className="text-2xl font-bold">{totalInputTokens.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {totalInputTokens + totalOutputTokens > 0
-                      ? `${((totalInputTokens / (totalInputTokens + totalOutputTokens)) * 100).toFixed(1)}% of total`
-                      : "0% of total"}
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No model usage data available.
                   </p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">Output Tokens</p>
-                  <p className="text-2xl font-bold">{totalOutputTokens.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {totalInputTokens + totalOutputTokens > 0
-                      ? `${((totalOutputTokens / (totalInputTokens + totalOutputTokens)) * 100).toFixed(1)}% of total`
-                      : "0% of total"}
-                  </p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">Avg Tokens/Request</p>
-                  <p className="text-2xl font-bold">
-                    {totalRequests > 0
-                      ? ((totalInputTokens + totalOutputTokens) / totalRequests).toFixed(1)
-                      : "0"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">per request</p>
-                </div>
+                )}
               </div>
-            </CardContent>
-          </Card>
+            </SurfaceCard>
+
+            <SurfaceCard
+              title="Provider activity"
+              description="A compact operational view of your busiest models."
+            >
+              <div className="space-y-3">
+                {modelUsage.slice(0, 5).map((model) => (
+                  <div
+                    className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3"
+                    key={model.model}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {model.model}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {model.requests.toLocaleString()} requests
+                      </p>
+                    </div>
+                    <Badge className="rounded-md" variant="outline">
+                      Active
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </SurfaceCard>
+          </div>
         </>
       )}
     </div>

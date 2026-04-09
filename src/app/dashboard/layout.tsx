@@ -31,10 +31,10 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-black">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-brand-amber" />
-          <p className="text-muted-foreground">Loading...</p>
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-zinc-400" />
+          <p className="text-zinc-500">Loading...</p>
         </div>
       </div>
     );
@@ -45,7 +45,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black text-foreground">
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -53,43 +53,43 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      <div className="hidden lg:block fixed inset-y-0 left-0 w-[280px]">
+      <div className="fixed inset-y-0 left-0 hidden w-80 lg:block">
         <Sidebar />
       </div>
 
       <div
         className={`
-          fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-200 ease-in-out lg:hidden
+          fixed inset-y-0 left-0 z-50 w-80 transform transition-transform duration-200 ease-in-out lg:hidden
           ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
         <Sidebar />
       </div>
 
-      <div className="lg:pl-[280px]">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="p-2 -ml-2 rounded-md hover:bg-accent lg:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
+      <div className="lg:pl-80">
+        <header className="sticky top-0 z-30 border-b border-zinc-900 bg-black/90 backdrop-blur">
+          <div className="flex h-16 items-center gap-3 px-4 lg:px-8">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="-ml-1 rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-foreground/80 hover:bg-zinc-900 hover:text-foreground lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
 
-          <div className="hidden lg:flex items-center gap-2">
-            <img
-              src="/logo_trans_black.png"
-              alt="Routing.run"
-              className="h-6 w-auto object-contain"
-            />
-            <span className="font-semibold">Dashboard</span>
+            <div className="hidden min-w-0 lg:block">
+              <p className="text-sm font-medium text-zinc-100">Workspace</p>
+              <p className="truncate text-xs text-zinc-500">
+                Usage, keys, models, billing, and account settings
+              </p>
+            </div>
+
+            <div className="flex-1" />
+
+            <Header user={user} />
           </div>
-
-          <div className="flex-1" />
-
-          <Header user={user} />
         </header>
 
-        <main className="p-4 lg:p-6 min-h-[calc(100vh-56px)] lg:min-h-[calc(100vh-64px)] overflow-y-auto">
+        <main className="min-h-[calc(100vh-64px)] overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
           {children}
         </main>
       </div>
