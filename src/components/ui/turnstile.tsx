@@ -54,7 +54,7 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
             size,
           });
           widgetIdRef.current = widgetId;
-          if (onWidgetId) {
+          if (onWidgetId && widgetId) {
             onWidgetId(widgetId);
           }
           setIsLoading(false);
