@@ -2,23 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-interface TurnstileProps {
-  siteKey: string;
-  onVerify: (token: string) => void;
-  onExpire?: () => void;
-  onWidgetId?: (widgetId: string) => void;
-  theme?: "light" | "dark" | "auto";
-  size?: "normal" | "compact";
-}
-
-interface TurnstileInstance {
-  render: (container: string | HTMLElement, options: TurnstileRenderOptions) => string;
-  reset: (widgetId: string) => void;
-  remove: (widgetId: string) => void;
-  getResponse: (widgetId: string) => string;
-  ready: (callback: () => void) => void;
-}
-
 interface TurnstileRenderOptions {
   sitekey: string;
   callback: (token: string) => void;
@@ -32,11 +15,27 @@ interface TurnstileRenderOptions {
 
 declare global {
   interface Window {
-    turnstile?: TurnstileInstance;
+    turnstile?: {
+      render: (container: string | HTMLElement, options: TurnstileRenderOptions) => string;
+      reset: (widgetId: string) => void;
+      remove: (widgetId: string) => void;
+      getResponse: (widgetId: string) => string;
+      ready: (callback: () => void) => void;
+    };
+    onTurnstileLoad?: () => void;
   }
 }
 
-export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "auto", size = "normal" }: TurnstileProps) {
+interface TurnstileProps {
+  siteKey: string;
+  onVerify: (token: string) => void;
+  onExpire?: () => void;
+  onWidgetId?: (widgetId: string) => void;
+  theme?: "light" | "dark" | "auto";
+  size?: "normal" | "compact";
+}
+
+function TurnstileComponent({ siteKey, onVerify, onExpire, onWidgetId, theme = "auto", size = "normal" }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,33 +77,37 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
   useEffect(() => {
     const scriptId = "turnstile-script";
 
-    const initScript = () => {
-      if (!document.getElementById(scriptId)) {
-        const script = document.createElement("script");
-        script.id = scriptId;
-        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-          if (window.turnstile) {
-            window.turnstile.ready(() => {
-              renderWidget();
-            });
-          }
-        };
-        script.onerror = () => {
-          setScriptError(true);
-          setIsLoading(false);
-        };
-        document.head.appendChild(script);
-      } else if (window.turnstile) {
+    window.onTurnstileLoad = () => {
+      if (window.turnstile) {
         window.turnstile.ready(() => {
           renderWidget();
         });
       }
     };
 
-    initScript();
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (window.turnstile) {
+          window.turnstile.ready(() => {
+            renderWidget();
+          });
+        }
+      };
+      script.onerror = () => {
+        setScriptError(true);
+        setIsLoading(false);
+      };
+      document.head.appendChild(script);
+    } else if (window.turnstile) {
+      window.turnstile.ready(() => {
+        renderWidget();
+      });
+    }
   }, [renderWidget]);
 
   useEffect(() => {
@@ -137,8 +140,14 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
   );
 }
 
+export function Turnstile(props: TurnstileProps) {
+  return <TurnstileComponent {...props} />;
+}
+
 export function resetTurnstile(widgetId: string) {
   if (window.turnstile) {
     window.turnstile.reset(widgetId);
   }
 }
+
+export default Turnstile;
