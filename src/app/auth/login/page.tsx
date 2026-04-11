@@ -17,6 +17,8 @@ type Step = "credentials" | "otp";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
+console.log("[LOGIN PAGE] TURNSTILE_SITE_KEY:", TURNSTILE_SITE_KEY ? `${TURNSTILE_SITE_KEY.substring(0,10)}...` : "EMPTY/MISSING");
+
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
