@@ -1,17 +1,15 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import type { Icon } from "@phosphor-icons/react";
+import { DotsThree } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
-import { ChevronDown, LogOut } from "lucide-react";
 
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { cn } from "@/lib/utils";
 
 export type SidebarMenuItem = {
   name: string;
   href: string;
-  icon?: LucideIcon;
+  icon?: Icon;
 };
 
 export type SidebarProfile = {
@@ -28,77 +26,64 @@ type SidebarWithSubmenuProps = {
   onLogout?: () => void;
 };
 
-type MenuProps = {
-  label: string;
-  icon?: LucideIcon;
-  items: SidebarMenuItem[];
-};
+const sectionTitleClassName =
+  "px-3 text-[11px] font-medium text-zinc-400 dark:text-zinc-500";
 
-const NavItem = ({
+function NavItem({
   item,
   active,
 }: {
   item: SidebarMenuItem;
   active: boolean;
-}) => {
-  const Icon = item.icon;
+}) {
+  const IconComponent = item.icon;
 
   return (
     <Link
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
         active
-          ? "bg-white text-black"
-          : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100",
+          ? "border border-[#1470e3]/20 bg-[#1470e3]/10 text-[#0f5fc0] dark:border-[#8350e8]/25 dark:bg-[#8350e8]/12 dark:text-[#c7aff8]"
+          : "border border-transparent text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100",
       )}
       href={item.href}
     >
-      {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
+      {IconComponent ? (
+        <IconComponent className="h-4 w-4 shrink-0" weight="duotone" />
+      ) : null}
       <span className="truncate">{item.name}</span>
     </Link>
   );
-};
+}
 
-const Menu = ({ label, icon: Icon, items }: MenuProps) => {
+function NavSection({
+  title,
+  items,
+}: {
+  title: string;
+  items: SidebarMenuItem[];
+}) {
   const pathname = usePathname();
-  const [isOpened, setIsOpened] = useState(
-    items.some((item) => pathname === item.href),
-  );
+
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="space-y-1">
-      <button
-        aria-expanded={isOpened}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-100"
-        onClick={() => setIsOpened((current) => !current)}
-        type="button"
-      >
-        <div className="flex items-center gap-3">
-          {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
-          <span>{label}</span>
-        </div>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 transition-transform",
-            isOpened && "rotate-180",
-          )}
-        />
-      </button>
-
-      {isOpened ? (
-        <div className="ml-5 space-y-1 border-l border-zinc-800 pl-3">
-          {items.map((item, index) => (
-            <NavItem
-              active={pathname === item.href}
-              item={item}
-              key={`${item.href}-${item.name}-${index}`}
-            />
-          ))}
-        </div>
-      ) : null}
+    <div className="space-y-2">
+      <p className={sectionTitleClassName}>{title}</p>
+      <div className="space-y-1">
+        {items.map((item, index) => (
+          <NavItem
+            active={pathname === item.href}
+            item={item}
+            key={`${item.href}-${item.name}-${index}`}
+          />
+        ))}
+      </div>
     </div>
   );
-};
+}
 
 const defaultProfile: SidebarProfile = {
   name: "Dev User",
@@ -111,93 +96,33 @@ export default function SidebarWithSubmenu({
   footerItems = [],
   billingItems = [],
   profile = defaultProfile,
-  onLogout,
 }: SidebarWithSubmenuProps) {
-  const pathname = usePathname();
-
-  const initials = useMemo(
-    () =>
-      profile.name
-        .split(" ")
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase(),
-    [profile.name],
-  );
-
   return (
-    <aside className="flex h-full w-full flex-col rounded-r-3xl border-r border-zinc-900 bg-black">
-      <div className="border-b border-zinc-900 px-5 py-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-sm font-semibold text-zinc-100">
-            {initials}
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-zinc-100">
-              {profile.name}
-            </p>
-            <p className="truncate text-xs text-zinc-500">{profile.plan}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="space-y-1">
-          {navigation.map((item, index) => (
-            <NavItem
-              active={pathname === item.href}
-              item={item}
-              key={`${item.href}-${item.name}-${index}`}
-            />
-          ))}
-        </div>
-
-        {billingItems.length > 0 ? (
-          <div className="mt-5">
-            <Menu
-              icon={billingItems[0]?.icon}
-              items={billingItems}
-              label="Billing"
-            />
-          </div>
-        ) : null}
-
-        {footerItems.length > 0 ? (
-          <div className="mt-5 border-t border-zinc-900 pt-4">
-            <div className="space-y-1">
-              {footerItems.map((item, index) => (
-                <NavItem
-                  active={pathname === item.href}
-                  item={item}
-                  key={`${item.href}-${item.name}-${index}`}
-                />
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="border-t border-zinc-900 px-4 py-4">
-        <div className="flex items-center gap-3 rounded-xl border border-zinc-900 bg-zinc-950 px-3 py-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black text-sm font-semibold text-zinc-100">
-            {initials}
-          </div>
+    <aside className="flex h-full w-full flex-col bg-[#f7f7f7] p-3 dark:bg-[#141414]">
+      <div className="px-2 pb-4 pt-1">
+        <Link
+          className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900"
+          href="/dashboard"
+        >
+          <UserAvatar email={profile.email} name={profile.name} size={36} />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-zinc-100">
+            <p className="truncate text-[13px] font-medium text-zinc-950 dark:text-zinc-100">
               {profile.name}
             </p>
-            <p className="truncate text-xs text-zinc-500">{profile.email}</p>
+            <p className="truncate text-xs text-zinc-500 dark:text-zinc-500">
+              {profile.plan}
+            </p>
           </div>
-          <button
-            aria-label="Log out"
-            className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-black hover:text-zinc-100"
-            onClick={onLogout}
-            type="button"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
+          <DotsThree className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+        </Link>
       </div>
+
+      <div className="flex-1 space-y-6 overflow-y-auto px-1 pb-4">
+        <NavSection items={navigation} title="Workspace" />
+        <NavSection items={billingItems} title="Billing" />
+        <NavSection items={footerItems} title="Preferences" />
+      </div>
+
     </aside>
   );
 }

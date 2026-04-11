@@ -69,24 +69,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const accessToken = getAccessToken();
     const refreshToken = getRefreshToken();
-
-    if (!(accessToken && refreshToken)) {
-      return;
+    
+    if (accessToken && refreshToken) {
+      api.auth
+        .me()
+        .then((userData) => {
+          setUser(userData);
+        })
+        .catch(() => {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("csrf_token");
+            window.location.href = "/auth/login";
+          }
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
-
-    api.auth
-      .me()
-      .then((userData) => {
-        setUser(userData);
-      })
-      .catch(() => {
-        if (typeof window !== "undefined") {
-          window.location.href = "/auth/login";
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
   }, []);
 
   const login = async (email: string, otp: string) => {

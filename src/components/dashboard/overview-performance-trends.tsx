@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Line, LineChart, XAxis, YAxis } from "recharts";
 
@@ -25,7 +25,7 @@ type Props = {
 };
 
 const chartConfig = {
-  requests: { label: "Requests", color: "var(--color-chart-4)" },
+  requests: { label: "Requests", color: "#2d9cdb" },
   inputTokens: { label: "Input Tokens", color: "var(--color-chart-3)" },
   outputTokens: { label: "Output Tokens", color: "var(--color-chart-2)" },
   cost: { label: "Cost", color: "var(--color-chart-5)" },
@@ -57,32 +57,42 @@ const metricMeta = [
 function CustomTooltip({
   active,
   payload,
+  label,
 }: {
   active?: boolean;
   payload?: Array<{ dataKey: string; value: number; color: string }>;
+  label?: string;
 }) {
   if (!active || !payload?.length) {
     return null;
   }
 
-  const item = payload[0];
-  const meta = metricMeta.find((entry) => entry.key === item.dataKey);
-
-  if (!meta) {
-    return null;
-  }
-
   return (
-    <div className="min-w-[120px] rounded-lg border border-zinc-800 bg-zinc-950 p-3 shadow-sm shadow-black/20">
-      <div className="flex items-center gap-2 text-sm">
-        <div
-          className="size-1.5 rounded-full"
-          style={{ backgroundColor: item.color }}
-        />
-        <span className="text-zinc-400">{meta.label}:</span>
-        <span className="font-semibold text-zinc-100">
-          {meta.format(item.value)}
-        </span>
+    <div className="min-w-[180px] rounded-lg border border-zinc-200 bg-white p-3 shadow-sm shadow-black/10 dark:border-zinc-800 dark:bg-[#181818] dark:shadow-black/20">
+      <div className="mb-2 text-xs font-medium text-zinc-500">{label}</div>
+      <div className="space-y-2">
+        {payload.map((item) => {
+          const meta = metricMeta.find((entry) => entry.key === item.dataKey);
+
+          if (!meta) {
+            return null;
+          }
+
+          return (
+            <div className="flex items-center justify-between gap-3 text-sm" key={item.dataKey}>
+              <div className="flex items-center gap-2">
+                <div
+                  className="size-1.5 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-zinc-500 dark:text-zinc-400">{meta.label}</span>
+              </div>
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                {meta.format(item.value)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -99,8 +109,6 @@ export function OverviewPerformanceTrends({
 	loading,
 	remainingRequests,
 }: Props) {
-  const [selectedMetric, setSelectedMetric] = useState<string>("requests");
-
   const platformData = useMemo(() => {
     const totalRequests = usage?.total_requests || 0;
     const totalInputTokens = usage?.total_input_tokens || 0;
@@ -168,13 +176,13 @@ export function OverviewPerformanceTrends({
   });
 
   return (
-    <div className="rounded-2xl border border-zinc-900 bg-zinc-950">
-      <div className="flex flex-col gap-3 border-b border-zinc-900 px-6 py-5 md:flex-row md:items-start md:justify-between">
+    <div className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]">
+      <div className="flex flex-col gap-3 border-b border-zinc-200 px-6 py-5 dark:border-zinc-800 md:flex-row md:items-start md:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-zinc-100">
-            Performance trend
+          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            Usage
           </h3>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Remaining requests today: {loading ? "..." : formatCompactNumber(remainingRequests)}
           </p>
         </div>
@@ -183,17 +191,12 @@ export function OverviewPerformanceTrends({
             const isPositive = metric.change >= 0;
 
             return (
-              <button
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                  selectedMetric === metric.key
-                    ? "border-zinc-700 bg-black text-zinc-100"
-                    : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:bg-black hover:text-zinc-100",
-                )}
-                key={metric.key}
-                onClick={() => setSelectedMetric(metric.key)}
-                type="button"
-              >
+                <div
+                  className={cn(
+                  "inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-400",
+                  )}
+                  key={metric.key}
+                >
                 <span>{metric.label}</span>
                 <span
                   className={cn(
@@ -208,7 +211,7 @@ export function OverviewPerformanceTrends({
                   )}
                   {Math.abs(metric.change).toFixed(1)}%
                 </span>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -216,7 +219,7 @@ export function OverviewPerformanceTrends({
 
       <div className="px-3 py-6">
         {loading ? (
-          <div className="h-96 w-full animate-pulse rounded-xl border border-zinc-900 bg-black" />
+          <div className="h-96 w-full animate-pulse rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]" />
         ) : (
           <ChartContainer
             className="h-96 w-full overflow-visible [&_.recharts-curve.recharts-tooltip-cursor]:stroke-initial"
@@ -244,20 +247,6 @@ export function OverviewPerformanceTrends({
                     r="1"
                   />
                 </pattern>
-                <filter
-                  id="overviewLineShadow"
-                  x="-100%"
-                  y="-100%"
-                  width="300%"
-                  height="300%"
-                >
-                  <feDropShadow
-                    dx="4"
-                    dy="6"
-                    floodColor={`${chartConfig[selectedMetric as keyof typeof chartConfig]?.color}60`}
-                    stdDeviation="25"
-                  />
-                </filter>
               </defs>
 
               <XAxis
@@ -277,16 +266,26 @@ export function OverviewPerformanceTrends({
 
               <YAxis
                 axisLine={false}
+                dataKey="requests"
+                domain={[0, (dataMax: number) => Math.max(10, Math.ceil(dataMax * 1.15))]}
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 tickCount={6}
-                tickFormatter={(value) => {
-                  const metric = metrics.find(
-                    (entry) => entry.key === selectedMetric,
-                  );
-                  return metric ? metric.format(value) : String(value);
-                }}
+                tickFormatter={formatCompactNumber}
                 tickLine={false}
                 tickMargin={10}
+                yAxisId="requests"
+              />
+
+              <YAxis
+                axisLine={false}
+                domain={[0, "dataMax + 1000"]}
+                orientation="right"
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                tickCount={6}
+                tickFormatter={formatCompactNumber}
+                tickLine={false}
+                tickMargin={10}
+                yAxisId="tokens"
               />
 
               <ChartTooltip
@@ -305,20 +304,45 @@ export function OverviewPerformanceTrends({
 
               <Line
                 activeDot={{
-                  fill: chartConfig[selectedMetric as keyof typeof chartConfig]
-                    ?.color,
+                  fill: chartConfig.requests.color,
                   r: 6,
                   stroke: "white",
                   strokeWidth: 2,
                 }}
-                dataKey={selectedMetric}
+                dataKey="requests"
+                dot={{ fill: chartConfig.requests.color, r: 2.5, strokeWidth: 0 }}
+                stroke={chartConfig.requests.color}
+                strokeWidth={3}
+                type="monotone"
+                yAxisId="requests"
+              />
+              <Line
+                activeDot={{
+                  fill: chartConfig.inputTokens.color,
+                  r: 6,
+                  stroke: "white",
+                  strokeWidth: 2,
+                }}
+                dataKey="inputTokens"
                 dot={false}
-                filter="url(#overviewLineShadow)"
-                stroke={
-                  chartConfig[selectedMetric as keyof typeof chartConfig]?.color
-                }
+                stroke={chartConfig.inputTokens.color}
                 strokeWidth={2}
                 type="monotone"
+                yAxisId="tokens"
+              />
+              <Line
+                activeDot={{
+                  fill: chartConfig.outputTokens.color,
+                  r: 6,
+                  stroke: "white",
+                  strokeWidth: 2,
+                }}
+                dataKey="outputTokens"
+                dot={false}
+                stroke={chartConfig.outputTokens.color}
+                strokeWidth={2}
+                type="monotone"
+                yAxisId="tokens"
               />
             </LineChart>
           </ChartContainer>

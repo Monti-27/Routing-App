@@ -422,8 +422,8 @@
    ========================================================================== */
 
 .dark {
-  --background: #0a0a0c;
-  --background-theme: #111113;
+  --background: #141414;
+  --background-theme: #141414;
   --foreground: #e4e4e7;
   --card: #141416;
   --card-foreground: #e4e4e7;
@@ -459,7 +459,7 @@
   --chart-4: #38bdf8;
   --chart-5: #34d399;
 
-  --sidebar: #111113;
+  --sidebar: #141414;
   --sidebar-foreground: #e4e4e7;
   --sidebar-primary: #a78bfa;
   --sidebar-primary-foreground: #09090b;
@@ -521,10 +521,12 @@
     text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: var(--background);
   }
 
   body {
     @apply bg-background text-foreground font-sans;
+    background-color: var(--background);
     font-feature-settings:
       "rlig" 1,
       "calt" 1,

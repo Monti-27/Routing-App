@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut, Settings, CreditCard } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 interface HeaderProps {
   user?: {
@@ -26,14 +26,6 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   const router = useRouter();
   const { logout, isDevBypassEnabled } = useAuth();
-
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : (user?.email?.[0]?.toUpperCase() ?? "U");
 
   const handleLogout = () => {
     logout();
@@ -59,11 +51,7 @@ export function Header({ user }: HeaderProps) {
             variant="ghost"
             className="relative h-9 w-9 rounded-lg border border-zinc-800 bg-zinc-950"
           >
-            <Avatar className="h-9 w-9">
-              <AvatarFallback className="rounded-lg bg-black text-xs text-zinc-100">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            <UserAvatar email={user?.email} name={user?.name} size={36} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>

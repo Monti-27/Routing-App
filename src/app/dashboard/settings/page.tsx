@@ -104,10 +104,10 @@ function getAccessToken(): string | null {
 }
 
 function planTone(planTier: string): string {
-  if (planTier === "max") return "border-violet-500/30 bg-violet-500/10";
-  if (planTier === "premium") return "border-indigo-500/30 bg-indigo-500/10";
-  if (planTier === "lite") return "border-amber-500/30 bg-amber-500/10";
-  return "border-zinc-800 bg-black";
+  if (planTier === "max") return "border-[#8350e8]/30 bg-[#8350e8]/10";
+  if (planTier === "premium") return "border-[#1470e3]/30 bg-[#1470e3]/10";
+  if (planTier === "lite") return "border-[#1470e3]/18 bg-[#1470e3]/7";
+  return "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]";
 }
 
 function ModalShell({
@@ -121,7 +121,7 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <Card className="w-full max-w-md rounded-2xl border border-zinc-900 bg-zinc-950 shadow-2xl">
+      <Card className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-[#181818]">
         <CardHeader>
           <CardTitle className="text-xl text-foreground">{title}</CardTitle>
           <CardDescription className="leading-6">{description}</CardDescription>
@@ -144,7 +144,7 @@ function SettingRow({
   danger?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-zinc-900 bg-black px-4 py-4 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818] md:flex-row md:items-center md:justify-between">
       <div className="space-y-1">
         <p
           className={`text-sm font-medium ${danger ? "text-red-400" : "text-foreground"}`}
@@ -333,7 +333,7 @@ export default function SettingsPage() {
           meta={
             isDevBypassEnabled ? (
               <Badge
-                className="rounded-md border-zinc-800 bg-black text-zinc-100"
+                className="rounded-md border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-100"
                 variant="outline"
               >
                 Dev auth bypass enabled
@@ -403,7 +403,7 @@ export default function SettingsPage() {
                   </Badge>
                   {user.email_verified ? (
                     <Badge
-                      className="rounded-md border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                      className="rounded-md border-[#1470e3]/25 bg-[#1470e3]/10 text-[#8ebcf3] dark:border-[#1470e3]/30 dark:bg-[#1470e3]/10 dark:text-[#9dc4f4]"
                       variant="outline"
                     >
                       Verified
@@ -424,7 +424,7 @@ export default function SettingsPage() {
                   {isSaving ? "Saving" : saved ? "Saved" : "Save changes"}
                 </Button>
                 {saved ? (
-                  <span className="text-sm text-zinc-400">
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
                     Profile updated locally
                   </span>
                 ) : null}
@@ -437,7 +437,7 @@ export default function SettingsPage() {
             description="A concise view of what your current tier unlocks."
           >
             <div className="space-y-4">
-              <div className="rounded-xl border border-zinc-900 bg-black px-4 py-4">
+              <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818]">
                 <p className="text-sm text-muted-foreground">Active tier</p>
                 <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-foreground">
                   {activePlan.name}
@@ -447,7 +447,7 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-zinc-900 bg-black px-4 py-4">
+              <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818]">
                 <p className="text-sm font-medium text-foreground">
                   Included features
                 </p>
@@ -481,8 +481,8 @@ export default function SettingsPage() {
                     className={cn(
                       "rounded-xl border px-4 py-4 transition-colors",
                       isCurrentPlan
-                        ? "border-zinc-700 bg-black"
-                        : "border-zinc-900 bg-zinc-950 hover:border-zinc-800",
+                        ? "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-[#181818]"
+                        : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-[#181818] dark:hover:border-zinc-700",
                     )}
                     key={plan.id}
                   >
@@ -492,7 +492,7 @@ export default function SettingsPage() {
                       </p>
                       {isCurrentPlan ? (
                         <Badge
-                          className="rounded-md border-zinc-700 bg-black text-zinc-100"
+                          className="rounded-md border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-[#181818] dark:text-zinc-100"
                           variant="outline"
                         >
                           Current
@@ -527,9 +527,9 @@ export default function SettingsPage() {
             </div>
 
             {isPayg ? (
-              <div className="rounded-xl border border-zinc-900 bg-black px-4 py-4">
+              <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818]">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-200">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-200">
                     <Coins className="h-4 w-4" />
                   </div>
                   <div>
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                 <div className="mt-4 grid gap-3 sm:grid-cols-4">
                   {CREDITS_PACKAGES.map((pkg) => (
                     <button
-                      className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 text-left transition-colors hover:bg-black disabled:opacity-60"
+                      className="rounded-xl border border-zinc-200 bg-white px-3 py-3 text-left transition-colors hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-800 dark:bg-[#181818] dark:hover:bg-zinc-900"
                       disabled={isAddingCredits}
                       key={pkg.amount}
                       onClick={() => void handleAddCredits(pkg)}
@@ -638,7 +638,7 @@ export default function SettingsPage() {
         </div>
 
         <SurfaceCard
-          className="border-red-500/20"
+          className="border-red-500/20 dark:border-red-500/20"
           title="Danger zone"
           description="These actions are destructive and should be used carefully."
         >
