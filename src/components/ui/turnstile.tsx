@@ -34,6 +34,7 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const scriptId = "turnstile-script";
@@ -44,8 +45,14 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
       if (containerRef.current && window.turnstile) {
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
-          callback: onVerify,
-          "expired-callback": onExpire,
+          callback: (token) => {
+            setIsLoading(false);
+            onVerify(token);
+          },
+          "expired-callback": () => {
+            setIsLoading(false);
+            onExpire?.();
+          },
           theme,
           size,
         });
@@ -63,6 +70,7 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
       script.async = true;
       script.defer = true;
       script.onload = initTurnstile;
+      script.onerror = () => setIsLoading(false);
       document.head.appendChild(script);
     } else if (window.turnstile) {
       initTurnstile();
@@ -84,7 +92,14 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
     };
   }, [siteKey, onVerify, onExpire, theme, size]);
 
-  return <div ref={containerRef} />;
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div ref={containerRef} style={{ minWidth: "300px", minHeight: "65px" }} />
+      {isLoading && (
+        <span className="text-xs text-muted-foreground">Loading CAPTCHA...</span>
+      )}
+    </div>
+  );
 }
 
 export function resetTurnstile(widgetId: string) {
