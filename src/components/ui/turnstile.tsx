@@ -30,7 +30,7 @@ interface TurnstileRenderOptions {
   size?: "normal" | "compact";
 }
 
-export function Turnstile({ siteKey, onVerify, onExpire, theme = "auto", size = "normal" }: TurnstileProps) {
+export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "auto", size = "normal" }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [isReady, setIsReady] = useState(false);
