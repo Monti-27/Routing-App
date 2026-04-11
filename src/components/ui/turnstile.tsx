@@ -27,8 +27,6 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
   }, [onVerify, onExpire, onWidgetId]);
 
   useEffect(() => {
-    const containerId = "turnstile-widget-container";
-
     const renderWidget = () => {
       if (!containerRef.current || widgetIdRef.current !== null) return;
       if (typeof window === "undefined" || !(window as any).turnstile) return;
@@ -81,7 +79,6 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
       document.head.appendChild(script);
     } else if ((window as any).turnstile) {
       renderWidget();
-      renderWidget();
     }
 
     return () => {
@@ -104,7 +101,7 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div ref={containerRef} id={containerRef.current?.id || "turnstile-widget-container"} style={{ minWidth: "300px", minHeight: "65px" }} />
+      <div ref={containerRef} style={{ minWidth: "300px", minHeight: "65px" }} />
       {isLoading && (
         <span className="text-xs text-muted-foreground">Loading CAPTCHA...</span>
       )}
