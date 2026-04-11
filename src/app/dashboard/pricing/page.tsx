@@ -3,19 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
-import {
-  Rocket,
-  Zap,
-  SparklesIcon,
-  Crown,
-  Check,
-  Copy,
-  ArrowRight,
-} from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const modelLogos: Record<string, string> = {
@@ -100,7 +91,7 @@ const plans = [
     label: "FREE",
     price: "$0",
     priceDetail: "forever",
-    badge: "bg-zinc-600",
+    badge: "bg-zinc-700 text-white dark:bg-zinc-700",
     requestsPerDay: 50,
     checkoutUrl: "/auth/register",
     features: [
@@ -116,7 +107,7 @@ const plans = [
     label: "LITE",
     price: "$10",
     priceDetail: "/month",
-    badge: "bg-blue-600",
+    badge: "bg-[#1470e3] text-white",
     requestsPerDay: 400,
     checkoutUrl: "https://whop.com/tropic-6587/routing-lite/",
     popular: false,
@@ -133,7 +124,7 @@ const plans = [
     label: "PREMIUM",
     price: "$20",
     priceDetail: "/month",
-    badge: "bg-indigo-600",
+    badge: "bg-[#1470e3] text-white",
     requestsPerDay: 1000,
     checkoutUrl: "https://whop.com/tropic-6587/routing-premium/",
     popular: true,
@@ -150,7 +141,7 @@ const plans = [
     label: "MAX",
     price: "$50",
     priceDetail: "/month",
-    badge: "bg-violet-600",
+    badge: "bg-[#8350e8] text-white",
     requestsPerDay: 2500,
     checkoutUrl: "https://whop.com/tropic-6587/routing-max/",
     features: [
@@ -161,6 +152,82 @@ const plans = [
     ],
   },
 ];
+
+const pricingCardVariants = {
+  initial: { scale: 1, y: 0 },
+  hover: {
+    scale: 1.02,
+    y: -5,
+    transition: { type: "spring" as const, stiffness: 300, damping: 20 },
+  },
+};
+
+function DashboardPricingCard({
+  plan,
+}: {
+  plan: (typeof plans)[number];
+}) {
+  return (
+    <motion.div
+      variants={pricingCardVariants}
+      initial="initial"
+      whileHover="hover"
+      className={cn(
+        "relative flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-8 text-zinc-950 shadow-sm dark:border-zinc-800 dark:bg-[#181818] dark:text-white",
+        plan.popular && "border-[#8350e8]/45 shadow-lg shadow-[#8350e8]/15",
+      )}
+    >
+      {plan.popular ? (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[linear-gradient(135deg,#1470e3,#8350e8)] px-4 py-1 text-sm font-medium text-white">
+          Most Popular
+        </div>
+      ) : null}
+
+      <div className="flex flex-col space-y-6">
+        <div>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-2xl font-bold">{plan.name}</h3>
+            <Badge className={plan.badge} variant="secondary">
+              {plan.label}
+            </Badge>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-5xl font-bold">{plan.price}</span>
+            <span className="ml-1 text-zinc-500 dark:text-gray-400">
+              {plan.priceDetail}
+            </span>
+          </div>
+          <p className="mt-3 text-zinc-500 dark:text-gray-400">
+            {plan.requestsPerDay} requests/day
+          </p>
+        </div>
+
+        <ul className="space-y-3">
+          {plan.features.map((feature) => (
+            <li key={feature} className="flex items-center gap-3">
+              <Check className="h-5 w-5 shrink-0 text-[#1470e3] dark:text-[#9dc4f4]" />
+              <span className="text-sm">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-8">
+        <Button
+          className={cn(
+            "w-full",
+            plan.popular
+              ? "bg-[linear-gradient(135deg,#1470e3,#8350e8)] text-white hover:opacity-95"
+              : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200",
+          )}
+          onClick={() => window.open(plan.checkoutUrl, "_blank")}
+        >
+          {plan.id === "free" ? "Get Started" : "Subscribe"}
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function PricingPage() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -183,13 +250,13 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#f7f7f7] text-zinc-950 dark:bg-[#141414] dark:text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Simple, transparent pricing
           </h1>
-          <p className="mt-4 text-lg text-gray-400">
+          <p className="mt-4 text-lg text-zinc-500 dark:text-gray-400">
             Choose the plan that fits your needs. All plans include access to our
             router.
           </p>
@@ -197,58 +264,7 @@ export default function PricingPage() {
 
         <div className="mt-12 grid gap-8 lg:grid-cols-4">
           {plans.map((plan) => (
-            <Card
-              key={plan.id}
-              className={cn(
-                "relative border-neutral-800 bg-neutral-900/50",
-                plan.popular &&
-                  "border-indigo-500 shadow-lg shadow-indigo-500/20"
-              )}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-1 text-xs font-medium">
-                    Most Popular
-                  </Badge>
-                </div>
-              )}
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{plan.name}</h3>
-                  <Badge className={plan.badge} variant="secondary">
-                    {plan.label}
-                  </Badge>
-                </div>
-                <div className="mt-4 flex items-baseline">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="ml-1 text-gray-400">{plan.priceDetail}</span>
-                </div>
-                <p className="mt-2 text-sm text-gray-400">
-                  {plan.requestsPerDay} requests/day
-                </p>
-                <ul className="mt-6 space-y-3">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  className={cn(
-                    "mt-6 w-full",
-                    plan.popular
-                      ? "bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600"
-                      : "bg-neutral-800 hover:bg-neutral-700"
-                  )}
-                  onClick={() =>
-                    window.open(plan.checkoutUrl, "_blank")
-                  }
-                >
-                  {plan.id === "free" ? "Get Started" : "Subscribe"}
-                </Button>
-              </CardContent>
-            </Card>
+            <DashboardPricingCard key={plan.id} plan={plan} />
           ))}
         </div>
 
@@ -258,13 +274,13 @@ export default function PricingPage() {
             onValueChange={setSelectedTier}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-4 bg-neutral-800">
+            <TabsList className="grid w-full grid-cols-4 border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]">
               {plans.map((plan) => (
                 <TabsTrigger
                   key={plan.id}
                   value={plan.id}
                   className={cn(
-                    "data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-violet-500"
+                    "data-[state=active]:bg-[linear-gradient(135deg,#1470e3,#8350e8)] data-[state=active]:text-white"
                   )}
                 >
                   {plan.name}
@@ -276,7 +292,7 @@ export default function PricingPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-neutral-800 text-left text-sm text-gray-400">
+                      <tr className="border-b border-zinc-200 text-left text-sm text-zinc-500 dark:border-zinc-800 dark:text-gray-400">
                         <th className="pb-3 font-medium">Model</th>
                         <th className="pb-3 font-medium">Input</th>
                         <th className="pb-3 font-medium">Output</th>
@@ -288,13 +304,13 @@ export default function PricingPage() {
                         .map((model) => (
                           <tr
                             key={`${model.tier}-${model.model}`}
-                            className="border-b border-neutral-800/50"
+                            className="border-b border-zinc-200/80 dark:border-zinc-800/50"
                           >
                             <td className="py-3 font-medium">{model.display_name}</td>
-                            <td className="py-3 text-gray-400">
+                            <td className="py-3 text-zinc-500 dark:text-gray-400">
                               {formatPrice(model.input_per_million)}
                             </td>
-                            <td className="py-3 text-gray-400">
+                            <td className="py-3 text-zinc-500 dark:text-gray-400">
                               {formatPrice(model.output_per_million)}
                             </td>
                           </tr>

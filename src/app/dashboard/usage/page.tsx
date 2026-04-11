@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart3,
   Calendar,
@@ -10,15 +10,18 @@ import {
 } from "lucide-react";
 
 import {
-  InlineMetric,
   PageHeader,
   StatCard,
   SubtleBadge,
   SurfaceCard,
 } from "@/components/dashboard/page-ui";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PieCenter } from "@/components/charts/pie-center";
+import { PieChart } from "@/components/charts/pie-chart";
+import { PieSlice } from "@/components/charts/pie-slice";
+import { UsageSummaryCard } from "@/components/dashboard/usage-summary-card";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 type Period = "daily" | "hourly" | "monthly";
 
@@ -29,7 +32,95 @@ interface ModelUsage {
   cost: number;
 }
 
+interface UsageChartSlice {
+  label: string;
+  value: number;
+  color: string;
+  model: ModelUsage | null;
+}
+
+const usageChartColors = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+] as const;
+
+const DEV_USAGE_MODELS: ModelUsage[] = [
+  { model: "route/minimax-m2.5", requests: 6420, tokens: 686000, cost: 6.86 },
+  { model: "route/kimi-k2.5", requests: 5180, tokens: 597000, cost: 5.97 },
+  { model: "route/glm-5", requests: 4030, tokens: 493000, cost: 4.93 },
+  { model: "route/deepseek-v3.2", requests: 2790, tokens: 324000, cost: 3.24 },
+  { model: "route/qwen3.5-397b-a17b", requests: 1940, tokens: 246000, cost: 2.46 },
+  { model: "route/minimax-m2.7-highspeed", requests: 1210, tokens: 182000, cost: 1.82 },
+];
+
+const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
+  daily: [
+    { date: "Mon", requests: 1480 },
+    { date: "Tue", requests: 1720 },
+    { date: "Wed", requests: 1580 },
+    { date: "Thu", requests: 1940 },
+    { date: "Fri", requests: 2210 },
+  ],
+  hourly: [
+    { date: "08:00", requests: 82 },
+    { date: "10:00", requests: 134 },
+    { date: "12:00", requests: 168 },
+    { date: "14:00", requests: 121 },
+    { date: "16:00", requests: 156 },
+  ],
+  monthly: [
+    { date: "Week 1", requests: 4820 },
+    { date: "Week 2", requests: 5360 },
+    { date: "Week 3", requests: 4980 },
+    { date: "Week 4", requests: 6410 },
+  ],
+};
+
+function applyUsageSnapshot({
+  chart,
+  cost,
+  costMultiplier,
+  inputTokens,
+  models,
+  outputTokens,
+  requests,
+  setChartData,
+  setCostMultiplier,
+  setModelUsage,
+  setTotalCost,
+  setTotalInputTokens,
+  setTotalOutputTokens,
+  setTotalRequests,
+}: {
+  chart: { date: string; requests: number }[];
+  cost: number;
+  costMultiplier: number;
+  inputTokens: number;
+  models: ModelUsage[];
+  outputTokens: number;
+  requests: number;
+  setChartData: React.Dispatch<React.SetStateAction<{ date: string; requests: number }[]>>;
+  setCostMultiplier: React.Dispatch<React.SetStateAction<number>>;
+  setModelUsage: React.Dispatch<React.SetStateAction<ModelUsage[]>>;
+  setTotalCost: React.Dispatch<React.SetStateAction<number>>;
+  setTotalInputTokens: React.Dispatch<React.SetStateAction<number>>;
+  setTotalOutputTokens: React.Dispatch<React.SetStateAction<number>>;
+  setTotalRequests: React.Dispatch<React.SetStateAction<number>>;
+}) {
+  setCostMultiplier(costMultiplier);
+  setTotalRequests(requests);
+  setTotalInputTokens(inputTokens);
+  setTotalOutputTokens(outputTokens);
+  setTotalCost(cost);
+  setModelUsage(models.sort((a, b) => b.requests - a.requests));
+  setChartData(chart);
+}
+
 export default function UsagePage() {
+  const { isDevBypassEnabled } = useAuth();
   const [period, setPeriod] = useState<Period>("daily");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +133,33 @@ export default function UsagePage() {
     { date: string; requests: number }[]
   >([]);
   const [costMultiplier, setCostMultiplier] = useState(1.65);
+  const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       setError(null);
+
+      if (isDevBypassEnabled) {
+        applyUsageSnapshot({
+          chart: DEV_USAGE_CHARTS[period],
+          cost: 48.36,
+          costMultiplier: 1.65,
+          inputTokens: 1_254_000,
+          models: DEV_USAGE_MODELS,
+          outputTokens: 846_000,
+          requests: 18_420,
+          setChartData,
+          setCostMultiplier,
+          setModelUsage,
+          setTotalCost,
+          setTotalInputTokens,
+          setTotalOutputTokens,
+          setTotalRequests,
+        });
+        setLoading(false);
+        return;
+      }
 
       try {
         const [usageData, settingsData] = await Promise.all([
@@ -54,17 +167,10 @@ export default function UsagePage() {
           api.settings.get(),
         ]);
 
-        setCostMultiplier(settingsData.cost_multiplier);
-
         const requests = usageData.total_requests || 0;
         const inputTokens = usageData.total_input_tokens || 0;
         const outputTokens = usageData.total_output_tokens || 0;
         const cost = (usageData.total_cost || 0) * settingsData.cost_multiplier;
-
-        setTotalRequests(requests);
-        setTotalInputTokens(inputTokens);
-        setTotalOutputTokens(outputTokens);
-        setTotalCost(cost);
 
         const models: ModelUsage[] = [];
         const chart: { date: string; requests: number }[] = [];
@@ -102,20 +208,86 @@ export default function UsagePage() {
           chart.push({ date: period === "hourly" ? "Now" : "Today", requests });
         }
 
-        setModelUsage(models.sort((a, b) => b.requests - a.requests));
-        setChartData(chart);
+        applyUsageSnapshot({
+          chart,
+          cost,
+          costMultiplier: settingsData.cost_multiplier,
+          inputTokens,
+          models,
+          outputTokens,
+          requests,
+          setChartData,
+          setCostMultiplier,
+          setModelUsage,
+          setTotalCost,
+          setTotalInputTokens,
+          setTotalOutputTokens,
+          setTotalRequests,
+        });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load usage");
+        if (process.env.NODE_ENV === "development") {
+          applyUsageSnapshot({
+            chart: DEV_USAGE_CHARTS[period],
+            cost: 48.36,
+            costMultiplier: 1.65,
+            inputTokens: 1_254_000,
+            models: DEV_USAGE_MODELS,
+            outputTokens: 846_000,
+            requests: 18_420,
+            setChartData,
+            setCostMultiplier,
+            setModelUsage,
+            setTotalCost,
+            setTotalInputTokens,
+            setTotalOutputTokens,
+            setTotalRequests,
+          });
+          setError(null);
+        } else {
+          setError(err instanceof Error ? err.message : "Failed to load usage");
+        }
       } finally {
         setLoading(false);
       }
     }
 
     void fetchData();
-  }, [period]);
+  }, [isDevBypassEnabled, period]);
 
   const maxRequests = Math.max(...chartData.map((entry) => entry.requests), 1);
   const totalTokens = totalInputTokens + totalOutputTokens;
+  const usageByModelChartData = useMemo(() => {
+    if (modelUsage.length === 0) {
+      return [] as UsageChartSlice[];
+    }
+
+    const topModels = modelUsage.slice(0, 5);
+    const remainingRequests = modelUsage
+      .slice(5)
+      .reduce((sum, model) => sum + model.requests, 0);
+
+    const items: UsageChartSlice[] = topModels.map((model, index) => ({
+      label: model.model.replace("route/", ""),
+      value: model.requests,
+      color: usageChartColors[index % usageChartColors.length],
+      model,
+    }));
+
+    if (remainingRequests > 0) {
+      items.push({
+        label: "Other",
+        value: remainingRequests,
+        color: "var(--chart-5)",
+        model: null,
+      });
+    }
+
+    return items;
+  }, [modelUsage]);
+  const totalChartRequests = useMemo(
+    () => usageByModelChartData.reduce((sum, item) => sum + item.value, 0),
+    [usageByModelChartData],
+  );
 
   return (
     <div className="space-y-6">
@@ -199,21 +371,38 @@ export default function UsagePage() {
             />
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+          <div className="grid gap-6 xl:grid-cols-2">
             <SurfaceCard
+              contentClassName="pt-0"
+              title="Total usage"
+              description="Combined input and output token volume for the current reporting window."
+            >
+              <UsageSummaryCard
+                backgroundColor="bg-card"
+                borderColor="border-border/70"
+                leftLabel="Input"
+                leftValue={totalInputTokens}
+                rightLabel="Output"
+                rightValue={totalOutputTokens}
+                totalLabel="Total tokens"
+              />
+            </SurfaceCard>
+            <SurfaceCard
+              className="h-full"
+              contentClassName="flex flex-1 flex-col px-4 pb-2 pt-3"
               title="Request distribution"
               description="Relative request volume for the current reporting selection."
             >
-              <div className="flex h-[280px] items-end gap-3">
+              <div className="mt-auto flex h-[380px] items-end gap-3">
                 {chartData.map((entry) => (
                   <div
-                    className="flex min-w-0 flex-1 flex-col items-center gap-2"
+                    className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2"
                     key={entry.date}
                   >
                     <span className="text-xs text-muted-foreground">
                       {entry.requests.toLocaleString()}
                     </span>
-                    <div className="flex h-[220px] w-full items-end rounded-lg bg-muted/60 px-2 pb-2">
+                    <div className="flex h-[320px] w-full items-end rounded-lg bg-muted/60 px-2 pb-2">
                       <div
                         className="w-full rounded-md bg-foreground"
                         style={{
@@ -230,81 +419,89 @@ export default function UsagePage() {
             </SurfaceCard>
 
             <SurfaceCard
-              title="Token breakdown"
-              description="How prompt and completion volume are split."
-            >
-              <div className="space-y-3">
-                <InlineMetric
-                  label="Input tokens"
-                  value={totalInputTokens.toLocaleString()}
-                />
-                <InlineMetric
-                  label="Output tokens"
-                  value={totalOutputTokens.toLocaleString()}
-                />
-                <InlineMetric
-                  label="Input share"
-                  value={
-                    totalTokens > 0
-                      ? `${((totalInputTokens / totalTokens) * 100).toFixed(1)}%`
-                      : "0%"
-                  }
-                />
-                <InlineMetric
-                  label="Output share"
-                  value={
-                    totalTokens > 0
-                      ? `${((totalOutputTokens / totalTokens) * 100).toFixed(1)}%`
-                      : "0%"
-                  }
-                />
-              </div>
-            </SurfaceCard>
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-2">
-            <SurfaceCard
               title="Usage by model"
               description="Highest-volume models sorted by request count."
+              className="xl:col-span-2"
             >
-              <div className="space-y-3">
-                {modelUsage.length > 0 ? (
-                  modelUsage.map((model) => (
-                    <div
-                      className="rounded-lg border border-border/70 px-4 py-3"
-                      key={model.model}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <p
-                            className="truncate text-sm font-medium text-foreground"
-                            title={model.model}
-                          >
-                            {model.model}
-                          </p>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {(model.tokens / 1000).toFixed(1)}K tokens
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-foreground">
-                            {model.requests.toLocaleString()}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            ${(model.cost * costMultiplier).toFixed(2)} est.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-3 h-1.5 rounded-full bg-muted">
-                        <div
-                          className="h-1.5 rounded-full bg-foreground"
-                          style={{
-                            width: `${Math.max((model.requests / (modelUsage[0]?.requests || 1)) * 100, 2)}%`,
-                          }}
+              <div className="space-y-6">
+                {usageByModelChartData.length > 0 ? (
+                  <>
+                    <div className="flex justify-center">
+                      <PieChart
+                        className="mx-auto"
+                        cornerRadius={4}
+                        data={usageByModelChartData}
+                        hoverOffset={8}
+                        hoveredIndex={hoveredModelIndex}
+                        innerRadius={72}
+                        onHoverChange={setHoveredModelIndex}
+                        padAngle={0.02}
+                        size={260}
+                      >
+                        {usageByModelChartData.map((item, index) => (
+                          <PieSlice
+                            color={item.color}
+                            hoverEffect="grow"
+                            index={index}
+                            key={item.label}
+                            showGlow={false}
+                          />
+                        ))}
+                        <PieCenter
+                          className="rounded-full bg-background/80"
+                          defaultLabel="Requests"
+                          formatOptions={{ notation: "compact" }}
+                          valueClassName="text-xl font-semibold text-foreground"
+                          labelClassName="text-xs text-muted-foreground"
                         />
-                      </div>
+                      </PieChart>
                     </div>
-                  ))
+
+                    <div className="space-y-3">
+                      {usageByModelChartData.map((item, index) => {
+                        const percentage =
+                          totalChartRequests > 0
+                            ? (item.value / totalChartRequests) * 100
+                            : 0;
+
+                        return (
+                          <button
+                            className="flex w-full items-center gap-3 rounded-lg border border-border/70 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                            key={item.label}
+                            onMouseEnter={() => setHoveredModelIndex(index)}
+                            onMouseLeave={() => setHoveredModelIndex(null)}
+                            type="button"
+                          >
+                            <span
+                              className="h-2.5 w-2.5 shrink-0 rounded-full"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p
+                                className="truncate text-sm font-medium text-foreground"
+                                title={item.label}
+                              >
+                                {item.label}
+                              </p>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {percentage.toFixed(1)}% of requests
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold text-foreground">
+                                {item.value.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {item.model
+                                  ? `${(item.model.tokens / 1000).toFixed(1)}K tokens`
+                                  : "Grouped remainder"}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
                 ) : (
                   <p className="text-sm text-muted-foreground">
                     No model usage data available.
@@ -313,31 +510,6 @@ export default function UsagePage() {
               </div>
             </SurfaceCard>
 
-            <SurfaceCard
-              title="Provider activity"
-              description="A compact operational view of your busiest models."
-            >
-              <div className="space-y-3">
-                {modelUsage.slice(0, 5).map((model) => (
-                  <div
-                    className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3"
-                    key={model.model}
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {model.model}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {model.requests.toLocaleString()} requests
-                      </p>
-                    </div>
-                    <Badge className="rounded-md" variant="outline">
-                      Active
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </SurfaceCard>
           </div>
         </>
       )}
