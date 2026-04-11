@@ -35,6 +35,7 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
   const widgetIdRef = useRef<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [scriptError, setScriptError] = useState(false);
 
   useEffect(() => {
     const scriptId = "turnstile-script";
@@ -43,23 +44,28 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
       if (widgetIdRef.current !== null) return;
 
       if (containerRef.current && window.turnstile) {
-        widgetIdRef.current = window.turnstile.render(containerRef.current, {
-          sitekey: siteKey,
-          callback: (token) => {
-            setIsLoading(false);
-            onVerify(token);
-          },
-          "expired-callback": () => {
-            setIsLoading(false);
-            onExpire?.();
-          },
-          theme,
-          size,
-        });
-        if (onWidgetId && widgetIdRef.current) {
-          onWidgetId(widgetIdRef.current);
+        try {
+          widgetIdRef.current = window.turnstile.render(containerRef.current, {
+            sitekey: siteKey,
+            callback: (token) => {
+              setIsLoading(false);
+              onVerify(token);
+            },
+            "expired-callback": () => {
+              setIsLoading(false);
+              onExpire?.();
+            },
+            theme,
+            size,
+          });
+          if (onWidgetId && widgetIdRef.current) {
+            onWidgetId(widgetIdRef.current);
+          }
+          setIsReady(true);
+        } catch (e) {
+          console.error("Turnstile render error:", e);
+          setIsLoading(false);
         }
-        setIsReady(true);
       }
     };
 
@@ -69,8 +75,15 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
       script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
       script.async = true;
       script.defer = true;
-      script.onload = initTurnstile;
-      script.onerror = () => setIsLoading(false);
+      script.onload = () => {
+        setIsLoading(false);
+        initTurnstile();
+      };
+      script.onerror = () => {
+        console.error("Failed to load Turnstile script");
+        setScriptError(true);
+        setIsLoading(false);
+      };
       document.head.appendChild(script);
     } else if (window.turnstile) {
       initTurnstile();
@@ -92,10 +105,18 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
     };
   }, [siteKey, onVerify, onExpire, theme, size]);
 
+  if (scriptError) {
+    return (
+      <div className="flex flex-col items-center gap-2 p-4 border border-yellow-500/50 rounded-lg bg-yellow-500/10">
+        <span className="text-xs text-yellow-500">CAPTCHA unavailable - email verification still works</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-2">
       <div ref={containerRef} style={{ minWidth: "300px", minHeight: "65px" }} />
-      {isLoading && (
+      {isLoading && !isReady && (
         <span className="text-xs text-muted-foreground">Loading CAPTCHA...</span>
       )}
     </div>
