@@ -31,10 +31,10 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
 
     const renderWidget = () => {
       if (!containerRef.current || widgetIdRef.current !== null) return;
-      if (typeof window === "undefined" || !window.turnstile) return;
+      if (typeof window === "undefined" || !(window as any).turnstile) return;
 
       try {
-        const id = window.turnstile.render(containerRef.current, {
+        const id = (window as any).turnstile.render(containerRef.current, {
           sitekey: siteKey,
           callback: (token: string) => {
             onVerifyRef.current(token);
@@ -80,6 +80,7 @@ export function Turnstile({ siteKey, onVerify, onExpire, onWidgetId, theme = "au
 
       document.head.appendChild(script);
     } else if ((window as any).turnstile) {
+      renderWidget();
       renderWidget();
     }
 
