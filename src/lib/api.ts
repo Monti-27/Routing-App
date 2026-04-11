@@ -235,10 +235,10 @@ export { fetchApi };
 
 export const api = {
   auth: {
-    login: async (email: string, otp: string): Promise<{ user: User }> => {
-      const loginResponse = await fetchApi<TokenResponse & { user: User }>("/auth/login/verify", {
+    login: async (email: string, password: string): Promise<{ user: User }> => {
+      const loginResponse = await fetchApi<TokenResponse & { user: User }>("/auth/login", {
         method: "POST",
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email, password }),
       });
       if (typeof window !== "undefined") {
         localStorage.setItem("access_token", loginResponse.access_token);

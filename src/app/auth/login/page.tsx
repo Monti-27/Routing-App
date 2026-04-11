@@ -4,14 +4,21 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { GithubLogoIcon, SpinnerIcon } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/auth-context";
+import { api } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
@@ -31,6 +38,21 @@ export default function LoginPage() {
     setIsOAuthLoading("github");
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
     window.location.href = `${apiUrl}/auth/oauth/github`;
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsEmailLoading(true);
+
+    try {
+      await api.auth.login(email, password);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setIsEmailLoading(false);
+    }
   };
 
   return (
@@ -69,17 +91,52 @@ export default function LoginPage() {
                 <Separator className="flex-1 opacity-70" />
               </div>
 
-              <div className="text-center text-sm text-muted-foreground">
-                <p>Email/password login is disabled.</p>
-                <p>Please use GitHub OAuth to sign in.</p>
-              </div>
+              <form onSubmit={handleEmailLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isEmailLoading}
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isEmailLoading}
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-sm text-red-500 text-center">{error}</p>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isEmailLoading || !email || !password}
+                >
+                  {isEmailLoading ? (
+                    <SpinnerIcon className="size-4 animate-spin" />
+                  ) : (
+                    "Sign in"
+                  )}
+                </Button>
+              </form>
             </div>
           </div>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <span className="font-medium text-muted-foreground/70">Sign up is by invitation only</span>
+          <Link href="/auth/register" className="font-medium text-accent-foreground hover:text-accent-foreground/80">
+            Sign up with GitHub
+          </Link>
         </p>
       </div>
     </div>

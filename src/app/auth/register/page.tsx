@@ -70,8 +70,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="text-center text-sm text-muted-foreground">
-                <p>Email/password signup is disabled.</p>
-                <p>Please use GitHub OAuth to create an account.</p>
+                <p>Sign up with GitHub to get started.</p>
               </div>
             </div>
           </div>
