@@ -8,12 +8,14 @@ import { Loader2 } from "lucide-react";
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const provider = searchParams.get("provider");
-    const code = searchParams.get("code");
-    const errorParam = searchParams.get("error");
+    const provider = searchParams?.get("provider");
+    const code = searchParams?.get("code");
+    const errorParam = searchParams?.get("error");
 
     if (errorParam) {
       setError(errorParam);
