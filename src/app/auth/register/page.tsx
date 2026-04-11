@@ -4,63 +4,20 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
-import { GithubLogoIcon, SpinnerIcon, InfoIcon } from "@phosphor-icons/react";
+import { GithubLogoIcon, SpinnerIcon } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/auth-context";
-import { toast } from "sonner";
-
-type Step = "form" | "otp";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, isAuthenticated, isLoading: authLoading } = useAuth();
-  const [step, setStep] = useState<Step>("form");
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [otp, setOtp] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
-  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (isAuthenticated && !authLoading) {
       router.push("/dashboard");
     }
-  }, [authLoading, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
-
-  const handleResendOtp = async () => {
-    if (resendCooldown > 0) return;
-    setIsLoading(true);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
-      await fetch(`${apiUrl}/auth/signup/init`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
-      });
-      toast.success("OTP resent to your email");
-      setResendCooldown(60);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to resend OTP");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [isAuthenticated, authLoading, router]);
 
   if (authLoading || isAuthenticated) {
     return (
@@ -69,91 +26,6 @@ export default function RegisterPage() {
       </div>
     );
   }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    if (!acceptTerms) {
-      toast.error("You must accept the terms and conditions");
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
-      return;
-    }
-
-    const hasUpperCase = /[A-Z]/.test(formData.password);
-    const hasLowerCase = /[a-z]/.test(formData.password);
-    const hasNumbers = /\d/.test(formData.password);
-
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
-      toast.error("Password must contain uppercase, lowercase, and numbers");
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
-      const response = await fetch(`${apiUrl}/auth/signup/init`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
-      });
-
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        let errorMessage = "Failed to send verification code";
-        
-        if (contentType && contentType.includes("application/json")) {
-          try {
-            const error = await response.json();
-            errorMessage = error.message || error.detail || error.error || "Failed to send verification code";
-          } catch {
-            errorMessage = `Server error (${response.status})`;
-          }
-        } else {
-          errorMessage = `Server error (${response.status})`;
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      setStep("otp");
-      toast.success("Verification code sent to your email");
-      setResendCooldown(60);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send verification code");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      await register(formData.email, otp, formData.password, formData.name);
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Verification failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleGithubOAuth = async () => {
     setIsOAuthLoading("github");
@@ -165,19 +37,15 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-[#453C7C]/5 p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="mb-8 space-y-1 px-6 text-left">
-          <h1 className="font-medium text-2xl text-foreground">
-            {step === "form" ? "Create your account" : "Verify your email"}
-          </h1>
+          <h1 className="font-medium text-2xl text-foreground">Create your account</h1>
           <p className="text-muted-foreground text-sm">
-            {step === "form" 
-              ? "Sign up to start using Routing.Run" 
-              : `Enter the code sent to ${formData.email}`}
+            Sign up to start using Routing.Run
           </p>
         </div>
 
         <div className="relative px-6">
           <div className="relative z-10">
-            <div className="space-y-4">
+            <div className="space-y-6">
               <Button
                 className="relative w-full"
                 disabled={isOAuthLoading !== null}
@@ -201,167 +69,10 @@ export default function RegisterPage() {
                 <Separator className="flex-1 opacity-70" />
               </div>
 
-              {step === "form" ? (
-                <form onSubmit={handleFormSubmit} className="space-y-5">
-                  <div className="space-y-3">
-                    <Label className="font-medium text-foreground" htmlFor="name">
-                      Full name<span className="text-primary">*</span>
-                    </Label>
-                    <Input
-                      autoComplete="name"
-                      id="name"
-                      name="name"
-                      onChange={handleChange}
-                      placeholder="Enter your name"
-                      required
-                      type="text"
-                      value={formData.name}
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="font-medium text-foreground" htmlFor="email">
-                      Email address<span className="text-primary">*</span>
-                    </Label>
-                    <Input
-                      autoComplete="email"
-                      id="email"
-                      name="email"
-                      onChange={handleChange}
-                      placeholder="Enter your email"
-                      required
-                      type="email"
-                      value={formData.email}
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Label className="font-medium text-foreground" htmlFor="password">
-                        Password<span className="text-primary">*</span>
-                      </Label>
-                      <InfoIcon className="size-4 text-muted-foreground" />
-                    </div>
-                    <Input
-                      autoComplete="new-password"
-                      id="password"
-                      name="password"
-                      onChange={handleChange}
-                      placeholder="Min. 8 characters"
-                      required
-                      minLength={8}
-                      type="password"
-                      value={formData.password}
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="font-medium text-foreground" htmlFor="confirmPassword">
-                      Confirm password<span className="text-primary">*</span>
-                    </Label>
-                    <Input
-                      autoComplete="new-password"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      onChange={handleChange}
-                      placeholder="Confirm your password"
-                      required
-                      minLength={8}
-                      type="password"
-                      value={formData.confirmPassword}
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={acceptTerms}
-                        className="cursor-pointer"
-                        id="terms"
-                        onCheckedChange={(checked: boolean) => setAcceptTerms(checked)}
-                      />
-                      <Label className="text-sm text-muted-foreground" htmlFor="terms">
-                        I agree to the{" "}
-                        <Link className="font-medium text-accent-foreground hover:underline" href="/terms">
-                          Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link className="font-medium text-accent-foreground hover:underline" href="/privacy">
-                          Privacy Policy
-                        </Link>
-                      </Label>
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full"
-                    disabled={isLoading}
-                    type="submit"
-                  >
-                    {isLoading ? (
-                      <>
-                        <SpinnerIcon className="mr-2 size-4 animate-spin" />
-                        Sending code...
-                      </>
-                    ) : (
-                      "Continue"
-                    )}
-                  </Button>
-                </form>
-              ) : (
-                <form onSubmit={handleOtpSubmit} className="space-y-5">
-                  <div className="space-y-3">
-                    <Label className="font-medium text-foreground" htmlFor="otp">
-                      Verification Code<span className="text-primary">*</span>
-                    </Label>
-                    <Input
-                      id="otp"
-                      name="otp"
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter 6-digit code"
-                      required
-                      type="text"
-                      maxLength={6}
-                      value={otp}
-                    />
-                  </div>
-
-                  <Button
-                    className="w-full"
-                    disabled={isLoading}
-                    type="submit"
-                  >
-                    {isLoading ? (
-                      <>
-                        <SpinnerIcon className="mr-2 size-4 animate-spin" />
-                        Creating account...
-                      </>
-                    ) : (
-                      "Create account"
-                    )}
-                  </Button>
-
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={handleResendOtp}
-                      disabled={isLoading || resendCooldown > 0}
-                    >
-                      {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="flex-1"
-                      onClick={() => setStep("form")}
-                    >
-                      Use different email
-                    </Button>
-                  </div>
-                </form>
-              )}
+              <div className="text-center text-sm text-muted-foreground">
+                <p>Email/password signup is disabled.</p>
+                <p>Please use GitHub OAuth to create an account.</p>
+              </div>
             </div>
           </div>
         </div>
