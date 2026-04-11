@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,12 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { GithubLogoIcon, SpinnerIcon, InfoIcon } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
-import { Turnstile, resetTurnstile } from "@/components/ui/turnstile";
 
 type Step = "form" | "otp";
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,8 +29,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [turnstileToken, setTurnstileToken] = useState<string>("");
-  const [turnstileWidgetId, setTurnstileWidgetId] = useState<string>("");
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -58,7 +51,7 @@ export default function RegisterPage() {
       await fetch(`${apiUrl}/auth/signup/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email, turnstile_token: turnstileToken || undefined }),
+        body: JSON.stringify({ email: formData.email }),
       });
       toast.success("OTP resent to your email");
       setResendCooldown(60);
@@ -109,11 +102,6 @@ export default function RegisterPage() {
       return;
     }
 
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
-      toast.error("Please complete the CAPTCHA verification");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -121,7 +109,7 @@ export default function RegisterPage() {
       const response = await fetch(`${apiUrl}/auth/signup/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email, turnstile_token: turnstileToken }),
+        body: JSON.stringify({ email: formData.email }),
       });
 
       if (!response.ok) {
@@ -305,18 +293,6 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  {TURNSTILE_SITE_KEY && (
-                    <div className="flex justify-center">
-                      <Turnstile
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onVerify={(token) => setTurnstileToken(token)}
-                        onWidgetId={(id) => setTurnstileWidgetId(id)}
-                        onExpire={() => setTurnstileToken("")}
-                        theme="light"
-                      />
-                    </div>
-                  )}
-
                   <Button
                     className="w-full"
                     disabled={isLoading}
@@ -379,13 +355,7 @@ export default function RegisterPage() {
                       type="button"
                       variant="ghost"
                       className="flex-1"
-                      onClick={() => {
-                        setStep("form");
-                        setTurnstileToken("");
-                        if (turnstileWidgetId) {
-                          resetTurnstile(turnstileWidgetId);
-                        }
-                      }}
+                      onClick={() => setStep("form")}
                     >
                       Use different email
                     </Button>

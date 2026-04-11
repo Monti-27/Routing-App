@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,11 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { GithubLogoIcon, SpinnerIcon } from "@phosphor-icons/react";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
-import { Turnstile, resetTurnstile } from "@/components/ui/turnstile";
 
 type Step = "credentials" | "otp";
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,8 +23,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [turnstileToken, setTurnstileToken] = useState<string>("");
-  const [turnstileWidgetId, setTurnstileWidgetId] = useState<string>("");
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
@@ -51,7 +45,7 @@ export default function LoginPage() {
       await fetch(`${apiUrl}/auth/login/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, turnstile_token: turnstileToken || undefined }),
+        body: JSON.stringify({ email, password }),
       });
       toast.success("OTP resent to your email");
       setResendCooldown(60);
@@ -72,12 +66,6 @@ export default function LoginPage() {
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
-      toast.error("Please complete the CAPTCHA verification");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -85,7 +73,7 @@ export default function LoginPage() {
       const response = await fetch(`${apiUrl}/auth/login/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, turnstile_token: turnstileToken }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
@@ -204,17 +192,6 @@ export default function LoginPage() {
                       value={password}
                     />
                   </div>
-                  {TURNSTILE_SITE_KEY && (
-                    <div className="flex justify-center">
-                      <Turnstile
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onVerify={(token) => setTurnstileToken(token)}
-                        onWidgetId={(id) => setTurnstileWidgetId(id)}
-                        onExpire={() => setTurnstileToken("")}
-                        theme="light"
-                      />
-                    </div>
-                  )}
                   <Button
                     className="w-full"
                     disabled={isLoading}
@@ -275,13 +252,7 @@ export default function LoginPage() {
                       type="button"
                       variant="ghost"
                       className="flex-1"
-                      onClick={() => {
-                        setStep("credentials");
-                        setTurnstileToken("");
-                        if (turnstileWidgetId) {
-                          resetTurnstile(turnstileWidgetId);
-                        }
-                      }}
+                      onClick={() => setStep("credentials")}
                     >
                       Use different email
                     </Button>
