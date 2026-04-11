@@ -45,8 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .then((userData) => {
           setUser(userData);
         })
-        .catch(() => {
+        .catch((err) => {
           if (typeof window !== "undefined") {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("csrf_token");
             window.location.href = "/auth/login";
           }
         })
