@@ -206,6 +206,7 @@ export default function LoginPage() {
                   </div>
                   {TURNSTILE_SITE_KEY && (
                     <div className="flex justify-center">
+                      <div className="text-xs text-red-500 bg-red-500/10 px-2 py-1 rounded">CAPTCHA KEY: {TURNSTILE_SITE_KEY}</div>
                       <Turnstile
                         siteKey={TURNSTILE_SITE_KEY}
                         onVerify={(token) => setTurnstileToken(token)}
