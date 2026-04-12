@@ -63,34 +63,13 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
     async function handleCallback() {
       try {
-        console.log("[DEBUG] Making fetch to API...");
+        console.log("[DEBUG] Redirecting to API callback...");
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const encodedProvider = encodeURIComponent(provider);
         const encodedCode = encodeURIComponent(code || "");
         const encodedState = encodeURIComponent(state || "");
-        const response = await fetch(
-          `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`,
-          { credentials: "include" }
-        );
-        console.log("[DEBUG] Fetch response status:", response.status);
-
-        if (!response.ok) {
-          throw new Error(`Authentication failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("[DEBUG] Response data:", data);
-
-        if (data.access_token && data.refresh_token && typeof window !== "undefined") {
-          localStorage.setItem("access_token", data.access_token);
-          localStorage.setItem("refresh_token", data.refresh_token);
-          if (data.csrf_token) {
-            localStorage.setItem("csrf_token", data.csrf_token);
-          }
-          console.log("[DEBUG] Tokens stored in localStorage");
-        }
-
-        window.location.href = "/dashboard";
+        
+        window.location.href = `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`;
       } catch (err) {
         console.error("[DEBUG] Callback error:", err);
         setError("Authentication failed. Please try again.");
