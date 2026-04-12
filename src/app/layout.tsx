@@ -33,6 +33,11 @@ const ltSuperiorMono = localFont({
 export const metadata: Metadata = {
   title: "Routing.Run Dashboard",
   description: "API gateway with multi-provider LLM routing",
+  icons: {
+    icon: "/logo_trans_black.png",
+    shortcut: "/logo_trans_black.png",
+    apple: "/logo_trans_black.png",
+  },
 };
 
 export default function RootLayout({
