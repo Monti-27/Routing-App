@@ -63,13 +63,41 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
     async function handleCallback() {
       try {
-        console.log("[DEBUG] Redirecting to API callback...");
+        console.log("[DEBUG] Making fetch to API callback...");
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const encodedProvider = encodeURIComponent(provider);
         const encodedCode = encodeURIComponent(code || "");
         const encodedState = encodeURIComponent(state || "");
         
-        window.location.href = `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`;
+        const response = await fetch(
+          `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`,
+          { credentials: "include" }
+        );
+        console.log("[DEBUG] Response status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Authentication failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("[DEBUG] Response data:", data);
+
+        if (data.user) {
+          // Store tokens in localStorage
+          if (data.access_token && data.refresh_token) {
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("refresh_token", data.refresh_token);
+            if (data.csrf_token) {
+              localStorage.setItem("csrf_token", data.csrf_token);
+            }
+          }
+          // Store user in sessionStorage for dashboard to pick up
+          sessionStorage.setItem("oauth_user", JSON.stringify(data.user));
+          // Redirect to dashboard
+          window.location.href = "/dashboard";
+        } else {
+          throw new Error("No user data in response");
+        }
       } catch (err) {
         console.error("[DEBUG] Callback error:", err);
         setError("Authentication failed. Please try again.");
