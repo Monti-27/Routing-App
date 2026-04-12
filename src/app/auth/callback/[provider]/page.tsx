@@ -80,7 +80,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
         const data = await response.json();
 
-        if (typeof window !== "undefined") {
+        if (data.access_token && data.refresh_token && typeof window !== "undefined") {
           localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("refresh_token", data.refresh_token);
           if (data.csrf_token) {
@@ -88,7 +88,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
           }
         }
 
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } catch {
         setError("Authentication failed. Please try again.");
       }
