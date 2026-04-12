@@ -13,7 +13,6 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { UserAvatar } from "@/components/ui/user-avatar";
 
 interface HeaderProps {
   user?: {
@@ -46,12 +45,13 @@ export function Header({ user }: HeaderProps) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div
+          <button
             aria-label="Open account menu"
-            className="relative h-9 w-9 rounded-lg border border-zinc-800 bg-[#141414]"
+            className="inline-flex h-9 items-center rounded-lg border border-zinc-800 bg-[#141414] px-3 text-sm font-medium text-foreground transition-colors hover:bg-zinc-900"
+            type="button"
           >
-            <UserAvatar email={user?.email} name={user?.name} size={36} />
-          </div>
+            Account
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
