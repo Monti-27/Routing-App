@@ -270,7 +270,7 @@ export default function SettingsPage() {
 
     try {
       const token = getAccessToken();
-      await fetch(`${API_URL}/v1/user/keys/revoke-all`, {
+      await fetch(`${API_URL}/v1/user/key/revoke-all`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
