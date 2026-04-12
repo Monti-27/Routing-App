@@ -5,11 +5,12 @@ import { useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
+  Coins,
   Crown,
-  Gem,
-  Shield,
+  Diamond,
+  Leaf,
+  Rocket,
   Sparkles,
-  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -398,7 +399,7 @@ const tierMeta: Record<
   }
 > = {
   free: {
-    icon: Shield,
+    icon: Leaf,
     iconClassName: "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900",
     chipClassName:
       "border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
@@ -406,7 +407,7 @@ const tierMeta: Record<
     accentClassName: "text-zinc-700 dark:text-zinc-200",
   },
   lite: {
-    icon: Zap,
+    icon: Rocket,
     iconClassName: "bg-[#1470e3] text-white",
     chipClassName:
       "border-[#1470e3]/20 bg-[#1470e3]/10 text-[#1470e3] dark:border-[#1470e3]/30",
@@ -415,15 +416,14 @@ const tierMeta: Record<
   },
   premium: {
     icon: Crown,
-    iconClassName: "bg-[linear-gradient(135deg,#1470e3,#8350e8)] text-white",
+    iconClassName: "bg-[#8350e8] text-white",
     chipClassName:
       "border-[#8350e8]/20 bg-[#8350e8]/10 text-[#8350e8] dark:border-[#8350e8]/30",
-    cardClassName:
-      "border-[#8350e8]/30 shadow-[0_0_0_1px_rgba(131,80,232,0.08)]",
+    cardClassName: "border-[#8350e8]/30 dark:border-[#8350e8]/40",
     accentClassName: "text-[#8350e8]",
   },
   max: {
-    icon: Gem,
+    icon: Diamond,
     iconClassName: "bg-[#8350e8] text-white",
     chipClassName:
       "border-[#8350e8]/20 bg-[#8350e8]/10 text-[#8350e8] dark:border-[#8350e8]/30",
@@ -489,77 +489,64 @@ function PricingPlanCard({
   return (
     <div
       className={cn(
-        "flex h-full flex-col rounded-xl border bg-white p-5 shadow-none transition-colors dark:bg-[#181818]",
+        "group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all hover:border-zinc-300 hover:shadow-lg dark:bg-[#181818] dark:hover:border-zinc-700",
         tierStyles.cardClassName,
+        plan.popular && "ring-2 ring-[#8350e8]/40",
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-3">
-          <div
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-xl",
-              tierStyles.iconClassName,
-            )}
-          >
-            <TierIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold text-foreground">
-                {plan.name}
-              </h3>
-              {plan.popular ? <SubtleBadge>Most popular</SubtleBadge> : null}
-              {isCurrentPlan ? <SubtleBadge>Current</SubtleBadge> : null}
-            </div>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              {plan.summary}
-            </p>
-          </div>
-        </div>
-        <Badge
+      {plan.popular && (
+        <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-[#8350e8]" />
+      )}
+
+      <div className="flex items-center gap-3">
+        <div
           className={cn(
-            "rounded-md border px-2.5 py-1 text-[11px] font-medium shadow-none",
-            tierStyles.chipClassName,
+            "flex h-10 w-10 items-center justify-center rounded-xl",
+            tierStyles.iconClassName,
           )}
-          variant="outline"
         >
-          {plan.label}
-        </Badge>
+          <TierIcon className="h-5 w-5" />
+        </div>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground">
+              {plan.name}
+            </h3>
+            {isCurrentPlan && <SubtleBadge>Current</SubtleBadge>}
+            {plan.popular && !isCurrentPlan && <SubtleBadge>Popular</SubtleBadge>}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {plan.priceDetail === "forever" ? "Free forever" : plan.priceDetail}
+          </p>
+        </div>
       </div>
 
-      <div className="mt-6 flex items-end gap-2">
-        <span className="text-[34px] font-semibold tracking-[-0.04em] text-foreground">
+      <div className="mt-6 flex items-baseline gap-1">
+        <span className="text-4xl font-semibold tracking-tight text-foreground">
           {plan.price}
         </span>
-        <span className="pb-1 text-sm text-muted-foreground">
-          {plan.priceDetail}
-        </span>
+        {plan.priceDetail !== "forever" && (
+          <span className="text-sm text-muted-foreground">/month</span>
+        )}
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2">
-        <PillStat
-          label="Requests / day"
-          value={plan.requestsPerDay.toLocaleString()}
-        />
-        <PillStat
-          label="Models in tier"
-          value={
-            staticModelPricing.filter((entry) => entry.tier === plan.id).length
-          }
-        />
+      <p className="mt-3 text-sm text-muted-foreground">
+        {plan.summary}
+      </p>
+
+      <div className="mt-6 rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900/50">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Daily requests</span>
+          <span className="text-lg font-semibold text-foreground">
+            {plan.requestsPerDay.toLocaleString()}
+          </span>
+        </div>
       </div>
 
-      <div className="mt-5 flex-1 space-y-3">
+      <div className="mt-4 flex-1 space-y-2.5">
         {plan.features.map((feature) => (
-          <div className="flex items-start gap-3" key={feature}>
-            <div
-              className={cn(
-                "mt-0.5 flex h-5 w-5 items-center justify-center rounded-full",
-                tierStyles.chipClassName,
-              )}
-            >
-              <Check className="h-3.5 w-3.5" />
-            </div>
+          <div className="flex items-center gap-2.5" key={feature}>
+            <Check className={cn("h-4 w-4", tierStyles.accentClassName)} />
             <span className="text-sm text-foreground">{feature}</span>
           </div>
         ))}
@@ -567,22 +554,20 @@ function PricingPlanCard({
 
       <Button
         className={cn(
-          "mt-6 h-10 justify-between rounded-lg",
+          "mt-6 h-11 w-full justify-center rounded-xl text-sm font-medium transition-all",
           plan.popular
-            ? "bg-[linear-gradient(135deg,#1470e3,#8350e8)] text-white hover:opacity-95"
+            ? "bg-[#8350e8] text-white hover:opacity-90"
             : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200",
+          isCurrentPlan && plan.id !== "free" && "opacity-70",
         )}
         onClick={handleAction}
         type="button"
       >
-        <span>
-          {plan.id === "free"
-            ? "Get started"
-            : isCurrentPlan
-              ? "Manage plan"
-              : "Upgrade"}
-        </span>
-        <ArrowRight className="h-4 w-4" />
+        {plan.id === "free"
+          ? "Get started free"
+          : isCurrentPlan
+            ? "Manage plan"
+            : `Upgrade to ${plan.name}`}
       </Button>
     </div>
   );
@@ -609,72 +594,19 @@ export default function PricingPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        description="Review plan limits, compare model pricing, and upgrade without leaving the dashboard flow."
-        meta={<SubtleBadge>Current tier: {currentTier}</SubtleBadge>}
+        description="Choose a plan that matches your traffic volume and model needs."
+        meta={<SubtleBadge>Current: {currentTier}</SubtleBadge>}
         title="Pricing"
       />
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
-        <SurfaceCard
-          contentClassName="space-y-5"
-          description="Each plan increases daily request capacity and unlocks more of the router catalog."
-          title="Plans"
-        >
-          <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-4">
-            {plans.map((plan) => (
-              <PricingPlanCard
-                isCurrentPlan={currentTier === plan.id}
-                key={plan.id}
-                plan={plan}
-              />
-            ))}
-          </div>
-        </SurfaceCard>
-
-        <SurfaceCard
-          contentClassName="space-y-4"
-          description="A quick snapshot of what changes as you move up the pricing ladder."
-          title="At a glance"
-        >
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Requests
-              </p>
-              <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground">
-                50 to 2,500/day
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Scale from lightweight testing to heavier daily production
-                traffic without changing your integration.
-              </p>
-            </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Catalog access
-              </p>
-              <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground">
-                Tier-based unlocks
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Free keeps the starter set available, while higher tiers widen
-                the model roster and expose faster variants.
-              </p>
-            </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Billing style
-              </p>
-              <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground">
-                Flat tier + token pricing
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Keep predictable plan limits while seeing per-model input and
-                output rates directly inside the dashboard.
-              </p>
-            </div>
-          </div>
-        </SurfaceCard>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {plans.map((plan) => (
+          <PricingPlanCard
+            isCurrentPlan={currentTier === plan.id}
+            key={plan.id}
+            plan={plan}
+          />
+        ))}
       </div>
 
       <SurfaceCard
@@ -800,7 +732,7 @@ export default function PricingPage() {
         </div>
         <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
           <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Zap className="h-4 w-4 text-[#1470e3]" />
+            <Coins className="h-4 w-4 text-[#1470e3]" />
             Token billing
           </div>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
