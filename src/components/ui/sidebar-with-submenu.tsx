@@ -163,16 +163,20 @@ export default function SidebarWithSubmenu({
               <DropdownMenuItem
                 onClick={() => router.push("/dashboard/settings")}
               >
-                <GearSix className="h-4 w-4" weight="duotone" />
+                <span className="flex h-4 w-4 items-center justify-center">
+                  <GearSix className="h-4 w-4" weight="duotone" />
+                </span>
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  {resolvedTheme === "dark" ? (
-                    <Moon className="h-4 w-4" weight="duotone" />
-                  ) : (
-                    <Sun className="h-4 w-4" weight="duotone" />
-                  )}
+                  <span className="flex h-4 w-4 items-center justify-center">
+                    {resolvedTheme === "dark" ? (
+                      <Moon className="h-4 w-4" weight="duotone" />
+                    ) : (
+                      <Sun className="h-4 w-4" weight="duotone" />
+                    )}
+                  </span>
                   Theme
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
@@ -199,7 +203,9 @@ export default function SidebarWithSubmenu({
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onLogout}>
-                    <SignOut className="h-4 w-4" weight="duotone" />
+                    <span className="flex h-4 w-4 items-center justify-center">
+                      <SignOut className="h-4 w-4" weight="duotone" />
+                    </span>
                     Log out
                   </DropdownMenuItem>
                 </>
