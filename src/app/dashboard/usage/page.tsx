@@ -381,23 +381,27 @@ export default function UsagePage() {
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard
+              compact
               hint="Requests recorded in the selected period"
               icon={BarChart3}
               label="Total Requests"
               value={totalRequests.toLocaleString()}
             />
             <StatCard
+              compact
               hint={`${totalInputTokens.toLocaleString()} in / ${totalOutputTokens.toLocaleString()} out`}
               icon={TrendingUp}
               label="Total Tokens"
               value={totalTokens.toLocaleString()}
             />
             <StatCard
+              compact
               hint={`Multiplier ${costMultiplier.toFixed(2)}x applied`}
               label="Estimated Cost"
               value={`$${totalCost.toFixed(2)}`}
             />
             <StatCard
+              compact
               badge={<SubtleBadge>{period.toUpperCase()}</SubtleBadge>}
               hint="Average token volume per request"
               label="Avg Tokens / Request"
