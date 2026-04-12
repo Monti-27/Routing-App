@@ -1,5 +1,3 @@
-import { Facehash, stringHash } from "facehash";
-
 import { cn } from "@/lib/utils";
 
 const avatarPalettes = [
@@ -22,19 +20,16 @@ const getPaletteIndex = (seed: string) => {
   return Math.abs(hash) % avatarPalettes.length;
 };
 
-const getOpenEyeSeed = (seed: string) => {
-  const preferredFaceIndexes = new Set([0, 1]);
+const getInitials = (name?: string | null, email?: string | null) => {
+  const trimmedName = name?.trim();
 
-  for (let index = 0; index < 8; index += 1) {
-    const candidate = `${seed}:${index}`;
-    const faceIndex = stringHash(candidate) % 4;
-
-    if (preferredFaceIndexes.has(faceIndex)) {
-      return candidate;
-    }
+  if (trimmedName) {
+    const parts = trimmedName.split(/\s+/).filter(Boolean);
+    return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
   }
 
-  return `${seed}:0`;
+  const fallback = email?.trim() || "routing-user";
+  return fallback.slice(0, 2).toUpperCase();
 };
 
 type UserAvatarProps = {
@@ -52,17 +47,22 @@ export function UserAvatar({
 }: UserAvatarProps) {
   const baseSeed = name?.trim() || email?.trim() || "routing-user";
   const colors = avatarPalettes[getPaletteIndex(baseSeed)];
-  const avatarSeed = getOpenEyeSeed(baseSeed);
+  const initials = getInitials(name, email);
 
   return (
-    <Facehash
-      className={cn("rounded-lg text-white", className)}
-      colors={[...colors]}
-      intensity3d="subtle"
-      name={avatarSeed}
-      showInitial={false}
-      size={size}
-      variant="solid"
-    />
+    <span
+      aria-hidden="true"
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center rounded-lg font-medium text-white",
+        className,
+      )}
+      style={{
+        background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]})`,
+        height: size,
+        width: size,
+      }}
+    >
+      <span className="text-xs leading-none">{initials}</span>
+    </span>
   );
 }
