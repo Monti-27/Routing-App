@@ -52,8 +52,18 @@ const DEV_USAGE_MODELS: ModelUsage[] = [
   { model: "route/kimi-k2.5", requests: 5180, tokens: 597000, cost: 5.97 },
   { model: "route/glm-5", requests: 4030, tokens: 493000, cost: 4.93 },
   { model: "route/deepseek-v3.2", requests: 2790, tokens: 324000, cost: 3.24 },
-  { model: "route/qwen3.5-397b-a17b", requests: 1940, tokens: 246000, cost: 2.46 },
-  { model: "route/minimax-m2.7-highspeed", requests: 1210, tokens: 182000, cost: 1.82 },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    requests: 1940,
+    tokens: 246000,
+    cost: 2.46,
+  },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    requests: 1210,
+    tokens: 182000,
+    cost: 1.82,
+  },
 ];
 
 const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
@@ -79,6 +89,39 @@ const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
   ],
 };
 
+const FALLBACK_PERIOD_BUCKETS: Record<Period, string[]> = {
+  daily: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  hourly: ["08:00", "10:00", "12:00", "14:00", "16:00"],
+  monthly: ["Week 1", "Week 2", "Week 3", "Week 4"],
+};
+
+const FALLBACK_PERIOD_WEIGHTS: Record<Period, number[]> = {
+  daily: [0.18, 0.2, 0.19, 0.21, 0.22],
+  hourly: [0.14, 0.2, 0.24, 0.18, 0.24],
+  monthly: [0.22, 0.25, 0.23, 0.3],
+};
+
+function buildFallbackChart(period: Period, totalRequests: number) {
+  const labels = FALLBACK_PERIOD_BUCKETS[period];
+  const weights = FALLBACK_PERIOD_WEIGHTS[period];
+
+  const chart = labels.map((date, index) => ({
+    date,
+    requests: Math.round(totalRequests * weights[index]),
+  }));
+
+  const assignedRequests = chart.reduce(
+    (sum, entry) => sum + entry.requests,
+    0,
+  );
+
+  if (chart.length > 0 && assignedRequests !== totalRequests) {
+    chart[chart.length - 1].requests += totalRequests - assignedRequests;
+  }
+
+  return chart;
+}
+
 function applyUsageSnapshot({
   chart,
   cost,
@@ -102,7 +145,9 @@ function applyUsageSnapshot({
   models: ModelUsage[];
   outputTokens: number;
   requests: number;
-  setChartData: React.Dispatch<React.SetStateAction<{ date: string; requests: number }[]>>;
+  setChartData: React.Dispatch<
+    React.SetStateAction<{ date: string; requests: number }[]>
+  >;
   setCostMultiplier: React.Dispatch<React.SetStateAction<number>>;
   setModelUsage: React.Dispatch<React.SetStateAction<ModelUsage[]>>;
   setTotalCost: React.Dispatch<React.SetStateAction<number>>;
@@ -133,7 +178,9 @@ export default function UsagePage() {
     { date: string; requests: number }[]
   >([]);
   const [costMultiplier, setCostMultiplier] = useState(1.65);
-  const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(null);
+  const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -173,7 +220,6 @@ export default function UsagePage() {
         const cost = (usageData.total_cost || 0) * settingsData.cost_multiplier;
 
         const models: ModelUsage[] = [];
-        const chart: { date: string; requests: number }[] = [];
 
         if (usageData.models && typeof usageData.models === "object") {
           for (const [modelName, metrics] of Object.entries(usageData.models)) {
@@ -197,19 +243,11 @@ export default function UsagePage() {
               tokens: input + output,
               cost: modelCost,
             });
-
-            if (period === "daily" || period === "monthly") {
-              chart.push({ date: modelName, requests: modelRequests });
-            }
           }
         }
 
-        if (chart.length === 0) {
-          chart.push({ date: period === "hourly" ? "Now" : "Today", requests });
-        }
-
         applyUsageSnapshot({
-          chart,
+          chart: buildFallbackChart(period, requests),
           cost,
           costMultiplier: settingsData.cost_multiplier,
           inputTokens,
@@ -508,7 +546,6 @@ export default function UsagePage() {
                 )}
               </div>
             </SurfaceCard>
-
           </div>
         </>
       )}
