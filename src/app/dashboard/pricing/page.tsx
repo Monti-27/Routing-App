@@ -39,15 +39,17 @@ interface ModelPricing {
 
 const staticModelPricing: ModelPricing[] = [
   // Free tier models
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "free", input_per_million: 0.193, output_per_million: 1.238 },
   { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "free", input_per_million: 0.462, output_per_million: 2.42 },
+  { model: "route/glm-5", display_name: "GLM-5", tier: "free", input_per_million: 0.792, output_per_million: 2.53 },
 
   // Lite tier models (includes free models)
   { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "lite", input_per_million: 0.193, output_per_million: 1.238 },
   { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "lite", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/minimax-m2.7", display_name: "MiniMax-M2.7", tier: "lite", input_per_million: 0.33, output_per_million: 1.32 },
+  { model: "route/minimax-m2.7-highspeed", display_name: "MiniMax-M2.7-Highspeed", tier: "lite", input_per_million: 0.33, output_per_million: 1.32 },
+  { model: "route/kimi-k2.5-highspeed", display_name: "Kimi-K2.5-Highspeed", tier: "lite", input_per_million: 0.6468, output_per_million: 3.388 },
   { model: "route/glm-5", display_name: "GLM-5", tier: "lite", input_per_million: 0.792, output_per_million: 2.53 },
   { model: "route/glm-5.1", display_name: "GLM-5.1", tier: "lite", input_per_million: 1.00, output_per_million: 3.00 },
+  { model: "route/glm-5.1-precision", display_name: "GLM-5.1-Precision", tier: "lite", input_per_million: 1.20, output_per_million: 3.50 },
   { model: "route/glm-4.7", display_name: "GLM-4.7", tier: "lite", input_per_million: 1.32, output_per_million: 4.40 },
   { model: "route/glm-4.7-flash", display_name: "GLM-4.7-Flash", tier: "lite", input_per_million: 1.32, output_per_million: 4.40 },
   { model: "route/qwen3.5-9b", display_name: "Qwen3.5-9B", tier: "lite", input_per_million: 0.20, output_per_million: 0.60 },
