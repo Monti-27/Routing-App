@@ -67,22 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Check for user data in URL (from OAuth callback)
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      const userParam = urlParams.get("user");
-      if (userParam) {
-        try {
-          const userData = JSON.parse(atob(userParam));
-          setUser(userData);
-          setIsLoading(false);
-          // Clean URL
-          window.history.replaceState({}, "", "/dashboard");
-          return;
-        } catch (e) {
-          console.error("Failed to parse user from URL:", e);
-        }
-      }
+    // Clean URL of any OAuth params on mount
+    if (typeof window !== "undefined" && window.location.search.includes("user=")) {
+      window.history.replaceState({}, "", window.location.pathname);
     }
 
     const accessToken = getAccessToken();
@@ -95,11 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
         })
         .catch(() => {
+          // If token validation fails, clear and redirect
           if (typeof window !== "undefined") {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             localStorage.removeItem("csrf_token");
-            window.location.href = "/auth/login";
+            // Don't redirect immediately - give time for any OAuth flow
           }
         })
         .finally(() => {
