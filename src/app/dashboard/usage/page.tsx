@@ -425,10 +425,9 @@ export default function UsagePage() {
             >
               <div className="space-y-6">
                 {usageByModelChartData.length > 0 ? (
-                  <>
-                    <div className="flex justify-center">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex justify-center lg:flex-1">
                       <PieChart
-                        className="mx-auto"
                         cornerRadius={4}
                         data={usageByModelChartData}
                         hoverOffset={8}
@@ -457,7 +456,7 @@ export default function UsagePage() {
                       </PieChart>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="min-w-0 flex-1 space-y-2 lg:max-w-md">
                       {usageByModelChartData.map((item, index) => {
                         const percentage =
                           totalChartRequests > 0
@@ -466,32 +465,32 @@ export default function UsagePage() {
 
                         return (
                           <button
-                            className="flex w-full items-center gap-3 rounded-lg border border-border/70 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                            className="flex w-full items-center gap-2.5 rounded-lg border border-border/70 px-3 py-2 text-left transition-colors hover:bg-muted/40"
                             key={item.label}
                             onMouseEnter={() => setHoveredModelIndex(index)}
                             onMouseLeave={() => setHoveredModelIndex(null)}
                             type="button"
                           >
                             <span
-                              className="h-2.5 w-2.5 shrink-0 rounded-full"
+                              className="h-2 w-2 shrink-0 rounded-full"
                               style={{ backgroundColor: item.color }}
                             />
                             <div className="min-w-0 flex-1">
                               <p
-                                className="truncate text-sm font-medium text-foreground"
+                                className="truncate text-xs font-medium text-foreground sm:text-sm"
                                 title={item.label}
                               >
                                 {item.label}
                               </p>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-0.5 text-[11px] text-muted-foreground sm:text-xs">
                                 {percentage.toFixed(1)}% of requests
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-semibold text-foreground">
+                              <p className="text-xs font-semibold text-foreground sm:text-sm">
                                 {item.value.toLocaleString()}
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-[11px] text-muted-foreground sm:text-xs">
                                 {item.model
                                   ? `${(item.model.tokens / 1000).toFixed(1)}K tokens`
                                   : "Grouped remainder"}
@@ -501,7 +500,7 @@ export default function UsagePage() {
                         );
                       })}
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">
                     No model usage data available.
