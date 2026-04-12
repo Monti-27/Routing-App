@@ -55,13 +55,7 @@ interface ModelPricing {
 }
 
 const staticModelPricing: ModelPricing[] = [
-  {
-    model: "route/minimax-m2.5",
-    display_name: "MiniMax-M2.5",
-    tier: "free",
-    input_per_million: 0.193,
-    output_per_million: 1.238,
-  },
+  // Free tier models
   {
     model: "route/kimi-k2.5",
     display_name: "Kimi-K2.5",
@@ -69,6 +63,15 @@ const staticModelPricing: ModelPricing[] = [
     input_per_million: 0.462,
     output_per_million: 2.42,
   },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "free",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+
+  // Lite tier models (includes free models)
   {
     model: "route/minimax-m2.5",
     display_name: "MiniMax-M2.5",
@@ -84,11 +87,18 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 2.42,
   },
   {
-    model: "route/minimax-m2.7",
-    display_name: "MiniMax-M2.7",
+    model: "route/minimax-m2.7-highspeed",
+    display_name: "MiniMax-M2.7-Highspeed",
     tier: "lite",
     input_per_million: 0.33,
     output_per_million: 1.32,
+  },
+  {
+    model: "route/kimi-k2.5-highspeed",
+    display_name: "Kimi-K2.5-Highspeed",
+    tier: "lite",
+    input_per_million: 0.6468,
+    output_per_million: 3.388,
   },
   {
     model: "route/glm-5",
@@ -101,8 +111,15 @@ const staticModelPricing: ModelPricing[] = [
     model: "route/glm-5.1",
     display_name: "GLM-5.1",
     tier: "lite",
-    input_per_million: 1,
-    output_per_million: 3,
+    input_per_million: 1.0,
+    output_per_million: 3.0,
+  },
+  {
+    model: "route/glm-5.1-precision",
+    display_name: "GLM-5.1-Precision",
+    tier: "lite",
+    input_per_million: 1.2,
+    output_per_million: 3.5,
   },
   {
     model: "route/glm-4.7",
@@ -143,9 +160,11 @@ const staticModelPricing: ModelPricing[] = [
     model: "route/qwen3.6-plus-preview",
     display_name: "Qwen3.6-Plus-Preview",
     tier: "lite",
-    input_per_million: 0,
-    output_per_million: 0,
+    input_per_million: 0.0,
+    output_per_million: 0.0,
   },
+
+  // Premium tier models (includes lite and free models)
   {
     model: "route/minimax-m2.5",
     display_name: "MiniMax-M2.5",
@@ -199,8 +218,8 @@ const staticModelPricing: ModelPricing[] = [
     model: "route/glm-5.1",
     display_name: "GLM-5.1",
     tier: "premium",
-    input_per_million: 1,
-    output_per_million: 3,
+    input_per_million: 1.0,
+    output_per_million: 3.0,
   },
   {
     model: "route/glm-4.7",
@@ -241,9 +260,11 @@ const staticModelPricing: ModelPricing[] = [
     model: "route/qwen3.6-plus-preview",
     display_name: "Qwen3.6-Plus-Preview",
     tier: "premium",
-    input_per_million: 0,
-    output_per_million: 0,
+    input_per_million: 0.0,
+    output_per_million: 0.0,
   },
+
+  // Max tier models (all models)
   {
     model: "route/minimax-m2.7-highspeed",
     display_name: "MiniMax-M2.7-Highspeed",
@@ -255,8 +276,8 @@ const staticModelPricing: ModelPricing[] = [
     model: "route/glm-5.1",
     display_name: "GLM-5.1",
     tier: "max",
-    input_per_million: 1,
-    output_per_million: 3,
+    input_per_million: 1.0,
+    output_per_million: 3.0,
   },
   {
     model: "route/glm-4.7",
@@ -513,7 +534,9 @@ function PricingPlanCard({
               {plan.name}
             </h3>
             {isCurrentPlan && <SubtleBadge>Current</SubtleBadge>}
-            {plan.popular && !isCurrentPlan && <SubtleBadge>Popular</SubtleBadge>}
+            {plan.popular && !isCurrentPlan && (
+              <SubtleBadge>Popular</SubtleBadge>
+            )}
           </div>
           <p className="text-sm text-muted-foreground">
             {plan.priceDetail === "forever" ? "Free forever" : plan.priceDetail}
@@ -530,9 +553,7 @@ function PricingPlanCard({
         )}
       </div>
 
-      <p className="mt-3 text-sm text-muted-foreground">
-        {plan.summary}
-      </p>
+      <p className="mt-3 text-sm text-muted-foreground">{plan.summary}</p>
 
       <div className="mt-6 rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900/50">
         <div className="flex items-center justify-between">
