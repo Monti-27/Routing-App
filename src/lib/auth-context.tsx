@@ -67,9 +67,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Check for user data in URL (from OAuth callback)
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userParam = urlParams.get("user");
+      if (userParam) {
+        try {
+          const userData = JSON.parse(atob(userParam));
+          setUser(userData);
+          setIsLoading(false);
+          // Clean URL
+          window.history.replaceState({}, "", "/dashboard");
+          return;
+        } catch (e) {
+          console.error("Failed to parse user from URL:", e);
+        }
+      }
+    }
+
     const accessToken = getAccessToken();
     const refreshToken = getRefreshToken();
-    
+
     if (accessToken && refreshToken) {
       api.auth
         .me()
@@ -87,6 +105,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoading(false);
         });
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
