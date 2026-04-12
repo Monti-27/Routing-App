@@ -37,8 +37,8 @@ const plans = [
     badge: "bg-zinc-600",
     requestsPerDay: 50,
     models: [
-      "route/minimax-m2.5",
       "route/kimi-k2.5",
+      "route/glm-5",
     ],
   },
   {
