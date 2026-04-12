@@ -72,6 +72,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.history.replaceState({}, "", window.location.pathname);
     }
 
+    // Check if we just completed OAuth login (user data in sessionStorage)
+    if (typeof window !== "undefined") {
+      const oauthUser = sessionStorage.getItem("oauth_user");
+      if (oauthUser) {
+        sessionStorage.removeItem("oauth_user");
+        try {
+          const userData = JSON.parse(oauthUser);
+          setUser(userData);
+          setIsLoading(false);
+          return;
+        } catch (e) {
+          console.error("Failed to parse oauth_user:", e);
+        }
+      }
+    }
+
     const accessToken = getAccessToken();
     const refreshToken = getRefreshToken();
 
@@ -82,12 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
         })
         .catch(() => {
-          // If token validation fails, clear and redirect
+          // If token validation fails, clear
           if (typeof window !== "undefined") {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             localStorage.removeItem("csrf_token");
-            // Don't redirect immediately - give time for any OAuth flow
           }
         })
         .finally(() => {
