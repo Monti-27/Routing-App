@@ -94,8 +94,8 @@ const modelLogos: Record<string, string> = {
 
 const staticModelPricing: ModelPricing[] = [
   // Free tier models
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "free", input_per_million: 0.193, output_per_million: 1.238 },
   { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "free", input_per_million: 0.462, output_per_million: 2.42 },
+  { model: "route/glm-5", display_name: "GLM-5", tier: "free", input_per_million: 0.792, output_per_million: 2.53 },
   { model: "route/nemotron-3-super-120b", display_name: "Nemotron-3-Super-120B", tier: "free", input_per_million: 0.11, output_per_million: 0.55 },
   { model: "route/trinity-large-preview", display_name: "Trinity-Large-Preview", tier: "free", input_per_million: 0.00, output_per_million: 0.00 },
   { model: "route/nemotron-3-nano-30b", display_name: "Nemotron-3-Nano-30B", tier: "free", input_per_million: 0.055, output_per_million: 0.22 },
@@ -199,9 +199,8 @@ const plans = [
     border: "border-zinc-500/30",
     icon: <Rocket className="h-5 w-5" />,
     features: [
-      "MiniMax-M2.7 & M2.5",
-      "MiniMax-M2.5 Highspeed (~70 tps)",
       "Kimi-K2.5",
+      "GLM-5",
       "Nemotron-3-Super-120B",
       "GPT-OSS-120B",
       "Hermes-3-Llama-3.1-405B",
