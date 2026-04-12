@@ -120,11 +120,17 @@ export default function SidebarWithSubmenu({
     <aside className="flex h-full w-full flex-col bg-[#f7f7f7] p-3 dark:bg-[#141414]">
       <div className="px-2 pb-4 pt-1">
         <div className="flex items-center gap-2 rounded-xl px-2 py-2 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900">
+          <UserAvatar
+            className="mr-2"
+            email={profile.email}
+            interactive
+            name={profile.name}
+            size={46}
+          />
           <Link
             className="flex min-w-0 flex-1 items-center gap-3"
             href="/dashboard"
           >
-            <UserAvatar email={profile.email} name={profile.name} size={36} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13px] font-medium text-zinc-950 dark:text-zinc-100">
                 {profile.name}

@@ -35,6 +35,7 @@ import { AnimatePresence, motion, useInView } from "framer-motion";
 import type { Transition, Variants } from "framer-motion";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
+import { AuthLoadingScreen } from "@/components/ui/auth-loading-screen";
 import type {
   CreateTypes as ConfettiInstance,
   GlobalOptions as ConfettiGlobalOptions,
@@ -672,9 +673,11 @@ export const AuthComponent = ({
 
   if (authLoading || isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <AuthLoadingScreen
+        description="Please wait while we log you in and open your dashboard."
+        mode="thinking"
+        title="Logging you in..."
+      />
     );
   }
 
@@ -754,7 +757,12 @@ export const AuthComponent = ({
 
         <fieldset
           className="relative z-10 mx-auto flex w-[280px] flex-col items-center gap-8 p-4"
-          disabled={modalStatus !== "closed" || isSubmitting || isGithubLoading || isDiscordLoading}
+          disabled={
+            modalStatus !== "closed" ||
+            isSubmitting ||
+            isGithubLoading ||
+            isDiscordLoading
+          }
         >
           <AnimatePresence mode="wait">
             {authStep === "email" && (
