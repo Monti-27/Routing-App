@@ -294,18 +294,18 @@ export const api = {
 
   keys: {
     list: async (): Promise<{ data: ApiKey[] }> => {
-      return fetchApi<{ data: ApiKey[] }>("/v1/user/keys");
+      return fetchApi<{ data: ApiKey[] }>("/v1/user/key");
     },
 
     create: async (name?: string): Promise<ApiKey & { key: string }> => {
-      return fetchApi<ApiKey & { key: string }>("/v1/user/keys", {
+      return fetchApi<ApiKey & { key: string }>("/v1/user/key", {
         method: "POST",
         body: JSON.stringify({ name }),
       });
     },
 
     revoke: async (keyId: string): Promise<{ message: string }> => {
-      return fetchApi<{ message: string }>(`/v1/user/keys/${keyId}`, {
+      return fetchApi<{ message: string }>(`/v1/user/key/${keyId}`, {
         method: "DELETE",
       });
     },
