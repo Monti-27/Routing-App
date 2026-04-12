@@ -922,6 +922,21 @@
   animation: gradient-shift 6s ease infinite;
 }
 
+.gradient-title::selection {
+  background: var(--accent-foreground);
+  background-image: none;
+  color: var(--accent);
+  text-shadow: 0 0 0 var(--accent);
+  -webkit-text-fill-color: var(--accent);
+}
+
+.gradient-title::-moz-selection {
+  background: var(--accent-foreground);
+  background-image: none;
+  color: var(--accent);
+  text-shadow: 0 0 0 var(--accent);
+}
+
 @keyframes gradient-shift {
   0%,
   100% {
