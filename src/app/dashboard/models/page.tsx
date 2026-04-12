@@ -140,7 +140,7 @@ const allModels: Model[] = [
     context_length: "203K",
     input_price: 1.2,
     output_price: 3.5,
-    tiers: ["premium", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
   },
