@@ -1,21 +1,23 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GlassCard, GlowCard } from "@/components/ui/glass-card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   Bot,
+  Crown,
   Zap,
+  Gem,
   Globe,
+  Layers3,
   Coins,
-  ChevronRight,
   Copy,
   Check,
-  ArrowUpDown,
-  Sparkles,
+  Shield,
+  type LucideIcon,
 } from "lucide-react";
 
 interface Model {
@@ -31,18 +33,7 @@ interface Model {
   logo?: string;
 }
 
-const providerLogos: Record<string, string> = {
-  "minimax": "/model-logos/route-minimax.png",
-  "opencode": "/model-logos/route-minimax.png",
-  "zai": "/model-logos/route-zai.svg",
-  "openrouter": "/model-logos/route-nvidia.svg",
-  "nvidia": "/model-logos/route-nvidia.svg",
-  "qwen": "/model-logos/route-qwen.png",
-  "kimi": "/model-logos/route-kimi.png",
-  "deepseek": "/model-logos/route-deepseek.png",
-  "chutes": "/model-logos/route-deepseek.png",
-  "crof": "/model-logos/route-zai.svg",
-};
+type Tier = Model["tiers"][number];
 
 const allModels: Model[] = [
   {
@@ -135,8 +126,8 @@ const allModels: Model[] = [
     description: "Enhanced GLM with improved capabilities",
     provider: "crof",
     context_length: "128K",
-    input_price: 1.00,
-    output_price: 3.00,
+    input_price: 1.0,
+    output_price: 3.0,
     tiers: ["lite", "premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-zai.svg",
@@ -148,7 +139,7 @@ const allModels: Model[] = [
     provider: "crof",
     context_length: "200K",
     input_price: 1.32,
-    output_price: 4.40,
+    output_price: 4.4,
     tiers: ["lite", "premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-zai.svg",
@@ -160,7 +151,7 @@ const allModels: Model[] = [
     provider: "crof",
     context_length: "200K",
     input_price: 1.32,
-    output_price: 4.40,
+    output_price: 4.4,
     tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
@@ -183,8 +174,8 @@ const allModels: Model[] = [
     description: "Efficient 9B model for versatile tasks",
     provider: "crof",
     context_length: "32K",
-    input_price: 0.20,
-    output_price: 0.60,
+    input_price: 0.2,
+    output_price: 0.6,
     tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-qwen.png",
@@ -195,8 +186,8 @@ const allModels: Model[] = [
     description: "Large 397B parameter model",
     provider: "crof",
     context_length: "256K",
-    input_price: 1.10,
-    output_price: 3.30,
+    input_price: 1.1,
+    output_price: 3.3,
     tiers: ["lite", "premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-qwen.png",
@@ -207,8 +198,8 @@ const allModels: Model[] = [
     description: "Enhanced Qwen preview with plus capabilities",
     provider: "openrouter",
     context_length: "1000K",
-    input_price: 0.00,
-    output_price: 0.00,
+    input_price: 0.0,
+    output_price: 0.0,
     tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-qwen.png",
@@ -258,17 +249,12 @@ const tierColors = {
   max: "bg-brand-purple/20 text-brand-purple",
 };
 
-const tierBgColors = {
-  free: "bg-brand-amber",
-  lite: "bg-brand-blue",
-  premium: "bg-brand-coral",
-  max: "bg-brand-purple",
-};
-
-const gradientClasses = {
-  purple: "from-brand-purple/20 to-brand-purple/5 border-brand-purple/30",
-  amber: "from-brand-amber/20 to-brand-amber/5 border-brand-amber/30",
-  coral: "from-brand-coral/20 to-brand-coral/5 border-brand-coral/30",
+const tierBadgeColors = {
+  free: "border-brand-amber/30 bg-brand-amber/10 text-brand-amber dark:border-brand-amber/40 dark:bg-brand-amber/14",
+  lite: "border-brand-blue/30 bg-brand-blue/10 text-brand-blue dark:border-brand-blue/40 dark:bg-brand-blue/14",
+  premium:
+    "border-brand-coral/30 bg-brand-coral/10 text-brand-coral dark:border-brand-coral/40 dark:bg-brand-coral/14",
+  max: "border-brand-purple/30 bg-brand-purple/10 text-brand-purple dark:border-brand-purple/40 dark:bg-brand-purple/14",
 };
 
 const iconBgClasses = {
@@ -283,6 +269,55 @@ const tierRequestsPerDay = {
   lite: 400,
   premium: 1000,
   max: 2500,
+};
+
+const tierMeta: Record<
+  Tier,
+  {
+    icon: LucideIcon;
+    iconBg: keyof typeof iconBgClasses;
+    accentClass: string;
+    softCardClass: string;
+    label: string;
+    blurb: string;
+  }
+> = {
+  free: {
+    icon: Shield,
+    iconBg: "amber",
+    accentClass: "text-brand-amber",
+    softCardClass:
+      "border-brand-amber/20 bg-gradient-to-br from-brand-amber/10 via-brand-amber/5 to-transparent",
+    label: "Free Tier",
+    blurb: "Entry access for testing and light usage",
+  },
+  lite: {
+    icon: Zap,
+    iconBg: "blue",
+    accentClass: "text-brand-blue",
+    softCardClass:
+      "border-brand-blue/20 bg-gradient-to-br from-brand-blue/10 via-brand-blue/5 to-transparent",
+    label: "Lite Tier",
+    blurb: "Faster daily volume for active builders",
+  },
+  premium: {
+    icon: Crown,
+    iconBg: "coral",
+    accentClass: "text-brand-coral",
+    softCardClass:
+      "border-brand-coral/20 bg-gradient-to-br from-brand-coral/10 via-brand-coral/5 to-transparent",
+    label: "Premium Tier",
+    blurb: "More capacity plus premium-only models",
+  },
+  max: {
+    icon: Gem,
+    iconBg: "purple",
+    accentClass: "text-brand-purple",
+    softCardClass:
+      "border-brand-purple/20 bg-gradient-to-br from-brand-purple/10 via-brand-purple/5 to-transparent",
+    label: "Max Tier",
+    blurb: "Full catalog access with the highest limits",
+  },
 };
 
 function CopyButton({ text }: { text: string }) {
@@ -318,17 +353,31 @@ function getModelInitials(name: string): string {
   return name.substring(0, 2).toUpperCase();
 }
 
-function ModelAvatar({ name, gradient, logo }: { name: string; gradient: "purple" | "amber" | "coral"; logo?: string }) {
+function ModelAvatar({
+  name,
+  gradient,
+  logo,
+}: {
+  name: string;
+  gradient: "purple" | "amber" | "coral";
+  logo?: string;
+}) {
   if (logo) {
     return (
-      <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center bg-white/10">
-        <img src={logo} alt={name} className="w-8 h-8 object-contain" />
+      <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-black/5 bg-white/70 dark:border-white/10 dark:bg-white/5">
+        <Image
+          src={logo}
+          alt={name}
+          fill
+          sizes="48px"
+          className="p-2 object-contain"
+        />
       </div>
     );
   }
   return (
     <div
-      className={`w-12 h-12 rounded-lg ${iconBgClasses[gradient]} flex items-center justify-center font-bold text-sm`}
+      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${iconBgClasses[gradient]} font-bold text-sm`}
     >
       {getModelInitials(name)}
     </div>
@@ -337,23 +386,33 @@ function ModelAvatar({ name, gradient, logo }: { name: string; gradient: "purple
 
 function ModelCard({ model }: { model: Model }) {
   return (
-    <GlassCard hover gradient={model.gradient}>
+    <Card className="rounded-xl border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-[#181818]">
       <div className="p-5 space-y-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3">
-            <ModelAvatar name={model.name} gradient={model.gradient} logo={model.logo} />
+        <div className="flex items-start gap-3">
+          <div className="flex min-w-0 flex-1 items-start gap-3">
+            <ModelAvatar
+              name={model.name}
+              gradient={model.gradient}
+              logo={model.logo}
+            />
             <div className="space-y-1 min-w-0">
               <h3 className="font-semibold text-base truncate">{model.name}</h3>
-              <p className="text-xs text-muted-foreground line-clamp-2">{model.description}</p>
+              <p className="text-xs text-muted-foreground line-clamp-2">
+                {model.description}
+              </p>
             </div>
           </div>
-          <div className="flex flex-col gap-1 shrink-0">
+          <div className="ml-auto flex max-w-[9rem] shrink-0 flex-wrap justify-end gap-1.5">
             {model.tiers.map((tier) => (
               <Badge
                 key={tier}
-                variant="secondary"
-                className={tierColors[tier]}
+                variant="outline"
+                className={`h-6 rounded-full px-2.5 text-[10px] font-semibold tracking-[0.14em] uppercase shadow-sm ${tierBadgeColors[tier]}`}
               >
+                <span
+                  aria-hidden
+                  className="size-1.5 rounded-full bg-current/70"
+                />
                 {tier.toUpperCase()}
               </Badge>
             ))}
@@ -368,20 +427,26 @@ function ModelCard({ model }: { model: Model }) {
           </div>
           <div className="flex items-center gap-1.5">
             <Bot className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="font-medium truncate max-w-[100px]">{model.provider}</span>
+            <span className="font-medium truncate max-w-[100px]">
+              {model.provider}
+            </span>
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-lg p-2.5">
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 dark:border-zinc-800 dark:bg-zinc-900/40">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 text-xs">
               <div>
                 <span className="text-muted-foreground">In: </span>
-                <span className="font-medium">${model.input_price.toFixed(2)}</span>
+                <span className="font-medium">
+                  ${model.input_price.toFixed(2)}
+                </span>
               </div>
               <div>
                 <span className="text-muted-foreground">Out: </span>
-                <span className="font-medium">${model.output_price.toFixed(2)}</span>
+                <span className="font-medium">
+                  ${model.output_price.toFixed(2)}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -391,13 +456,13 @@ function ModelCard({ model }: { model: Model }) {
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <code className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-1 rounded truncate max-w-[160px]">
+          <code className="max-w-[160px] truncate rounded bg-muted/50 px-1.5 py-1 font-mono text-[10px] text-muted-foreground">
             {model.id}
           </code>
           <CopyButton text={model.id} />
         </div>
       </div>
-    </GlassCard>
+    </Card>
   );
 }
 
@@ -410,15 +475,19 @@ function ModelSection({
 }: {
   title: string;
   description: string;
-  tier: "free" | "lite" | "premium" | "max";
+  tier: Tier;
   models: Model[];
   viewMode: "grid" | "list";
 }) {
+  const Icon = tierMeta[tier].icon;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-lg ${iconBgClasses[tier === "free" ? "amber" : tier === "lite" ? "blue" : tier === "premium" ? "coral" : "purple"]} flex items-center justify-center`}>
-          <Sparkles className="h-4 w-4" />
+        <div
+          className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconBgClasses[tierMeta[tier].iconBg]}`}
+        >
+          <Icon className="h-4 w-4" />
         </div>
         <div>
           <h3 className="font-semibold text-lg">{title}</h3>
@@ -436,33 +505,49 @@ function ModelSection({
           ))}
         </div>
       ) : (
-        <Card className="border-white/10">
+        <Card className="rounded-xl border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-[#181818]">
           <CardContent className="p-0">
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {models.map((model) => (
                 <div
                   key={model.id}
-                  className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
+                  className="flex items-center justify-between p-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
                 >
                   <div className="flex items-center gap-3">
-                    <ModelAvatar name={model.name} gradient={model.gradient} logo={model.logo} />
+                    <ModelAvatar
+                      name={model.name}
+                      gradient={model.gradient}
+                      logo={model.logo}
+                    />
                     <div>
                       <p className="font-medium text-sm">{model.name}</p>
-                      <p className="text-xs text-muted-foreground">{model.provider}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {model.provider}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <p className="text-xs font-medium">{model.context_length}</p>
-                      <p className="text-[10px] text-muted-foreground">context</p>
+                      <p className="text-xs font-medium">
+                        {model.context_length}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        context
+                      </p>
                     </div>
                     <div className="text-right min-w-[60px]">
-                      <p className="text-xs font-medium">${model.input_price.toFixed(2)}</p>
+                      <p className="text-xs font-medium">
+                        ${model.input_price.toFixed(2)}
+                      </p>
                       <p className="text-[10px] text-muted-foreground">input</p>
                     </div>
                     <div className="text-right min-w-[60px]">
-                      <p className="text-xs font-medium">${model.output_price.toFixed(2)}</p>
-                      <p className="text-[10px] text-muted-foreground">output</p>
+                      <p className="text-xs font-medium">
+                        ${model.output_price.toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        output
+                      </p>
                     </div>
                     <code className="text-[9px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-1 rounded hidden lg:inline-block">
                       {model.id}
@@ -479,7 +564,9 @@ function ModelSection({
 }
 
 export default function ModelsPage() {
-  const [activeTab, setActiveTab] = useState<"all" | "free" | "lite" | "premium" | "max">("all");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "free" | "lite" | "premium" | "max"
+  >("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const freeModels = allModels.filter((m) => m.tiers.includes("free"));
@@ -487,18 +574,91 @@ export default function ModelsPage() {
   const premiumModels = allModels.filter((m) => m.tiers.includes("premium"));
   const maxModels = allModels.filter((m) => m.tiers.includes("max"));
 
+  const tierSummaryCards: Array<{
+    key: Tier | "all";
+    title: string;
+    value: number;
+    unit: string;
+    meta: string;
+    icon: LucideIcon;
+    cardClass: string;
+    iconWrapClass: string;
+    iconClass: string;
+  }> = [
+    {
+      key: "free",
+      title: tierMeta.free.label,
+      value: tierRequestsPerDay.free,
+      unit: "requests/day",
+      meta: `${freeModels.length} models`,
+      icon: tierMeta.free.icon,
+      cardClass: tierMeta.free.softCardClass,
+      iconWrapClass: iconBgClasses[tierMeta.free.iconBg],
+      iconClass: tierMeta.free.accentClass,
+    },
+    {
+      key: "lite",
+      title: tierMeta.lite.label,
+      value: tierRequestsPerDay.lite,
+      unit: "requests/day",
+      meta: `${liteModels.length} models`,
+      icon: tierMeta.lite.icon,
+      cardClass: tierMeta.lite.softCardClass,
+      iconWrapClass: iconBgClasses[tierMeta.lite.iconBg],
+      iconClass: tierMeta.lite.accentClass,
+    },
+    {
+      key: "premium",
+      title: tierMeta.premium.label,
+      value: tierRequestsPerDay.premium,
+      unit: "requests/day",
+      meta: `${premiumModels.length} models`,
+      icon: tierMeta.premium.icon,
+      cardClass: tierMeta.premium.softCardClass,
+      iconWrapClass: iconBgClasses[tierMeta.premium.iconBg],
+      iconClass: tierMeta.premium.accentClass,
+    },
+    {
+      key: "max",
+      title: tierMeta.max.label,
+      value: tierRequestsPerDay.max,
+      unit: "requests/day",
+      meta: `${maxModels.length} models`,
+      icon: tierMeta.max.icon,
+      cardClass: tierMeta.max.softCardClass,
+      iconWrapClass: iconBgClasses[tierMeta.max.iconBg],
+      iconClass: tierMeta.max.accentClass,
+    },
+    {
+      key: "all",
+      title: "All Models",
+      value: allModels.length,
+      unit: "total models",
+      meta: "route/ prefix",
+      icon: Layers3,
+      cardClass:
+        "border-zinc-200 bg-gradient-to-br from-zinc-100/80 via-white to-white dark:border-zinc-800 dark:from-zinc-900 dark:via-[#181818] dark:to-[#181818]",
+      iconWrapClass:
+        "bg-zinc-900/5 text-zinc-700 dark:bg-white/10 dark:text-zinc-200",
+      iconClass: "text-zinc-700 dark:text-zinc-200",
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            Models
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight">Models</h2>
           <p className="text-muted-foreground">
-            All models use <code className="text-xs bg-muted px-1 rounded">route/</code> prefix in API calls
+            All models use{" "}
+            <code className="text-xs bg-muted px-1 rounded">route/</code> prefix
+            in API calls
           </p>
         </div>
-        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "grid" | "list")}>
+        <Tabs
+          value={viewMode}
+          onValueChange={(v) => setViewMode(v as "grid" | "list")}
+        >
           <TabsList>
             <TabsTrigger value="grid">Grid</TabsTrigger>
             <TabsTrigger value="list">List</TabsTrigger>
@@ -506,60 +666,45 @@ export default function ModelsPage() {
         </Tabs>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card className="border-amber-500/20 bg-amber-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-amber-500">Free Tier</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerDay.free}</div>
-            <p className="text-xs text-muted-foreground">requests/day</p>
-            <p className="text-xs text-muted-foreground mt-2">{freeModels.length} models</p>
-          </CardContent>
-        </Card>
-        <Card className="border-blue-500/20 bg-blue-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-blue-500">Lite Tier</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerDay.lite}</div>
-            <p className="text-xs text-muted-foreground">requests/day</p>
-            <p className="text-xs text-muted-foreground mt-2">{liteModels.length} models</p>
-          </CardContent>
-        </Card>
-        <Card className="border-coral-500/20 bg-coral-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-coral-500">Premium Tier</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerDay.premium}</div>
-            <p className="text-xs text-muted-foreground">requests/day</p>
-            <p className="text-xs text-muted-foreground mt-2">{premiumModels.length} models</p>
-          </CardContent>
-        </Card>
-        <Card className="border-purple-500/20 bg-purple-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-500">Max Tier</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tierRequestsPerDay.max}</div>
-            <p className="text-xs text-muted-foreground">requests/day</p>
-            <p className="text-xs text-muted-foreground mt-2">{maxModels.length} models</p>
-          </CardContent>
-        </Card>
-        <Card className="border-white/10">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">All Models</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{allModels.length}</div>
-            <p className="text-xs text-muted-foreground">total models</p>
-            <p className="text-xs text-muted-foreground mt-2">route/ prefix</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+        {tierSummaryCards.map((card) => {
+          const Icon = card.icon;
+
+          return (
+            <Card
+              key={card.key}
+              className={`rounded-2xl shadow-none ${card.cardClass}`}
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      {card.title}
+                    </p>
+                    <div className="text-3xl font-semibold tracking-[-0.03em] text-foreground">
+                      {card.value}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{card.unit}</p>
+                  </div>
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${card.iconWrapClass}`}
+                  >
+                    <Icon className={`h-5 w-5 ${card.iconClass}`} />
+                  </div>
+                </div>
+                <div className="mt-4 border-t border-black/5 pt-3 text-xs text-muted-foreground dark:border-white/10">
+                  {card.meta}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as typeof activeTab)}
+      >
         <TabsList className="grid grid-cols-5 w-fit">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="free">Free</TabsTrigger>
@@ -611,19 +756,24 @@ export default function ModelsPage() {
         )}
       </div>
 
-      <GlowCard color="purple" intensity="low" className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-brand-purple/20">
-            <Coins className="h-6 w-6 text-brand-purple" />
+      <Card className="rounded-xl border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-[#181818]">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-brand-purple/20">
+              <Coins className="h-6 w-6 text-brand-purple" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold text-lg">Plan-Based Access</h3>
+              <p className="text-muted-foreground">
+                Your plan determines which models you can access. Free tier gets
+                50 requests/day, Lite gets 400/day, Premium gets 1,000/day, and
+                Max gets 2,500/day. Upgrade anytime to unlock more models and
+                higher limits.
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-lg">Plan-Based Access</h3>
-            <p className="text-muted-foreground">
-              Your plan determines which models you can access. Free tier gets 50 requests/day, Lite gets 400/day, Premium gets 1,000/day, and Max gets 2,500/day. Upgrade anytime to unlock more models and higher limits.
-            </p>
-          </div>
-        </div>
-      </GlowCard>
+        </CardContent>
+      </Card>
     </div>
   );
 }

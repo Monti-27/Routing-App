@@ -40,6 +40,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isDevelopment = process.env.NODE_ENV === "development";
+
   return (
     <html
       className={`${ltSuperior.variable} ${ltSuperiorMono.variable} h-full`}
@@ -47,6 +49,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex h-full min-h-0 flex-col bg-background text-foreground antialiased">
+        {isDevelopment ? (
+          <Script
+            src="//unpkg.com/react-grab/dist/index.global.js"
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        ) : null}
         <Script
           src="https://cdn.databuddy.cc/databuddy.js"
           data-client-id="6eac3218-8169-4ae2-bb34-e88a303fac76"
@@ -59,7 +68,12 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <AuthProvider>
             <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               {children}

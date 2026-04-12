@@ -1,14 +1,21 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { api, User } from "@/lib/api";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { api, type User } from "@/lib/api";
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isDevBypassEnabled: boolean;
   login: (email: string, otp: string) => Promise<void>;
-  register: (email: string, otp: string, password: string, name?: string) => Promise<void>;
+  register: (
+    email: string,
+    otp: string,
+    password: string,
+    name?: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -31,11 +38,35 @@ function getRefreshToken(): string | null {
   return getCookie("refresh_token") || localStorage.getItem("refresh_token");
 }
 
+const isDevBypassEnabled = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true";
+
+const devBypassUser: User = {
+  id: "dev-bypass-user",
+  email: "dev@routing.run",
+  name: "Dev User",
+  plan_tier: "max",
+  email_verified: true,
+  credits: 999,
+  is_upgraded: true,
+  upgrade_expires_at: null,
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const hasStoredSession =
+    !isDevBypassEnabled &&
+    typeof window !== "undefined" &&
+    Boolean(getAccessToken() && getRefreshToken());
+
+  const [user, setUser] = useState<User | null>(
+    isDevBypassEnabled ? devBypassUser : null,
+  );
+  const [isLoading, setIsLoading] = useState(hasStoredSession);
 
   useEffect(() => {
+    if (isDevBypassEnabled) {
+      return;
+    }
+
     const accessToken = getAccessToken();
     const refreshToken = getRefreshToken();
     
@@ -45,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .then((userData) => {
           setUser(userData);
         })
-        .catch((err) => {
+        .catch(() => {
           if (typeof window !== "undefined") {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
@@ -56,32 +87,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoading(false);
         });
-    } else {
-      setIsLoading(false);
     }
   }, []);
 
   const login = async (email: string, otp: string) => {
+    if (isDevBypassEnabled) {
+      setUser(devBypassUser);
+      return;
+    }
+
     const { user: userData } = await api.auth.login(email, otp);
     setUser(userData);
   };
 
-  const register = async (email: string, otp: string, password: string, name?: string) => {
-    const { user: userData } = await api.auth.register(email, otp, password, name);
+  const register = async (
+    email: string,
+    otp: string,
+    password: string,
+    name?: string,
+  ) => {
+    if (isDevBypassEnabled) {
+      setUser({
+        ...devBypassUser,
+        email,
+        name: name || devBypassUser.name,
+      });
+      return;
+    }
+
+    const { user: userData } = await api.auth.register(
+      email,
+      otp,
+      password,
+      name,
+    );
     setUser(userData);
   };
 
   const logout = async () => {
+    if (isDevBypassEnabled) {
+      setUser(devBypassUser);
+      return;
+    }
+
     await api.auth.logout();
     setUser(null);
   };
 
   const refreshUser = async () => {
+    if (isDevBypassEnabled) {
+      setUser(devBypassUser);
+      return;
+    }
+
     try {
       const userData = await api.auth.me();
       setUser(userData);
-    } catch {
-    }
+    } catch {}
   };
 
   return (
@@ -90,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isLoading,
         isAuthenticated: !!user,
+        isDevBypassEnabled,
         login,
         register,
         logout,
