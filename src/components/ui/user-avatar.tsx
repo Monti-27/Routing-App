@@ -5,12 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const avatarPalettes = [
-  ["#1470e3", "#8350e8", "#9dc4f4"],
-  ["#0f766e", "#14b8a6", "#99f6e4"],
-  ["#b45309", "#f59e0b", "#fde68a"],
-  ["#be123c", "#f43f5e", "#fda4af"],
-  ["#4338ca", "#6366f1", "#c7d2fe"],
-  ["#166534", "#22c55e", "#bbf7d0"],
+  ["#fe5608", "#fe5608", "#fe5608"],
+  ["#99bcfa", "#99bcfa", "#99bcfa"],
+  ["#ff9ce8", "#ff9ce8", "#ff9ce8"],
+  ["#5bf3b6", "#5bf3b6", "#5bf3b6"],
+  ["#fbf8a0", "#fbf8a0", "#fbf8a0"],
 ] as const;
 
 const avatarFaces = [
@@ -26,7 +25,7 @@ const avatarFaces = [
     leftEye: "top-[30%] left-[26%] h-[4%] w-[12%] rounded-full",
     rightEye: "top-[30%] right-[26%] h-[4%] w-[12%] rounded-full",
     mouth:
-      "bottom-[26%] left-1/2 h-[6%] w-[28%] -translate-x-1/2 rounded-full bg-current",
+      "bottom-[24%] left-1/2 h-[8%] w-[32%] -translate-x-1/2 rounded-full border-b-[2px] border-current",
   },
   {
     name: "zoe",
@@ -40,7 +39,7 @@ const avatarFaces = [
     leftEye: "top-[31%] left-[26%] h-[4%] w-[12%] -rotate-12 rounded-full",
     rightEye: "top-[31%] right-[26%] h-[4%] w-[12%] rotate-12 rounded-full",
     mouth:
-      "bottom-[24%] left-1/2 h-[8%] w-[36%] -translate-x-1/2 rounded-full border-t-[2px] border-current",
+      "bottom-[24%] left-1/2 h-[8%] w-[34%] -translate-x-1/2 rounded-full border-b-[2px] border-current",
   },
   {
     name: "frank",
@@ -84,21 +83,6 @@ const getPaletteIndex = (seed: string) => {
   return Math.abs(hash) % avatarPalettes.length;
 };
 
-const getInitials = (name?: string | null, email?: string | null) => {
-  const trimmedName = name?.trim();
-
-  if (trimmedName) {
-    const parts = trimmedName.split(/\s+/).filter(Boolean);
-    return parts
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? "")
-      .join("");
-  }
-
-  const fallback = email?.trim() || "routing-user";
-  return fallback.slice(0, 2).toUpperCase();
-};
-
 type UserAvatarProps = {
   email?: string | null;
   name?: string | null;
@@ -115,11 +99,25 @@ export function UserAvatar({
   interactive = false,
 }: UserAvatarProps) {
   const baseSeed = name?.trim() || email?.trim() || "routing-user";
-  const initials = getInitials(name, email);
   const basePaletteIndex = getPaletteIndex(baseSeed);
   const [clickCount, setClickCount] = useState(0);
   const [burstCount, setBurstCount] = useState(0);
   const [isBursting, setIsBursting] = useState(false);
+  const [isBlinking, setIsBlinking] = useState(false);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setIsBlinking(true);
+
+      window.setTimeout(() => {
+        setIsBlinking(false);
+      }, 140);
+    }, 2600);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isBursting) {
@@ -165,27 +163,22 @@ export function UserAvatar({
   const avatarInner = (
     <>
       <span className="absolute inset-0 rounded-[inherit] overflow-hidden">
-        <span
-          className="absolute inset-[10%] rounded-[inherit] opacity-25"
-          style={{
-            background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), transparent 46%)",
-          }}
-        />
-        <span
-          className="absolute inset-[18%] rounded-full bg-white/16"
-          style={{ backdropFilter: "blur(1px)" }}
-        />
-        <span className="absolute inset-0 rounded-[inherit] bg-black/8" />
         <span className="absolute inset-[14%] rounded-[inherit] border border-white/20" />
-        <span className="absolute inset-0 rounded-[inherit] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]" />
-        <span className="absolute inset-0 rounded-[inherit] bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.24),transparent_35%)]" />
-        <span className={cn("absolute bg-white/92", face.leftEye)} />
-        <span className={cn("absolute bg-white/92", face.rightEye)} />
+        <span
+          className={cn(
+            "absolute bg-white/92 transition-all duration-150",
+            face.leftEye,
+            isBlinking ? "h-[3%]" : "",
+          )}
+        />
+        <span
+          className={cn(
+            "absolute bg-white/92 transition-all duration-150",
+            face.rightEye,
+            isBlinking ? "h-[3%]" : "",
+          )}
+        />
         <span className={cn("absolute text-white/92", face.mouth)} />
-        <span className="absolute bottom-[11%] left-1/2 -translate-x-1/2 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/80">
-          {initials}
-        </span>
       </span>
       {isBursting
         ? BURST_DOTS.map((dot, index) => (
