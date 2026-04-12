@@ -79,6 +79,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         }
 
         const data = await response.json();
+        console.log("[DEBUG] Response data:", data);
 
         if (data.access_token && data.refresh_token && typeof window !== "undefined") {
           localStorage.setItem("access_token", data.access_token);
@@ -86,10 +87,12 @@ function AuthCallbackContent({ provider }: { provider: string }) {
           if (data.csrf_token) {
             localStorage.setItem("csrf_token", data.csrf_token);
           }
+          console.log("[DEBUG] Tokens stored in localStorage");
         }
 
         window.location.href = "/dashboard";
-      } catch {
+      } catch (err) {
+        console.error("[DEBUG] Callback error:", err);
         setError("Authentication failed. Please try again.");
       }
     }
