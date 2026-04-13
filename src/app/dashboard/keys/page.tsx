@@ -39,7 +39,33 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SimpleCodeBlock } from "@/components/ui/simple-code-block";
 import { api, type ApiKey } from "@/lib/api";
+
+const simpleCodeBlockTheme = {
+  backgroundColor: "var(--card)",
+  borderColor: "var(--input)",
+  codeTextColor: "var(--foreground)",
+  filenameColor: "var(--foreground)",
+  lineNumberColor: "var(--muted-foreground)",
+  hyperlinkUnderlineColor: "var(--muted-foreground)",
+} as const;
+
+const quickStartCode = `# Base URL
+https://api.routing.run/v1/chat/completions
+
+# Headers
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+# Example request
+curl -X POST https://api.routing.run/v1/chat/completions \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'`;
 
 export default function ApiKeysPage() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -320,29 +346,18 @@ export default function ApiKeysPage() {
         title="Integration reference"
         description="Everything needed to make your first authenticated request."
       >
-        <div className="space-y-4 text-sm">
-          <div className="rounded-lg border border-border/70 bg-background px-4 py-4">
-            <p className="font-medium text-foreground">Base URL</p>
-            <code className="mt-2 block font-mono text-muted-foreground">
-              https://api.routing.run/v1/chat/completions
-            </code>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-background px-4 py-4">
-            <p className="font-medium text-foreground">Headers</p>
-            <pre className="mt-2 overflow-x-auto font-mono text-muted-foreground">{`Authorization: Bearer YOUR_API_KEY
-Content-Type: application/json`}</pre>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-background px-4 py-4">
-            <p className="font-medium text-foreground">Example request</p>
-            <pre className="mt-2 overflow-x-auto font-mono text-muted-foreground">{`curl -X POST https://api.routing.run/v1/chat/completions \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-4o",
-    "messages": [{"role": "user", "content": "Hello!"}]
-  }'`}</pre>
-          </div>
-        </div>
+        <SimpleCodeBlock
+          code={quickStartCode}
+          filename="quickstart.sh"
+          codeLineHeight="1.45rem"
+          codePadding="10px 12px 10px 14px"
+          codeTextSize="0.9rem"
+          fontFamily="var(--font-lt-superior-mono)"
+          rootBorderRadius="8px"
+          rootPadding="8px 6px"
+          titleFontSize="0.9rem"
+          {...simpleCodeBlockTheme}
+        />
       </SurfaceCard>
     </div>
   );
