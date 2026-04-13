@@ -1,13 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+import {
+  ArrowRight,
+  Check,
+  Coins,
+  Crown,
+  Diamond,
+  Leaf,
+  Rocket,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
+
+import {
+  PageHeader,
+  PillStat,
+  SubtleBadge,
+  SurfaceCard,
+} from "@/components/dashboard/page-ui";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth-context";
-import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/lib/auth-context";
+import { cn } from "@/lib/utils";
 
 const modelLogos: Record<string, string> = {
   "route/minimax-m2.5": "/model-logos/route-minimax.png",
@@ -39,63 +56,298 @@ interface ModelPricing {
 
 const staticModelPricing: ModelPricing[] = [
   // Free tier models
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "free", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "free", input_per_million: 0.792, output_per_million: 2.53 },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "free",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "free",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
 
   // Lite tier models (includes free models)
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "lite", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "lite", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/minimax-m2.7-highspeed", display_name: "MiniMax-M2.7-Highspeed", tier: "lite", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/kimi-k2.5-highspeed", display_name: "Kimi-K2.5-Highspeed", tier: "lite", input_per_million: 0.6468, output_per_million: 3.388 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "lite", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/glm-5.1", display_name: "GLM-5.1", tier: "lite", input_per_million: 1.00, output_per_million: 3.00 },
-  { model: "route/glm-5.1-precision", display_name: "GLM-5.1-Precision", tier: "lite", input_per_million: 1.20, output_per_million: 3.50 },
-  { model: "route/glm-4.7", display_name: "GLM-4.7", tier: "lite", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.7-flash", display_name: "GLM-4.7-Flash", tier: "lite", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/qwen3.5-9b", display_name: "Qwen3.5-9B", tier: "lite", input_per_million: 0.20, output_per_million: 0.60 },
-  { model: "route/qwen3.5-397b-a17b", display_name: "Qwen3.5-397B-A17B", tier: "lite", input_per_million: 1.10, output_per_million: 3.30 },
-  { model: "route/deepseek-v3.2", display_name: "DeepSeek-V3.2", tier: "lite", input_per_million: 0.4928, output_per_million: 0.7392 },
-  { model: "route/qwen3.6-plus-preview", display_name: "Qwen3.6-Plus-Preview", tier: "lite", input_per_million: 0.00, output_per_million: 0.00 },
+  {
+    model: "route/minimax-m2.5",
+    display_name: "MiniMax-M2.5",
+    tier: "lite",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "lite",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    display_name: "MiniMax-M2.7-Highspeed",
+    tier: "lite",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/kimi-k2.5-highspeed",
+    display_name: "Kimi-K2.5-Highspeed",
+    tier: "lite",
+    input_per_million: 0.6468,
+    output_per_million: 3.388,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "lite",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+  {
+    model: "route/glm-5.1",
+    display_name: "GLM-5.1",
+    tier: "lite",
+    input_per_million: 1.0,
+    output_per_million: 3.0,
+  },
+  {
+    model: "route/glm-5.1-precision",
+    display_name: "GLM-5.1-Precision",
+    tier: "lite",
+    input_per_million: 1.2,
+    output_per_million: 3.5,
+  },
+  {
+    model: "route/glm-4.7",
+    display_name: "GLM-4.7",
+    tier: "lite",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.7-flash",
+    display_name: "GLM-4.7-Flash",
+    tier: "lite",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/qwen3.5-9b",
+    display_name: "Qwen3.5-9B",
+    tier: "lite",
+    input_per_million: 0.2,
+    output_per_million: 0.6,
+  },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    display_name: "Qwen3.5-397B-A17B",
+    tier: "lite",
+    input_per_million: 1.1,
+    output_per_million: 3.3,
+  },
+  {
+    model: "route/deepseek-v3.2",
+    display_name: "DeepSeek-V3.2",
+    tier: "lite",
+    input_per_million: 0.4928,
+    output_per_million: 0.7392,
+  },
+  {
+    model: "route/qwen3.6-plus-preview",
+    display_name: "Qwen3.6-Plus-Preview",
+    tier: "lite",
+    input_per_million: 0.0,
+    output_per_million: 0.0,
+  },
 
   // Premium tier models (includes lite and free models)
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "premium", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/minimax-m2.5-highspeed", display_name: "MiniMax-M2.5 Highspeed", tier: "premium", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/minimax-m2.7", display_name: "MiniMax-M2.7", tier: "premium", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/minimax-m2.7-highspeed", display_name: "MiniMax-M2.7 Highspeed", tier: "premium", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "premium", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/kimi-k2.5-highspeed", display_name: "Kimi-K2.5-Highspeed", tier: "premium", input_per_million: 0.6468, output_per_million: 3.388 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "premium", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/glm-5.1", display_name: "GLM-5.1", tier: "premium", input_per_million: 1.00, output_per_million: 3.00 },
-  { model: "route/glm-4.7", display_name: "GLM-4.7", tier: "premium", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.7-flash", display_name: "GLM-4.7-Flash", tier: "premium", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/qwen3.5-9b", display_name: "Qwen3.5-9B", tier: "premium", input_per_million: 0.20, output_per_million: 0.60 },
-  { model: "route/qwen3.5-397b-a17b", display_name: "Qwen3.5-397B-A17B", tier: "premium", input_per_million: 1.10, output_per_million: 3.30 },
-  { model: "route/deepseek-v3.2", display_name: "DeepSeek-V3.2", tier: "premium", input_per_million: 0.4928, output_per_million: 0.7392 },
-  { model: "route/qwen3.6-plus-preview", display_name: "Qwen3.6-Plus-Preview", tier: "premium", input_per_million: 0.00, output_per_million: 0.00 },
+  {
+    model: "route/minimax-m2.5",
+    display_name: "MiniMax-M2.5",
+    tier: "premium",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/minimax-m2.5-highspeed",
+    display_name: "MiniMax-M2.5 Highspeed",
+    tier: "premium",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/minimax-m2.7",
+    display_name: "MiniMax-M2.7",
+    tier: "premium",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    display_name: "MiniMax-M2.7 Highspeed",
+    tier: "premium",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "premium",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/kimi-k2.5-highspeed",
+    display_name: "Kimi-K2.5-Highspeed",
+    tier: "premium",
+    input_per_million: 0.6468,
+    output_per_million: 3.388,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "premium",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+  {
+    model: "route/glm-5.1",
+    display_name: "GLM-5.1",
+    tier: "premium",
+    input_per_million: 1.0,
+    output_per_million: 3.0,
+  },
+  {
+    model: "route/glm-4.7",
+    display_name: "GLM-4.7",
+    tier: "premium",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.7-flash",
+    display_name: "GLM-4.7-Flash",
+    tier: "premium",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/qwen3.5-9b",
+    display_name: "Qwen3.5-9B",
+    tier: "premium",
+    input_per_million: 0.2,
+    output_per_million: 0.6,
+  },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    display_name: "Qwen3.5-397B-A17B",
+    tier: "premium",
+    input_per_million: 1.1,
+    output_per_million: 3.3,
+  },
+  {
+    model: "route/deepseek-v3.2",
+    display_name: "DeepSeek-V3.2",
+    tier: "premium",
+    input_per_million: 0.4928,
+    output_per_million: 0.7392,
+  },
+  {
+    model: "route/qwen3.6-plus-preview",
+    display_name: "Qwen3.6-Plus-Preview",
+    tier: "premium",
+    input_per_million: 0.0,
+    output_per_million: 0.0,
+  },
 
   // Max tier models (all models)
-  { model: "route/minimax-m2.7-highspeed", display_name: "MiniMax-M2.7-Highspeed", tier: "max", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/glm-5.1", display_name: "GLM-5.1", tier: "max", input_per_million: 1.00, output_per_million: 3.00 },
-  { model: "route/glm-4.7", display_name: "GLM-4.7", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.7-flash", display_name: "GLM-4.7-Flash", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/qwen3.5-9b", display_name: "Qwen3.5-9B", tier: "max", input_per_million: 0.20, output_per_million: 0.60 },
-  { model: "route/qwen3.5-397b-a17b", display_name: "Qwen3.5-397B-A17B", tier: "max", input_per_million: 1.10, output_per_million: 3.30 },
-  { model: "route/glm-5-highspeed", display_name: "GLM-5-Highspeed", tier: "max", input_per_million: 1.1088, output_per_million: 3.542 },
-  { model: "route/kimi-k2.5-highspeed", display_name: "Kimi-K2.5-Highspeed", tier: "max", input_per_million: 0.6468, output_per_million: 3.388 },
-  { model: "route/deepseek-v3.2-speciale", display_name: "DeepSeek-V3.2-Speciale", tier: "max", input_per_million: 0.55, output_per_million: 0.82 },
-  { model: "route/deepseek-r1", display_name: "DeepSeek-R1", tier: "max", input_per_million: 0.495, output_per_million: 2.365 },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    display_name: "MiniMax-M2.7-Highspeed",
+    tier: "max",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/glm-5.1",
+    display_name: "GLM-5.1",
+    tier: "max",
+    input_per_million: 1.0,
+    output_per_million: 3.0,
+  },
+  {
+    model: "route/glm-4.7",
+    display_name: "GLM-4.7",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.7-flash",
+    display_name: "GLM-4.7-Flash",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/qwen3.5-9b",
+    display_name: "Qwen3.5-9B",
+    tier: "max",
+    input_per_million: 0.2,
+    output_per_million: 0.6,
+  },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    display_name: "Qwen3.5-397B-A17B",
+    tier: "max",
+    input_per_million: 1.1,
+    output_per_million: 3.3,
+  },
+  {
+    model: "route/glm-5-highspeed",
+    display_name: "GLM-5-Highspeed",
+    tier: "max",
+    input_per_million: 1.1088,
+    output_per_million: 3.542,
+  },
+  {
+    model: "route/kimi-k2.5-highspeed",
+    display_name: "Kimi-K2.5-Highspeed",
+    tier: "max",
+    input_per_million: 0.6468,
+    output_per_million: 3.388,
+  },
+  {
+    model: "route/deepseek-v3.2-speciale",
+    display_name: "DeepSeek-V3.2-Speciale",
+    tier: "max",
+    input_per_million: 0.55,
+    output_per_million: 0.82,
+  },
+  {
+    model: "route/deepseek-r1",
+    display_name: "DeepSeek-R1",
+    tier: "max",
+    input_per_million: 0.495,
+    output_per_million: 2.365,
+  },
 ];
 
 const plans = [
   {
     id: "free",
     name: "Free",
-    label: "FREE",
+    label: "Free",
     price: "$0",
     priceDetail: "forever",
-    badge: "bg-zinc-700 text-white dark:bg-zinc-700",
     requestsPerDay: 50,
     checkoutUrl: "/auth/register",
+    summary: "Best for trying the router and light personal usage.",
+    popular: false,
     features: [
       "50 requests per day",
       "Basic model access",
@@ -106,12 +358,12 @@ const plans = [
   {
     id: "lite",
     name: "Lite",
-    label: "LITE",
+    label: "Lite",
     price: "$10",
     priceDetail: "/month",
-    badge: "bg-[#1470e3] text-white",
     requestsPerDay: 400,
     checkoutUrl: "https://whop.com/tropic-6587/routing-lite/",
+    summary: "A stronger daily cap for active prototypes and internal tools.",
     popular: false,
     features: [
       "400 requests per day",
@@ -123,12 +375,13 @@ const plans = [
   {
     id: "premium",
     name: "Premium",
-    label: "PREMIUM",
+    label: "Popular",
     price: "$20",
     priceDetail: "/month",
-    badge: "bg-[#1470e3] text-white",
     requestsPerDay: 1000,
     checkoutUrl: "https://whop.com/tropic-6587/routing-premium/",
+    summary:
+      "The balanced tier for production apps with broader model coverage.",
     popular: true,
     features: [
       "1,000 requests per day",
@@ -140,12 +393,13 @@ const plans = [
   {
     id: "max",
     name: "Max",
-    label: "MAX",
+    label: "Max",
     price: "$50",
     priceDetail: "/month",
-    badge: "bg-[#8350e8] text-white",
     requestsPerDay: 2500,
     checkoutUrl: "https://whop.com/tropic-6587/routing-max/",
+    summary: "Full catalog access and the highest daily throughput envelope.",
+    popular: false,
     features: [
       "2,500 requests per day",
       "All models access",
@@ -153,178 +407,371 @@ const plans = [
       "Dedicated support",
     ],
   },
-];
+] as const;
 
-const pricingCardVariants = {
-  initial: { scale: 1, y: 0 },
-  hover: {
-    scale: 1.02,
-    y: -5,
-    transition: { type: "spring" as const, stiffness: 300, damping: 20 },
+const tierMeta: Record<
+  (typeof plans)[number]["id"],
+  {
+    icon: LucideIcon;
+    iconClassName: string;
+    chipClassName: string;
+    cardClassName: string;
+    accentClassName: string;
+  }
+> = {
+  free: {
+    icon: Leaf,
+    iconClassName: "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900",
+    chipClassName:
+      "border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
+    cardClassName: "border-zinc-200 dark:border-zinc-800",
+    accentClassName: "text-zinc-700 dark:text-zinc-200",
+  },
+  lite: {
+    icon: Rocket,
+    iconClassName: "bg-[#1470e3] text-white",
+    chipClassName:
+      "border-[#1470e3]/20 bg-[#1470e3]/10 text-[#1470e3] dark:border-[#1470e3]/30",
+    cardClassName: "border-[#1470e3]/20 dark:border-[#1470e3]/25",
+    accentClassName: "text-[#1470e3]",
+  },
+  premium: {
+    icon: Crown,
+    iconClassName: "bg-[#8350e8] text-white",
+    chipClassName:
+      "border-[#8350e8]/20 bg-[#8350e8]/10 text-[#8350e8] dark:border-[#8350e8]/30",
+    cardClassName: "border-[#8350e8]/30 dark:border-[#8350e8]/40",
+    accentClassName: "text-[#8350e8]",
+  },
+  max: {
+    icon: Diamond,
+    iconClassName: "bg-[#8350e8] text-white",
+    chipClassName:
+      "border-[#8350e8]/20 bg-[#8350e8]/10 text-[#8350e8] dark:border-[#8350e8]/30",
+    cardClassName: "border-[#8350e8]/25 dark:border-[#8350e8]/30",
+    accentClassName: "text-[#8350e8]",
   },
 };
 
-function DashboardPricingCard({
+function formatPrice(perMillion: number) {
+  if (perMillion === 0) return "Free";
+  return `$${perMillion.toFixed(3)}/M`;
+}
+
+function ModelAvatar({
+  model,
+  displayName,
+}: {
+  model: string;
+  displayName: string;
+}) {
+  const logo = modelLogos[model];
+
+  if (logo) {
+    return (
+      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
+        <Image
+          alt={displayName}
+          className="object-contain p-1.5"
+          fill
+          sizes="36px"
+          src={logo}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-[11px] font-semibold text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
+      {displayName.slice(0, 2).toUpperCase()}
+    </div>
+  );
+}
+
+function PricingPlanCard({
   plan,
+  isCurrentPlan,
 }: {
   plan: (typeof plans)[number];
+  isCurrentPlan: boolean;
 }) {
+  const tierStyles = tierMeta[plan.id];
+  const TierIcon = tierStyles.icon;
+
+  const handleAction = () => {
+    if (plan.checkoutUrl.startsWith("/")) {
+      window.location.href = plan.checkoutUrl;
+      return;
+    }
+
+    window.open(plan.checkoutUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <motion.div
-      variants={pricingCardVariants}
-      initial="initial"
-      whileHover="hover"
+    <div
       className={cn(
-        "relative flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-8 text-zinc-950 shadow-sm dark:border-zinc-800 dark:bg-[#181818] dark:text-white",
-        plan.popular && "border-[#8350e8]/45 shadow-lg shadow-[#8350e8]/15",
+        "group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all hover:border-zinc-300 hover:shadow-lg dark:bg-[#181818] dark:hover:border-zinc-700",
+        tierStyles.cardClassName,
+        plan.popular && "ring-2 ring-[#8350e8]/40",
       )}
     >
-      {plan.popular ? (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[linear-gradient(135deg,#1470e3,#8350e8)] px-4 py-1 text-sm font-medium text-white">
-          Most Popular
-        </div>
-      ) : null}
+      {plan.popular && (
+        <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-[#8350e8]" />
+      )}
 
-      <div className="flex flex-col space-y-6">
-        <div>
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <h3 className="text-2xl font-bold">{plan.name}</h3>
-            <Badge className={plan.badge} variant="secondary">
-              {plan.label}
-            </Badge>
+      <div className="flex items-center gap-3">
+        <div
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-xl",
+            tierStyles.iconClassName,
+          )}
+        >
+          <TierIcon className="h-5 w-5" />
+        </div>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground">
+              {plan.name}
+            </h3>
+            {isCurrentPlan && <SubtleBadge>Current</SubtleBadge>}
+            {plan.popular && !isCurrentPlan && (
+              <SubtleBadge>Popular</SubtleBadge>
+            )}
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-5xl font-bold">{plan.price}</span>
-            <span className="ml-1 text-zinc-500 dark:text-gray-400">
-              {plan.priceDetail}
-            </span>
-          </div>
-          <p className="mt-3 text-zinc-500 dark:text-gray-400">
-            {plan.requestsPerDay} requests/day
+          <p className="text-sm text-muted-foreground">
+            {plan.priceDetail === "forever" ? "Free forever" : plan.priceDetail}
           </p>
         </div>
-
-        <ul className="space-y-3">
-          {plan.features.map((feature) => (
-            <li key={feature} className="flex items-center gap-3">
-              <Check className="h-5 w-5 shrink-0 text-[#1470e3] dark:text-[#9dc4f4]" />
-              <span className="text-sm">{feature}</span>
-            </li>
-          ))}
-        </ul>
       </div>
 
-      <div className="mt-8">
-        <Button
-          className={cn(
-            "w-full",
-            plan.popular
-              ? "bg-[linear-gradient(135deg,#1470e3,#8350e8)] text-white hover:opacity-95"
-              : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200",
-          )}
-          onClick={() => window.open(plan.checkoutUrl, "_blank")}
-        >
-          {plan.id === "free" ? "Get Started" : "Subscribe"}
-        </Button>
+      <div className="mt-6 flex items-baseline gap-1">
+        <span className="text-4xl font-semibold tracking-tight text-foreground">
+          {plan.price}
+        </span>
+        {plan.priceDetail !== "forever" && (
+          <span className="text-sm text-muted-foreground">/month</span>
+        )}
       </div>
-    </motion.div>
+
+      <p className="mt-3 text-sm text-muted-foreground">{plan.summary}</p>
+
+      <div className="mt-6 rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900/50">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Daily requests</span>
+          <span className="text-lg font-semibold text-foreground">
+            {plan.requestsPerDay.toLocaleString()}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex-1 space-y-2.5">
+        {plan.features.map((feature) => (
+          <div className="flex items-center gap-2.5" key={feature}>
+            <Check className={cn("h-4 w-4", tierStyles.accentClassName)} />
+            <span className="text-sm text-foreground">{feature}</span>
+          </div>
+        ))}
+      </div>
+
+      <Button
+        className={cn(
+          "mt-6 h-11 w-full justify-center rounded-xl text-sm font-medium transition-all",
+          plan.popular
+            ? "bg-[#8350e8] text-white hover:opacity-90"
+            : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200",
+          isCurrentPlan && plan.id !== "free" && "opacity-70",
+        )}
+        onClick={handleAction}
+        type="button"
+      >
+        {plan.id === "free"
+          ? "Get started free"
+          : isCurrentPlan
+            ? "Manage plan"
+            : `Upgrade to ${plan.name}`}
+      </Button>
+    </div>
   );
 }
 
 export default function PricingPage() {
-  const [copied, setCopied] = useState<string | null>(null);
-  const [selectedTier, setSelectedTier] = useState<string>("free");
+  const [selectedTier, setSelectedTier] =
+    useState<(typeof plans)[number]["id"]>("free");
   const { user } = useAuth();
 
-  const copyToClipboard = async (text: string, id: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
-  };
+  const currentTier =
+    (user?.plan_tier?.toLowerCase() as
+      | (typeof plans)[number]["id"]
+      | undefined) ?? "free";
 
-  const filteredModels = staticModelPricing.filter(
-    (m) => m.tier === selectedTier
+  const filteredModels = useMemo(
+    () => staticModelPricing.filter((model) => model.tier === selectedTier),
+    [selectedTier],
   );
 
-  const formatPrice = (perMillion: number) => {
-    if (perMillion === 0) return "Free";
-    return `$${perMillion.toFixed(3)}/M`;
-  };
+  const selectedPlan =
+    plans.find((plan) => plan.id === selectedTier) ?? plans[0];
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] text-zinc-950 dark:bg-[#141414] dark:text-white">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Simple, transparent pricing
-          </h1>
-          <p className="mt-4 text-lg text-zinc-500 dark:text-gray-400">
-            Choose the plan that fits your needs. All plans include access to our
-            router.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <PageHeader
+        description="Choose a plan that matches your traffic volume and model needs."
+        meta={<SubtleBadge>Current: {currentTier}</SubtleBadge>}
+        title="Pricing"
+      />
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-4">
-          {plans.map((plan) => (
-            <DashboardPricingCard key={plan.id} plan={plan} />
-          ))}
-        </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {plans.map((plan) => (
+          <PricingPlanCard
+            isCurrentPlan={currentTier === plan.id}
+            key={plan.id}
+            plan={plan}
+          />
+        ))}
+      </div>
 
-        <div className="mt-16">
+      <SurfaceCard
+        action={
           <Tabs
+            className="w-full md:w-auto"
+            onValueChange={(value) =>
+              setSelectedTier(value as (typeof plans)[number]["id"])
+            }
             value={selectedTier}
-            onValueChange={setSelectedTier}
-            className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-4 border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]">
+            <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-800 dark:bg-zinc-900/40 md:w-auto md:grid-cols-4">
               {plans.map((plan) => (
                 <TabsTrigger
+                  className="rounded-lg px-3 py-2 text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:bg-[#181818]"
                   key={plan.id}
                   value={plan.id}
-                  className={cn(
-                    "data-[state=active]:bg-[linear-gradient(135deg,#1470e3,#8350e8)] data-[state=active]:text-white"
-                  )}
                 >
                   {plan.name}
                 </TabsTrigger>
               ))}
             </TabsList>
-            {plans.map((plan) => (
-              <TabsContent key={plan.id} value={plan.id} className="mt-6">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-zinc-200 text-left text-sm text-zinc-500 dark:border-zinc-800 dark:text-gray-400">
-                        <th className="pb-3 font-medium">Model</th>
-                        <th className="pb-3 font-medium">Input</th>
-                        <th className="pb-3 font-medium">Output</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {staticModelPricing
-                        .filter((m) => m.tier === plan.id)
-                        .map((model) => (
-                          <tr
-                            key={`${model.tier}-${model.model}`}
-                            className="border-b border-zinc-200/80 dark:border-zinc-800/50"
-                          >
-                            <td className="py-3 font-medium">{model.display_name}</td>
-                            <td className="py-3 text-zinc-500 dark:text-gray-400">
-                              {formatPrice(model.input_per_million)}
-                            </td>
-                            <td className="py-3 text-zinc-500 dark:text-gray-400">
-                              {formatPrice(model.output_per_million)}
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              </TabsContent>
-            ))}
           </Tabs>
+        }
+        contentClassName="p-0"
+        description="Token pricing for each plan tier. Input and output rates are shown per one million tokens."
+        title="Model Pricing"
+      >
+        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {selectedPlan.name} tier catalog
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {filteredModels.length} models currently listed for this tier.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <PillStat
+                label="Requests / day"
+                value={selectedPlan.requestsPerDay.toLocaleString()}
+              />
+              <PillStat label="Tier" value={selectedPlan.label} />
+            </div>
+          </div>
         </div>
-      </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px]">
+            <thead>
+              <tr className="border-b border-zinc-200 text-left text-xs uppercase tracking-[0.18em] text-muted-foreground dark:border-zinc-800">
+                <th className="px-5 py-3 font-medium">Model</th>
+                <th className="px-5 py-3 font-medium">Tier</th>
+                <th className="px-5 py-3 font-medium">Input</th>
+                <th className="px-5 py-3 font-medium">Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredModels.map((model) => {
+                const tierStyles = tierMeta[model.tier];
+
+                return (
+                  <tr
+                    className="border-b border-zinc-200/80 last:border-0 dark:border-zinc-800/80"
+                    key={`${model.tier}-${model.model}`}
+                  >
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <ModelAvatar
+                          displayName={model.display_name}
+                          model={model.model}
+                        />
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {model.display_name}
+                          </p>
+                          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+                            {model.model}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <Badge
+                        className={cn(
+                          "rounded-md border px-2.5 py-1 text-[11px] font-medium shadow-none",
+                          tierStyles.chipClassName,
+                        )}
+                        variant="outline"
+                      >
+                        {model.tier}
+                      </Badge>
+                    </td>
+                    <td className="px-5 py-4 text-sm font-medium text-foreground">
+                      {formatPrice(model.input_per_million)}
+                    </td>
+                    <td className="px-5 py-4 text-sm font-medium text-foreground">
+                      {formatPrice(model.output_per_million)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </SurfaceCard>
+
+      <SurfaceCard
+        contentClassName="grid gap-3 md:grid-cols-3"
+        description="A few practical notes so the pricing page answers the common questions without sending you elsewhere."
+        title="Notes"
+      >
+        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Sparkles className="h-4 w-4 text-[#1470e3]" />
+            Routing behavior
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            All plans use the same router. Higher tiers mainly expand daily
+            limits, model access, and access to faster variants.
+          </p>
+        </div>
+        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Coins className="h-4 w-4 text-[#1470e3]" />
+            Token billing
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Input and output prices are shown per million tokens so you can
+            compare models directly inside the dashboard before changing tiers.
+          </p>
+        </div>
+        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Crown className="h-4 w-4 text-[#8350e8]" />
+            Upgrades
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            If you outgrow your current cap, you can upgrade from here and keep
+            the same app integration, keys, and routing behavior.
+          </p>
+        </div>
+      </SurfaceCard>
     </div>
   );
 }

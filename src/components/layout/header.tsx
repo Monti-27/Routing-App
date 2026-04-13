@@ -10,11 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { UserAvatar } from "@/components/ui/user-avatar";
 
 interface HeaderProps {
   user?: {
@@ -47,12 +45,13 @@ export function Header({ user }: HeaderProps) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="relative h-9 w-9 rounded-lg border border-zinc-800 bg-zinc-950"
+          <button
+            aria-label="Open account menu"
+            className="inline-flex h-9 items-center rounded-lg border border-zinc-800 bg-[#141414] px-3 text-sm font-medium text-foreground transition-colors hover:bg-zinc-900"
+            type="button"
           >
-            <UserAvatar email={user?.email} name={user?.name} size={36} />
-          </Button>
+            Account
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
