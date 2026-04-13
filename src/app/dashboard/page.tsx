@@ -100,6 +100,7 @@ function formatUpgradeExpiry(dateStr: string | null): string {
 export default function DashboardPage() {
   const { user, isDevBypassEnabled } = useAuth();
   const [usage, setUsage] = useState<UsageData | null>(null);
+  const [dailyUsage, setDailyUsage] = useState<UsageData | null>(null);
   const [plan, setPlan] = useState<PlanData | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -109,6 +110,13 @@ export default function DashboardPage() {
     async function fetchData() {
       if (isDevBypassEnabled) {
         setUsage(DEV_USAGE_DATA);
+        setDailyUsage({
+          ...DEV_USAGE_DATA,
+          total_requests: DEV_PLAN_DATA.requests_used_today,
+          total_input_tokens: 21_000,
+          total_output_tokens: 14_000,
+          total_cost: 1.42,
+        });
         setPlan(DEV_PLAN_DATA);
         setUserData(DEV_USER_DATA);
         setError(null);
@@ -117,13 +125,16 @@ export default function DashboardPage() {
       }
 
       try {
-        const [usageData, requestsData, userInfo] = await Promise.all([
-          api.usage.get("monthly"),
-          api.requests.get(),
-          api.auth.me(),
-        ]);
+        const [usageData, dailyUsageData, requestsData, userInfo] =
+          await Promise.all([
+            api.usage.get("monthly"),
+            api.usage.get("daily"),
+            api.requests.get(),
+            api.auth.me(),
+          ]);
 
         setUsage(usageData);
+        setDailyUsage(dailyUsageData);
         setPlan({
           plan_tier: requestsData.plan_tier,
           requests_per_day: requestsData.requests_limit_today,
@@ -137,6 +148,7 @@ export default function DashboardPage() {
         setError(null);
       } catch (err) {
         setUsage(null);
+        setDailyUsage(null);
         setPlan(null);
         setUserData(null);
         setError(
@@ -197,6 +209,7 @@ export default function DashboardPage() {
       />
 
       <OverviewPerformanceTrends
+        dailyUsage={dailyUsage}
         loading={loading}
         remainingRequests={requestsRemaining}
         usage={usage}

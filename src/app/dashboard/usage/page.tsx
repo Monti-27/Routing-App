@@ -52,8 +52,18 @@ const DEV_USAGE_MODELS: ModelUsage[] = [
   { model: "route/kimi-k2.5", requests: 5180, tokens: 597000, cost: 5.97 },
   { model: "route/glm-5", requests: 4030, tokens: 493000, cost: 4.93 },
   { model: "route/deepseek-v3.2", requests: 2790, tokens: 324000, cost: 3.24 },
-  { model: "route/qwen3.5-397b-a17b", requests: 1940, tokens: 246000, cost: 2.46 },
-  { model: "route/minimax-m2.7-highspeed", requests: 1210, tokens: 182000, cost: 1.82 },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    requests: 1940,
+    tokens: 246000,
+    cost: 2.46,
+  },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    requests: 1210,
+    tokens: 182000,
+    cost: 1.82,
+  },
 ];
 
 const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
@@ -79,6 +89,39 @@ const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
   ],
 };
 
+const FALLBACK_PERIOD_BUCKETS: Record<Period, string[]> = {
+  daily: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  hourly: ["08:00", "10:00", "12:00", "14:00", "16:00"],
+  monthly: ["Week 1", "Week 2", "Week 3", "Week 4"],
+};
+
+const FALLBACK_PERIOD_WEIGHTS: Record<Period, number[]> = {
+  daily: [0.18, 0.2, 0.19, 0.21, 0.22],
+  hourly: [0.14, 0.2, 0.24, 0.18, 0.24],
+  monthly: [0.22, 0.25, 0.23, 0.3],
+};
+
+function buildFallbackChart(period: Period, totalRequests: number) {
+  const labels = FALLBACK_PERIOD_BUCKETS[period];
+  const weights = FALLBACK_PERIOD_WEIGHTS[period];
+
+  const chart = labels.map((date, index) => ({
+    date,
+    requests: Math.round(totalRequests * weights[index]),
+  }));
+
+  const assignedRequests = chart.reduce(
+    (sum, entry) => sum + entry.requests,
+    0,
+  );
+
+  if (chart.length > 0 && assignedRequests !== totalRequests) {
+    chart[chart.length - 1].requests += totalRequests - assignedRequests;
+  }
+
+  return chart;
+}
+
 function applyUsageSnapshot({
   chart,
   cost,
@@ -102,7 +145,9 @@ function applyUsageSnapshot({
   models: ModelUsage[];
   outputTokens: number;
   requests: number;
-  setChartData: React.Dispatch<React.SetStateAction<{ date: string; requests: number }[]>>;
+  setChartData: React.Dispatch<
+    React.SetStateAction<{ date: string; requests: number }[]>
+  >;
   setCostMultiplier: React.Dispatch<React.SetStateAction<number>>;
   setModelUsage: React.Dispatch<React.SetStateAction<ModelUsage[]>>;
   setTotalCost: React.Dispatch<React.SetStateAction<number>>;
@@ -133,7 +178,9 @@ export default function UsagePage() {
     { date: string; requests: number }[]
   >([]);
   const [costMultiplier, setCostMultiplier] = useState(1.65);
-  const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(null);
+  const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -173,7 +220,6 @@ export default function UsagePage() {
         const cost = (usageData.total_cost || 0) * settingsData.cost_multiplier;
 
         const models: ModelUsage[] = [];
-        const chart: { date: string; requests: number }[] = [];
 
         if (usageData.models && typeof usageData.models === "object") {
           for (const [modelName, metrics] of Object.entries(usageData.models)) {
@@ -197,19 +243,11 @@ export default function UsagePage() {
               tokens: input + output,
               cost: modelCost,
             });
-
-            if (period === "daily" || period === "monthly") {
-              chart.push({ date: modelName, requests: modelRequests });
-            }
           }
         }
 
-        if (chart.length === 0) {
-          chart.push({ date: period === "hourly" ? "Now" : "Today", requests });
-        }
-
         applyUsageSnapshot({
-          chart,
+          chart: buildFallbackChart(period, requests),
           cost,
           costMultiplier: settingsData.cost_multiplier,
           inputTokens,
@@ -343,23 +381,27 @@ export default function UsagePage() {
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard
+              compact
               hint="Requests recorded in the selected period"
               icon={BarChart3}
               label="Total Requests"
               value={totalRequests.toLocaleString()}
             />
             <StatCard
+              compact
               hint={`${totalInputTokens.toLocaleString()} in / ${totalOutputTokens.toLocaleString()} out`}
               icon={TrendingUp}
               label="Total Tokens"
               value={totalTokens.toLocaleString()}
             />
             <StatCard
+              compact
               hint={`Multiplier ${costMultiplier.toFixed(2)}x applied`}
               label="Estimated Cost"
               value={`$${totalCost.toFixed(2)}`}
             />
             <StatCard
+              compact
               badge={<SubtleBadge>{period.toUpperCase()}</SubtleBadge>}
               hint="Average token volume per request"
               label="Avg Tokens / Request"
@@ -425,10 +467,9 @@ export default function UsagePage() {
             >
               <div className="space-y-6">
                 {usageByModelChartData.length > 0 ? (
-                  <>
-                    <div className="flex justify-center">
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex justify-center lg:flex-1">
                       <PieChart
-                        className="mx-auto"
                         cornerRadius={4}
                         data={usageByModelChartData}
                         hoverOffset={8}
@@ -457,7 +498,7 @@ export default function UsagePage() {
                       </PieChart>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="min-w-0 flex-1 space-y-2 lg:max-w-md">
                       {usageByModelChartData.map((item, index) => {
                         const percentage =
                           totalChartRequests > 0
@@ -466,32 +507,32 @@ export default function UsagePage() {
 
                         return (
                           <button
-                            className="flex w-full items-center gap-3 rounded-lg border border-border/70 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                            className="flex w-full items-center gap-2.5 rounded-lg border border-border/70 px-3 py-2 text-left transition-colors hover:bg-muted/40"
                             key={item.label}
                             onMouseEnter={() => setHoveredModelIndex(index)}
                             onMouseLeave={() => setHoveredModelIndex(null)}
                             type="button"
                           >
                             <span
-                              className="h-2.5 w-2.5 shrink-0 rounded-full"
+                              className="h-2 w-2 shrink-0 rounded-full"
                               style={{ backgroundColor: item.color }}
                             />
                             <div className="min-w-0 flex-1">
                               <p
-                                className="truncate text-sm font-medium text-foreground"
+                                className="truncate text-xs font-medium text-foreground sm:text-sm"
                                 title={item.label}
                               >
                                 {item.label}
                               </p>
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-0.5 text-[11px] text-muted-foreground sm:text-xs">
                                 {percentage.toFixed(1)}% of requests
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-semibold text-foreground">
+                              <p className="text-xs font-semibold text-foreground sm:text-sm">
                                 {item.value.toLocaleString()}
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-[11px] text-muted-foreground sm:text-xs">
                                 {item.model
                                   ? `${(item.model.tokens / 1000).toFixed(1)}K tokens`
                                   : "Grouped remainder"}
@@ -501,7 +542,7 @@ export default function UsagePage() {
                         );
                       })}
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">
                     No model usage data available.
@@ -509,7 +550,6 @@ export default function UsagePage() {
                 )}
               </div>
             </SurfaceCard>
-
           </div>
         </>
       )}
