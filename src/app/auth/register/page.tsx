@@ -1,7 +1,5 @@
-"use client";
-
-import { AuthComponent } from "@/components/ui/sign-up";
+import { redirect } from "next/navigation";
 
 export default function RegisterPage() {
-  return <AuthComponent brandName="Routing.run" mode="register" />;
+  redirect("/auth/login");
 }
