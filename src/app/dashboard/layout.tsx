@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Loader2, Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -86,12 +85,10 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex-1" />
-
-            <Header user={user} />
           </div>
         </header>
 
-        <main className="min-h-screen px-4 py-6 lg:px-8 lg:py-10">
+        <main className="min-h-screen bg-[#f7f7f7] px-4 py-6 dark:bg-[#141414] lg:px-8 lg:py-10">
           <div className="mx-auto w-full max-w-[1120px]">{children}</div>
         </main>
       </div>

@@ -19,9 +19,10 @@ type UsageData = {
 };
 
 type Props = {
-	remainingRequests: number;
-	usage: UsageData | null;
-	loading: boolean;
+  remainingRequests: number;
+  usage: UsageData | null;
+  dailyUsage: UsageData | null;
+  loading: boolean;
 };
 
 const chartConfig = {
@@ -79,13 +80,18 @@ function CustomTooltip({
           }
 
           return (
-            <div className="flex items-center justify-between gap-3 text-sm" key={item.dataKey}>
+            <div
+              className="flex items-center justify-between gap-3 text-sm"
+              key={item.dataKey}
+            >
               <div className="flex items-center gap-2">
                 <div
                   className="size-1.5 rounded-full"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-zinc-500 dark:text-zinc-400">{meta.label}</span>
+                <span className="text-zinc-500 dark:text-zinc-400">
+                  {meta.label}
+                </span>
               </div>
               <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                 {meta.format(item.value)}
@@ -99,15 +105,16 @@ function CustomTooltip({
 }
 
 function formatCompactNumber(value: number) {
-	if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-	if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-	return value.toString();
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toString();
 }
 
 export function OverviewPerformanceTrends({
-	usage,
-	loading,
-	remainingRequests,
+  usage,
+  dailyUsage,
+  loading,
+  remainingRequests,
 }: Props) {
   const platformData = useMemo(() => {
     const totalRequests = usage?.total_requests || 0;
@@ -156,21 +163,40 @@ export function OverviewPerformanceTrends({
     }));
   }, [usage]);
 
+  const daysElapsedInMonth = Math.max(1, new Date().getDate());
+
+  const metricValueMap = {
+    requests: usage?.total_requests || 0,
+    inputTokens: usage?.total_input_tokens || 0,
+    outputTokens: usage?.total_output_tokens || 0,
+    cost: usage?.total_cost || 0,
+  } as const;
+
+  const dailyMetricValueMap = {
+    requests: dailyUsage?.total_requests || 0,
+    inputTokens: dailyUsage?.total_input_tokens || 0,
+    outputTokens: dailyUsage?.total_output_tokens || 0,
+    cost: dailyUsage?.total_cost || 0,
+  } as const;
+
   const metrics = metricMeta.map((metric) => {
     const value = platformData.reduce(
       (sum, item) =>
         sum + Number(item[metric.key as keyof (typeof platformData)[number]]),
       0,
     );
-    const previousValue = value * 0.86;
+    const monthToDateValue = metricValueMap[metric.key];
+    const previousValue = monthToDateValue / daysElapsedInMonth;
+    const currentValue = dailyMetricValueMap[metric.key];
     const change = previousValue
-      ? ((value - previousValue) / previousValue) * 100
+      ? ((currentValue - previousValue) / previousValue) * 100
       : 0;
 
     return {
       ...metric,
       change,
       value,
+      currentValue,
       previousValue,
     };
   });
@@ -183,7 +209,8 @@ export function OverviewPerformanceTrends({
             Usage
           </h3>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Remaining requests today: {loading ? "..." : formatCompactNumber(remainingRequests)}
+            Remaining requests today:{" "}
+            {loading ? "..." : formatCompactNumber(remainingRequests)}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -191,12 +218,12 @@ export function OverviewPerformanceTrends({
             const isPositive = metric.change >= 0;
 
             return (
-                <div
-                  className={cn(
+              <div
+                className={cn(
                   "inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-400",
-                  )}
-                  key={metric.key}
-                >
+                )}
+                key={metric.key}
+              >
                 <span>{metric.label}</span>
                 <span
                   className={cn(
@@ -267,7 +294,10 @@ export function OverviewPerformanceTrends({
               <YAxis
                 axisLine={false}
                 dataKey="requests"
-                domain={[0, (dataMax: number) => Math.max(10, Math.ceil(dataMax * 1.15))]}
+                domain={[
+                  0,
+                  (dataMax: number) => Math.max(10, Math.ceil(dataMax * 1.15)),
+                ]}
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                 tickCount={6}
                 tickFormatter={formatCompactNumber}
@@ -310,7 +340,11 @@ export function OverviewPerformanceTrends({
                   strokeWidth: 2,
                 }}
                 dataKey="requests"
-                dot={{ fill: chartConfig.requests.color, r: 2.5, strokeWidth: 0 }}
+                dot={{
+                  fill: chartConfig.requests.color,
+                  r: 2.5,
+                  strokeWidth: 0,
+                }}
                 stroke={chartConfig.requests.color}
                 strokeWidth={3}
                 type="monotone"

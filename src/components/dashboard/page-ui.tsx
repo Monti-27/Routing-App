@@ -90,6 +90,7 @@ type StatCardProps = {
   hint?: React.ReactNode;
   badge?: React.ReactNode;
   className?: string;
+  compact?: boolean;
 };
 
 export function StatCard({
@@ -99,6 +100,7 @@ export function StatCard({
   hint,
   badge,
   className,
+  compact = false,
 }: StatCardProps) {
   return (
     <Card
@@ -107,21 +109,40 @@ export function StatCard({
         className,
       )}
     >
-      <CardContent className="px-5 py-4">
+      <CardContent className={cn("px-5", compact ? "py-3" : "py-4")}>
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-3">
+          <div className={cn(compact ? "space-y-2" : "space-y-3")}>
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <div className="text-[28px] font-semibold tracking-[-0.03em] text-foreground">
+            <div
+              className={cn(
+                "font-semibold tracking-[-0.03em] text-foreground",
+                compact ? "text-2xl" : "text-[28px]",
+              )}
+            >
               {value}
             </div>
           </div>
           <div className="flex items-center gap-2">
             {badge}
-            {Icon ? <Icon className="mt-0.5 h-5 w-5 text-zinc-500" /> : null}
+            {Icon ? (
+              <Icon
+                className={cn(
+                  "mt-0.5 text-zinc-500",
+                  compact ? "h-4 w-4" : "h-5 w-5",
+                )}
+              />
+            ) : null}
           </div>
         </div>
         {hint ? (
-          <div className="mt-4 text-xs text-muted-foreground">{hint}</div>
+          <div
+            className={cn(
+              "text-xs text-muted-foreground",
+              compact ? "mt-3" : "mt-4",
+            )}
+          >
+            {hint}
+          </div>
         ) : null}
       </CardContent>
     </Card>
@@ -171,7 +192,7 @@ export function PillStat({ label, value }: PillStatProps) {
 export function SubtleBadge({ children }: { children: React.ReactNode }) {
   return (
     <Badge
-      className="rounded-md border-zinc-800 bg-black px-2.5 py-1 text-[11px] font-medium text-foreground shadow-none"
+      className="rounded-md border-zinc-900 bg-zinc-950 px-2.5 py-1 text-[11px] font-medium text-white shadow-none dark:border-zinc-800 dark:bg-black dark:text-white"
       variant="outline"
     >
       {children}
