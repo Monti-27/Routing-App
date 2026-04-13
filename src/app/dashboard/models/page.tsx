@@ -1,6 +1,6 @@
 import type { Viewport } from "next";
 
-import ComponentOrderingGraph from "@/app/demo/ComponentOrderingGraph";
+import { ModelsViewSwitcher } from "./models-view-switcher";
 
 export const viewport: Viewport = {
   initialScale: 1,
@@ -10,5 +10,5 @@ export const viewport: Viewport = {
 };
 
 export default function ModelsPage() {
-  return <ComponentOrderingGraph />;
+  return <ModelsViewSwitcher />;
 }
