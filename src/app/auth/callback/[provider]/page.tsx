@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { AuthLoadingScreen } from "@/components/ui/auth-loading-screen";
 
-const ALLOWED_OAUTH_PROVIDERS = ["github"];
+const ALLOWED_OAUTH_PROVIDERS = ["github", "discord"];
 
 function AuthCallbackContent({ provider }: { provider: string }) {
   const router = useRouter();
