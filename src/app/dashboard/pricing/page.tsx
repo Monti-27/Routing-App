@@ -45,7 +45,6 @@ const modelLogos: Record<string, string> = {
   "route/qwen3.5-397b-a17b": "/model-logos/route-qwen.png",
   "route/mimo-v2-omni": "/model-logos/route-xiaomi.png",
   "route/mimo-v2-pro": "/model-logos/route-xiaomi.png",
-  "route/deepseek-v3.2": "/model-logos/route-deepseek.png",
   "route/gemma-4-31b-it": "/model-logos/route-google.svg",
 };
 
