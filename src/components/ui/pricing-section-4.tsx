@@ -59,6 +59,7 @@ const plans = [
     features: [
       "1,000 requests/day",
       "Everything in Lite",
+      "Qwen3.5 Plus & Qwen3.6 Plus",
       "GLM-4.5-Air & variants",
       "GLM-4.7 & GLM-4.7-Flash",
       "GLM-5-Highspeed (100 tps)",
@@ -84,6 +85,7 @@ const plans = [
       "Everything in Premium",
       "MiniMax-M2.7 Highspeed (~100 tps)",
       "Mimo-V2-Omni/Pro/Flash",
+      "Qwen3.5 Plus & Qwen3.6 Plus",
       "DeepSeek-V3.2-Speciale",
       "DeepSeek-R1",
       "Grok-4.20-Beta & Multi-Agent",
