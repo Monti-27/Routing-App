@@ -182,6 +182,22 @@ const providerTree = [
         outputPrice: 3.3,
       },
       {
+        contextLength: "131K",
+        inputPrice: 0.55,
+        label: "Qwen3.5 Plus",
+        logo: "/model-logos/route-qwen.png",
+        modelId: "route/qwen3.5-plus",
+        outputPrice: 1.65,
+      },
+      {
+        contextLength: "131K",
+        inputPrice: 0.6,
+        label: "Qwen3.6 Plus",
+        logo: "/model-logos/route-qwen.png",
+        modelId: "route/qwen3.6-plus",
+        outputPrice: 1.8,
+      },
+      {
         contextLength: "1000K",
         inputPrice: 0.2,
         label: "Qwen3.5 9B",
