@@ -166,7 +166,7 @@ const allModels: Model[] = [
     input_price: 0.10,
     output_price: 0.30,
     tiers: ["free", "lite", "premium", "max"],
-    gradient: "blue",
+    gradient: "amber",
     logo: "/model-logos/route-google.svg",
   },
   {
