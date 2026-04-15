@@ -221,6 +221,28 @@ const providerTree = [
       },
     ],
   },
+  {
+    id: "mimo",
+    label: "MiMo",
+    models: [
+      {
+        contextLength: "256K",
+        inputPrice: 0.55,
+        label: "MiMo V2 Omni",
+        logo: "/model-logos/route-xiaomi.png",
+        modelId: "route/mimo-v2-omni",
+        outputPrice: 1.65,
+      },
+      {
+        contextLength: "256K",
+        inputPrice: 0.45,
+        label: "MiMo V2 Pro",
+        logo: "/model-logos/route-xiaomi.png",
+        modelId: "route/mimo-v2-pro",
+        outputPrice: 1.35,
+      },
+    ],
+  },
 ] as const;
 
 function slugify(value: string) {
