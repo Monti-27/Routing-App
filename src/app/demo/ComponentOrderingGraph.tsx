@@ -174,14 +174,6 @@ const providerTree = [
     label: "Qwen",
     models: [
       {
-        contextLength: "1000K",
-        inputPrice: 0,
-        label: "Qwen3.6 Plus Preview",
-        logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.6-plus-preview",
-        outputPrice: 0,
-      },
-      {
         contextLength: "262K",
         inputPrice: 1.1,
         label: "Qwen3.5 397B A17B",
