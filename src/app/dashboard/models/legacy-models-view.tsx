@@ -193,6 +193,30 @@ const allModels: Model[] = [
     gradient: "amber",
     logo: "/model-logos/route-deepseek.png",
   },
+  {
+    id: "route/mimo-v2-omni",
+    name: "MiMo V2 Omni",
+    description: "Xiaomi multimodal model for versatile tasks",
+    provider: "opencode",
+    context_length: "256K",
+    input_price: 0.55,
+    output_price: 1.65,
+    tiers: ["premium", "max"],
+    gradient: "amber",
+    logo: "/model-logos/route-xiaomi.png",
+  },
+  {
+    id: "route/mimo-v2-pro",
+    name: "MiMo V2 Pro",
+    description: "Xiaomi high-capability model for stronger outputs",
+    provider: "opencode",
+    context_length: "256K",
+    input_price: 0.45,
+    output_price: 1.35,
+    tiers: ["premium", "max"],
+    gradient: "amber",
+    logo: "/model-logos/route-xiaomi.png",
+  },
 ];
 
 const tierColors = {
