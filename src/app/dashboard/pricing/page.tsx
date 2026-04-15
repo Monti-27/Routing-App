@@ -43,7 +43,10 @@ const modelLogos: Record<string, string> = {
   "route/deepseek-r1": "/model-logos/route-deepseek.png",
   "route/qwen3.5-9b": "/model-logos/route-qwen.png",
   "route/qwen3.5-397b-a17b": "/model-logos/route-qwen.png",
-  "route/qwen3.6-plus-preview": "/model-logos/route-qwen.png",
+  "route/mimo-v2-omni": "/model-logos/route-xiaomi.png",
+  "route/mimo-v2-pro": "/model-logos/route-xiaomi.png",
+  "route/deepseek-v3.2": "/model-logos/route-deepseek.png",
+  "route/gemma-4-31b-it": "/model-logos/route-google.svg",
 };
 
 interface ModelPricing {
@@ -69,6 +72,34 @@ const staticModelPricing: ModelPricing[] = [
     tier: "free",
     input_per_million: 0.792,
     output_per_million: 2.53,
+  },
+  {
+    model: "route/deepseek-v3.2",
+    display_name: "DeepSeek-V3.2",
+    tier: "free",
+    input_per_million: 0.4928,
+    output_per_million: 0.7392,
+  },
+  {
+    model: "route/qwen3.5-9b",
+    display_name: "Qwen3.5-9B",
+    tier: "free",
+    input_per_million: 0.2,
+    output_per_million: 0.6,
+  },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    display_name: "Qwen3.5-397B-A17B",
+    tier: "free",
+    input_per_million: 1.1,
+    output_per_million: 3.3,
+  },
+  {
+    model: "route/gemma-4-31b-it",
+    display_name: "Gemma-4-31B-IT",
+    tier: "free",
+    input_per_million: 0.10,
+    output_per_million: 0.30,
   },
 
   // Lite tier models (includes free models)
@@ -155,13 +186,6 @@ const staticModelPricing: ModelPricing[] = [
     tier: "lite",
     input_per_million: 0.4928,
     output_per_million: 0.7392,
-  },
-  {
-    model: "route/qwen3.6-plus-preview",
-    display_name: "Qwen3.6-Plus-Preview",
-    tier: "lite",
-    input_per_million: 0.0,
-    output_per_million: 0.0,
   },
 
   // Premium tier models (includes lite and free models)
@@ -257,11 +281,18 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 0.7392,
   },
   {
-    model: "route/qwen3.6-plus-preview",
-    display_name: "Qwen3.6-Plus-Preview",
+    model: "route/mimo-v2-omni",
+    display_name: "MiMo-V2-Omni",
     tier: "premium",
-    input_per_million: 0.0,
-    output_per_million: 0.0,
+    input_per_million: 0.55,
+    output_per_million: 1.65,
+  },
+  {
+    model: "route/mimo-v2-pro",
+    display_name: "MiMo-V2-Pro",
+    tier: "premium",
+    input_per_million: 0.45,
+    output_per_million: 1.35,
   },
 
   // Max tier models (all models)
@@ -334,6 +365,20 @@ const staticModelPricing: ModelPricing[] = [
     tier: "max",
     input_per_million: 0.495,
     output_per_million: 2.365,
+  },
+  {
+    model: "route/mimo-v2-omni",
+    display_name: "MiMo-V2-Omni",
+    tier: "max",
+    input_per_million: 0.55,
+    output_per_million: 1.65,
+  },
+  {
+    model: "route/mimo-v2-pro",
+    display_name: "MiMo-V2-Pro",
+    tier: "max",
+    input_per_million: 0.45,
+    output_per_million: 1.35,
   },
 ];
 

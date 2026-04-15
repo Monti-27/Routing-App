@@ -22,10 +22,12 @@ const modelLogos: Record<string, { logo: string; name: string; provider: string 
   "route/glm-5-highspeed": { logo: "/model-logos/route-zai.svg", name: "GLM-5-Highspeed", provider: "ZAI" },
   "route/qwen3.5-9b": { logo: "/model-logos/route-qwen.png", name: "Qwen3.5-9B", provider: "Qwen" },
   "route/qwen3.5-397b-a17b": { logo: "/model-logos/route-qwen.png", name: "Qwen3.5-397B-A17B", provider: "Qwen" },
-  "route/qwen3.6-plus-preview": { logo: "/model-logos/route-qwen.png", name: "Qwen3.6-Plus-Preview", provider: "Qwen" },
   "route/deepseek-v3.2": { logo: "/model-logos/route-deepseek.png", name: "DeepSeek-V3.2", provider: "DeepSeek" },
   "route/deepseek-v3.2-speciale": { logo: "/model-logos/route-deepseek.png", name: "DeepSeek-V3.2-Speciale", provider: "DeepSeek" },
   "route/deepseek-r1": { logo: "/model-logos/route-deepseek.png", name: "DeepSeek-R1", provider: "DeepSeek" },
+  "route/mimo-v2-pro": { logo: "/model-logos/route-xiaomi.png", name: "MiMo-V2-Pro", provider: "Xiaomi" },
+  "route/mimo-v2-omni": { logo: "/model-logos/route-xiaomi.png", name: "MiMo-V2-Omni", provider: "Xiaomi" },
+  "route/gemma-4-31b-it": { logo: "/model-logos/route-google.svg", name: "Gemma-4-31B-IT", provider: "Google" },
 };
 
 const plans = [
@@ -39,6 +41,10 @@ const plans = [
     models: [
       "route/kimi-k2.5",
       "route/glm-5",
+      "route/deepseek-v3.2",
+      "route/qwen3.5-9b",
+      "route/qwen3.5-397b-a17b",
+      "route/gemma-4-31b-it",
     ],
   },
   {
@@ -59,7 +65,6 @@ const plans = [
       "route/qwen3.5-9b",
       "route/qwen3.5-397b-a17b",
       "route/deepseek-v3.2",
-      "route/qwen3.6-plus-preview",
     ],
   },
   {
@@ -84,7 +89,8 @@ const plans = [
       "route/qwen3.5-9b",
       "route/qwen3.5-397b-a17b",
       "route/deepseek-v3.2",
-      "route/qwen3.6-plus-preview",
+      "route/mimo-v2-omni",
+      "route/mimo-v2-pro",
     ],
   },
   {
