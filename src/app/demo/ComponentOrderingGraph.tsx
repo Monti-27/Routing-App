@@ -266,11 +266,11 @@ function slugify(value: string) {
 }
 
 function buildGraph(activeProvider: ProviderId | null) {
-  const providerSpacing = 210;
-  const providerStartX = 60;
-  const horizontalPadding = 32;
+  const providerSpacing = 160;
+  const providerStartX = 40;
+  const horizontalPadding = 24;
   const graphWidth = Math.max(
-    980,
+    920,
     providerStartX * 2 + providerSpacing * (providerTree.length - 1) + NODE_WIDTH,
   );
   const rootX = Math.round(graphWidth / 2 - NODE_WIDTH / 2);
@@ -428,7 +428,7 @@ export default function ComponentOrderingGraph() {
     const observer = new ResizeObserver((entries) => {
       const containerWidth = entries[0].contentRect.width;
       if (containerWidth > 0 && graphWidth > 0) {
-        setScale(Math.min(1, (containerWidth - 8) / graphWidth));
+        setScale(Math.min(1.15, (containerWidth - 8) / graphWidth));
       }
     });
 
