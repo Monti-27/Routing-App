@@ -423,7 +423,7 @@ const plans = [
     price: "$20",
     priceDetail: "/month",
     requestsPerDay: 1000,
-    checkoutUrl: "https://whop.com/tropic-6587/routing-premium/",
+    checkoutUrl: "https://whop.com/tropic-6587/routing-pro/",
     summary:
       "The balanced tier for production apps with broader model coverage.",
     popular: true,

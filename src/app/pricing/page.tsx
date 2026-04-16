@@ -94,100 +94,628 @@ const modelLogos: Record<string, string> = {
 
 const staticModelPricing: ModelPricing[] = [
   // Free tier models
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "free", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "free", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/nemotron-3-super-120b", display_name: "Nemotron-3-Super-120B", tier: "free", input_per_million: 0.11, output_per_million: 0.55 },
-  { model: "route/trinity-large-preview", display_name: "Trinity-Large-Preview", tier: "free", input_per_million: 0.00, output_per_million: 0.00 },
-  { model: "route/nemotron-3-nano-30b", display_name: "Nemotron-3-Nano-30B", tier: "free", input_per_million: 0.055, output_per_million: 0.22 },
-  { model: "route/gpt-oss-120b", display_name: "GPT-OSS-120B", tier: "free", input_per_million: 0.043, output_per_million: 0.209 },
-  { model: "route/hermes-3-llama-3.1-405b", display_name: "Hermes-3-Llama-3.1-405B", tier: "free", input_per_million: 1.10, output_per_million: 1.10 },
-  { model: "route/llama-3.2-3b-instruct", display_name: "Llama-3.2-3B-Instruct", tier: "free", input_per_million: 0.056, output_per_million: 0.374 },
-  { model: "route/gemma-3-27b-it", display_name: "Gemma-3-27B-IT", tier: "free", input_per_million: 0.088, output_per_million: 0.176 },
-  { model: "route/deepseek-v3.2", display_name: "DeepSeek-V3.2", tier: "free", input_per_million: 0.4928, output_per_million: 0.7392 },
-  { model: "route/qwen3.5-9b", display_name: "Qwen3.5-9B", tier: "free", input_per_million: 0.20, output_per_million: 0.60 },
-  { model: "route/qwen3.5-397b-a17b", display_name: "Qwen3.5-397B-A17B", tier: "free", input_per_million: 1.10, output_per_million: 3.30 },
-  { model: "route/gemma-4-31b-it", display_name: "Gemma-4-31B-IT", tier: "free", input_per_million: 0.10, output_per_million: 0.30 },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "free",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "free",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+  {
+    model: "route/nemotron-3-super-120b",
+    display_name: "Nemotron-3-Super-120B",
+    tier: "free",
+    input_per_million: 0.11,
+    output_per_million: 0.55,
+  },
+  {
+    model: "route/trinity-large-preview",
+    display_name: "Trinity-Large-Preview",
+    tier: "free",
+    input_per_million: 0.0,
+    output_per_million: 0.0,
+  },
+  {
+    model: "route/nemotron-3-nano-30b",
+    display_name: "Nemotron-3-Nano-30B",
+    tier: "free",
+    input_per_million: 0.055,
+    output_per_million: 0.22,
+  },
+  {
+    model: "route/gpt-oss-120b",
+    display_name: "GPT-OSS-120B",
+    tier: "free",
+    input_per_million: 0.043,
+    output_per_million: 0.209,
+  },
+  {
+    model: "route/hermes-3-llama-3.1-405b",
+    display_name: "Hermes-3-Llama-3.1-405B",
+    tier: "free",
+    input_per_million: 1.1,
+    output_per_million: 1.1,
+  },
+  {
+    model: "route/llama-3.2-3b-instruct",
+    display_name: "Llama-3.2-3B-Instruct",
+    tier: "free",
+    input_per_million: 0.056,
+    output_per_million: 0.374,
+  },
+  {
+    model: "route/gemma-3-27b-it",
+    display_name: "Gemma-3-27B-IT",
+    tier: "free",
+    input_per_million: 0.088,
+    output_per_million: 0.176,
+  },
+  {
+    model: "route/deepseek-v3.2",
+    display_name: "DeepSeek-V3.2",
+    tier: "free",
+    input_per_million: 0.4928,
+    output_per_million: 0.7392,
+  },
+  {
+    model: "route/qwen3.5-9b",
+    display_name: "Qwen3.5-9B",
+    tier: "free",
+    input_per_million: 0.2,
+    output_per_million: 0.6,
+  },
+  {
+    model: "route/qwen3.5-397b-a17b",
+    display_name: "Qwen3.5-397B-A17B",
+    tier: "free",
+    input_per_million: 1.1,
+    output_per_million: 3.3,
+  },
+  {
+    model: "route/gemma-4-31b-it",
+    display_name: "Gemma-4-31B-IT",
+    tier: "free",
+    input_per_million: 0.1,
+    output_per_million: 0.3,
+  },
 
   // Lite tier models
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "lite", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "lite", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/nemotron-3-super-120b", display_name: "Nemotron-3-Super-120B", tier: "lite", input_per_million: 0.11, output_per_million: 0.55 },
-  { model: "route/trinity-large-preview", display_name: "Trinity-Large-Preview", tier: "lite", input_per_million: 0.00, output_per_million: 0.00 },
-  { model: "route/nemotron-3-nano-30b", display_name: "Nemotron-3-Nano-30B", tier: "lite", input_per_million: 0.055, output_per_million: 0.22 },
-  { model: "route/gpt-oss-120b", display_name: "GPT-OSS-120B", tier: "lite", input_per_million: 0.043, output_per_million: 0.209 },
-  { model: "route/hermes-3-llama-3.1-405b", display_name: "Hermes-3-Llama-3.1-405B", tier: "lite", input_per_million: 1.10, output_per_million: 1.10 },
-  { model: "route/llama-3.2-3b-instruct", display_name: "Llama-3.2-3B-Instruct", tier: "lite", input_per_million: 0.056, output_per_million: 0.374 },
-  { model: "route/gemma-3-27b-it", display_name: "Gemma-3-27B-IT", tier: "lite", input_per_million: 0.088, output_per_million: 0.176 },
-  { model: "route/minimax-m2.7", display_name: "MiniMax-M2.7", tier: "lite", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "lite", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/glm-5.1-precision", display_name: "GLM-5.1-Precision", tier: "lite", input_per_million: 1.20, output_per_million: 3.50 },
+  {
+    model: "route/minimax-m2.5",
+    display_name: "MiniMax-M2.5",
+    tier: "lite",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "lite",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/nemotron-3-super-120b",
+    display_name: "Nemotron-3-Super-120B",
+    tier: "lite",
+    input_per_million: 0.11,
+    output_per_million: 0.55,
+  },
+  {
+    model: "route/trinity-large-preview",
+    display_name: "Trinity-Large-Preview",
+    tier: "lite",
+    input_per_million: 0.0,
+    output_per_million: 0.0,
+  },
+  {
+    model: "route/nemotron-3-nano-30b",
+    display_name: "Nemotron-3-Nano-30B",
+    tier: "lite",
+    input_per_million: 0.055,
+    output_per_million: 0.22,
+  },
+  {
+    model: "route/gpt-oss-120b",
+    display_name: "GPT-OSS-120B",
+    tier: "lite",
+    input_per_million: 0.043,
+    output_per_million: 0.209,
+  },
+  {
+    model: "route/hermes-3-llama-3.1-405b",
+    display_name: "Hermes-3-Llama-3.1-405B",
+    tier: "lite",
+    input_per_million: 1.1,
+    output_per_million: 1.1,
+  },
+  {
+    model: "route/llama-3.2-3b-instruct",
+    display_name: "Llama-3.2-3B-Instruct",
+    tier: "lite",
+    input_per_million: 0.056,
+    output_per_million: 0.374,
+  },
+  {
+    model: "route/gemma-3-27b-it",
+    display_name: "Gemma-3-27B-IT",
+    tier: "lite",
+    input_per_million: 0.088,
+    output_per_million: 0.176,
+  },
+  {
+    model: "route/minimax-m2.7",
+    display_name: "MiniMax-M2.7",
+    tier: "lite",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "lite",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+  {
+    model: "route/glm-5.1-precision",
+    display_name: "GLM-5.1-Precision",
+    tier: "lite",
+    input_per_million: 1.2,
+    output_per_million: 3.5,
+  },
 
   // Pro tier models
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "pro", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/minimax-m2.5-highspeed", display_name: "MiniMax-M2.5 Highspeed", tier: "pro", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/minimax-m2.7", display_name: "MiniMax-M2.7", tier: "pro", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/minimax-m2.7-highspeed", display_name: "MiniMax-M2.7 Highspeed", tier: "pro", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "pro", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/nemotron-3-super-120b", display_name: "Nemotron-3-Super-120B", tier: "pro", input_per_million: 0.11, output_per_million: 0.55 },
-  { model: "route/trinity-large-preview", display_name: "Trinity-Large-Preview", tier: "pro", input_per_million: 0.00, output_per_million: 0.00 },
-  { model: "route/nemotron-3-nano-30b", display_name: "Nemotron-3-Nano-30B", tier: "pro", input_per_million: 0.055, output_per_million: 0.22 },
-  { model: "route/gpt-oss-120b", display_name: "GPT-OSS-120B", tier: "pro", input_per_million: 0.043, output_per_million: 0.209 },
-  { model: "route/hermes-3-llama-3.1-405b", display_name: "Hermes-3-Llama-3.1-405B", tier: "pro", input_per_million: 1.10, output_per_million: 1.10 },
-  { model: "route/llama-3.2-3b-instruct", display_name: "Llama-3.2-3B-Instruct", tier: "pro", input_per_million: 0.056, output_per_million: 0.374 },
-  { model: "route/gemma-3-27b-it", display_name: "Gemma-3-27B-IT", tier: "pro", input_per_million: 0.088, output_per_million: 0.176 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "pro", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/glm-5-turbo", display_name: "GLM-5-Turbo", tier: "pro", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-5.1-precision", display_name: "GLM-5.1-Precision", tier: "pro", input_per_million: 1.20, output_per_million: 3.50 },
-  { model: "route/glm-4.5-air", display_name: "GLM-4.5-Air", tier: "pro", input_per_million: 0.143, output_per_million: 0.935 },
-  { model: "route/glm-4.5-airx", display_name: "GLM-4.5-AirX", tier: "pro", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.5-flash", display_name: "GLM-4.5-Flash", tier: "pro", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.7-flashx", display_name: "GLM-4.7-FlashX", tier: "pro", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.6v-flashx", display_name: "GLM-4.6V-FlashX", tier: "pro", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/deepseek-v3.2", display_name: "DeepSeek-V3.2", tier: "pro", input_per_million: 0.286, output_per_million: 0.418 },
-  { model: "route/qwen3-coder", display_name: "Qwen3-Coder", tier: "pro", input_per_million: 0.242, output_per_million: 1.10 },
-  { model: "route/qwen3-coder-next", display_name: "Qwen3-Coder-Next", tier: "pro", input_per_million: 0.132, output_per_million: 0.825 },
-  { model: "route/qwen3-32b", display_name: "Qwen3-32B", tier: "pro", input_per_million: 0.088, output_per_million: 0.264 },
-  { model: "route/qwen3-next-80b", display_name: "Qwen3-Next-80B", tier: "pro", input_per_million: 0.099, output_per_million: 1.21 },
-  { model: "route/grok-4-fast", display_name: "Grok-4-Fast", tier: "pro", input_per_million: 0.22, output_per_million: 0.55 },
-  { model: "route/minimax-image-1", display_name: "MiniMax-Image-1", tier: "pro", input_per_million: 0.00, output_per_million: 0.05 },
-  { model: "route/mimo-v2-omni", display_name: "Mimo-V2-Omni", tier: "pro", input_per_million: 0.55, output_per_million: 1.65 },
-  { model: "route/mimo-v2-pro", display_name: "Mimo-V2-Pro", tier: "pro", input_per_million: 0.45, output_per_million: 1.35 },
+  {
+    model: "route/minimax-m2.5",
+    display_name: "MiniMax-M2.5",
+    tier: "pro",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/minimax-m2.5-highspeed",
+    display_name: "MiniMax-M2.5 Highspeed",
+    tier: "pro",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/minimax-m2.7",
+    display_name: "MiniMax-M2.7",
+    tier: "pro",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    display_name: "MiniMax-M2.7 Highspeed",
+    tier: "pro",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "pro",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/nemotron-3-super-120b",
+    display_name: "Nemotron-3-Super-120B",
+    tier: "pro",
+    input_per_million: 0.11,
+    output_per_million: 0.55,
+  },
+  {
+    model: "route/trinity-large-preview",
+    display_name: "Trinity-Large-Preview",
+    tier: "pro",
+    input_per_million: 0.0,
+    output_per_million: 0.0,
+  },
+  {
+    model: "route/nemotron-3-nano-30b",
+    display_name: "Nemotron-3-Nano-30B",
+    tier: "pro",
+    input_per_million: 0.055,
+    output_per_million: 0.22,
+  },
+  {
+    model: "route/gpt-oss-120b",
+    display_name: "GPT-OSS-120B",
+    tier: "pro",
+    input_per_million: 0.043,
+    output_per_million: 0.209,
+  },
+  {
+    model: "route/hermes-3-llama-3.1-405b",
+    display_name: "Hermes-3-Llama-3.1-405B",
+    tier: "pro",
+    input_per_million: 1.1,
+    output_per_million: 1.1,
+  },
+  {
+    model: "route/llama-3.2-3b-instruct",
+    display_name: "Llama-3.2-3B-Instruct",
+    tier: "pro",
+    input_per_million: 0.056,
+    output_per_million: 0.374,
+  },
+  {
+    model: "route/gemma-3-27b-it",
+    display_name: "Gemma-3-27B-IT",
+    tier: "pro",
+    input_per_million: 0.088,
+    output_per_million: 0.176,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "pro",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+  {
+    model: "route/glm-5-turbo",
+    display_name: "GLM-5-Turbo",
+    tier: "pro",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-5.1-precision",
+    display_name: "GLM-5.1-Precision",
+    tier: "pro",
+    input_per_million: 1.2,
+    output_per_million: 3.5,
+  },
+  {
+    model: "route/glm-4.5-air",
+    display_name: "GLM-4.5-Air",
+    tier: "pro",
+    input_per_million: 0.143,
+    output_per_million: 0.935,
+  },
+  {
+    model: "route/glm-4.5-airx",
+    display_name: "GLM-4.5-AirX",
+    tier: "pro",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.5-flash",
+    display_name: "GLM-4.5-Flash",
+    tier: "pro",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.7-flashx",
+    display_name: "GLM-4.7-FlashX",
+    tier: "pro",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.6v-flashx",
+    display_name: "GLM-4.6V-FlashX",
+    tier: "pro",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/deepseek-v3.2",
+    display_name: "DeepSeek-V3.2",
+    tier: "pro",
+    input_per_million: 0.286,
+    output_per_million: 0.418,
+  },
+  {
+    model: "route/qwen3-coder",
+    display_name: "Qwen3-Coder",
+    tier: "pro",
+    input_per_million: 0.242,
+    output_per_million: 1.1,
+  },
+  {
+    model: "route/qwen3-coder-next",
+    display_name: "Qwen3-Coder-Next",
+    tier: "pro",
+    input_per_million: 0.132,
+    output_per_million: 0.825,
+  },
+  {
+    model: "route/qwen3-32b",
+    display_name: "Qwen3-32B",
+    tier: "pro",
+    input_per_million: 0.088,
+    output_per_million: 0.264,
+  },
+  {
+    model: "route/qwen3-next-80b",
+    display_name: "Qwen3-Next-80B",
+    tier: "pro",
+    input_per_million: 0.099,
+    output_per_million: 1.21,
+  },
+  {
+    model: "route/grok-4-fast",
+    display_name: "Grok-4-Fast",
+    tier: "pro",
+    input_per_million: 0.22,
+    output_per_million: 0.55,
+  },
+  {
+    model: "route/minimax-image-1",
+    display_name: "MiniMax-Image-1",
+    tier: "pro",
+    input_per_million: 0.0,
+    output_per_million: 0.05,
+  },
+  {
+    model: "route/mimo-v2-omni",
+    display_name: "Mimo-V2-Omni",
+    tier: "pro",
+    input_per_million: 0.55,
+    output_per_million: 1.65,
+  },
+  {
+    model: "route/mimo-v2-pro",
+    display_name: "Mimo-V2-Pro",
+    tier: "pro",
+    input_per_million: 0.45,
+    output_per_million: 1.35,
+  },
 
   // Max tier models
-  { model: "route/minimax-m2.5", display_name: "MiniMax-M2.5", tier: "max", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/minimax-m2.5-highspeed", display_name: "MiniMax-M2.5 Highspeed", tier: "max", input_per_million: 0.193, output_per_million: 1.238 },
-  { model: "route/minimax-m2.7", display_name: "MiniMax-M2.7", tier: "max", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/minimax-m2.7-highspeed", display_name: "MiniMax-M2.7 Highspeed", tier: "max", input_per_million: 0.33, output_per_million: 1.32 },
-  { model: "route/kimi-k2.5", display_name: "Kimi-K2.5", tier: "max", input_per_million: 0.462, output_per_million: 2.42 },
-  { model: "route/nemotron-3-super-120b", display_name: "Nemotron-3-Super-120B", tier: "max", input_per_million: 0.11, output_per_million: 0.55 },
-  { model: "route/trinity-large-preview", display_name: "Trinity-Large-Preview", tier: "max", input_per_million: 0.00, output_per_million: 0.00 },
-  { model: "route/nemotron-3-nano-30b", display_name: "Nemotron-3-Nano-30B", tier: "max", input_per_million: 0.055, output_per_million: 0.22 },
-  { model: "route/gpt-oss-120b", display_name: "GPT-OSS-120B", tier: "max", input_per_million: 0.043, output_per_million: 0.209 },
-  { model: "route/hermes-3-llama-3.1-405b", display_name: "Hermes-3-Llama-3.1-405B", tier: "max", input_per_million: 1.10, output_per_million: 1.10 },
-  { model: "route/llama-3.2-3b-instruct", display_name: "Llama-3.2-3B-Instruct", tier: "max", input_per_million: 0.056, output_per_million: 0.374 },
-  { model: "route/gemma-3-27b-it", display_name: "Gemma-3-27B-IT", tier: "max", input_per_million: 0.088, output_per_million: 0.176 },
-  { model: "route/glm-5", display_name: "GLM-5", tier: "max", input_per_million: 0.792, output_per_million: 2.53 },
-  { model: "route/glm-5-turbo", display_name: "GLM-5-Turbo", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-5.1-precision", display_name: "GLM-5.1-Precision", tier: "max", input_per_million: 1.20, output_per_million: 3.50 },
-  { model: "route/glm-4.5-air", display_name: "GLM-4.5-Air", tier: "max", input_per_million: 0.143, output_per_million: 0.935 },
-  { model: "route/glm-4.5-airx", display_name: "GLM-4.5-AirX", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.5-flash", display_name: "GLM-4.5-Flash", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.7-flashx", display_name: "GLM-4.7-FlashX", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/glm-4.6v-flashx", display_name: "GLM-4.6V-FlashX", tier: "max", input_per_million: 1.32, output_per_million: 4.40 },
-  { model: "route/deepseek-v3.2", display_name: "DeepSeek-V3.2", tier: "max", input_per_million: 0.286, output_per_million: 0.418 },
-  { model: "route/deepseek-v3.2-speciale", display_name: "DeepSeek-V3.2-Speciale", tier: "max", input_per_million: 0.44, output_per_million: 1.32 },
-  { model: "route/deepseek-r1", display_name: "DeepSeek-R1", tier: "max", input_per_million: 0.495, output_per_million: 2.365 },
-  { model: "route/qwen3-coder", display_name: "Qwen3-Coder", tier: "max", input_per_million: 0.242, output_per_million: 1.10 },
-  { model: "route/qwen3-coder-next", display_name: "Qwen3-Coder-Next", tier: "max", input_per_million: 0.132, output_per_million: 0.825 },
-  { model: "route/qwen3-32b", display_name: "Qwen3-32B", tier: "max", input_per_million: 0.088, output_per_million: 0.264 },
-  { model: "route/qwen3-next-80b", display_name: "Qwen3-Next-80B", tier: "max", input_per_million: 0.099, output_per_million: 1.21 },
-  { model: "route/grok-4-fast", display_name: "Grok-4-Fast", tier: "max", input_per_million: 0.22, output_per_million: 0.55 },
-  { model: "route/grok-4.20-beta", display_name: "Grok-4.20-Beta", tier: "max", input_per_million: 2.20, output_per_million: 6.60 },
-  { model: "route/grok-4.20-multi-agent-beta", display_name: "Grok-4.20-Multi-Agent-Beta", tier: "max", input_per_million: 2.20, output_per_million: 6.60 },
-  { model: "route/minimax-image-1", display_name: "MiniMax-Image-1", tier: "max", input_per_million: 0.00, output_per_million: 0.05 },
-  { model: "route/mimo-v2-omni", display_name: "Mimo-V2-Omni", tier: "max", input_per_million: 0.55, output_per_million: 1.65 },
-  { model: "route/mimo-v2-pro", display_name: "Mimo-V2-Pro", tier: "max", input_per_million: 0.45, output_per_million: 1.35 },
-  { model: "route/mimo-v2-flash", display_name: "Mimo-V2-Flash", tier: "max", input_per_million: 0.099, output_per_million: 0.319 },
+  {
+    model: "route/minimax-m2.5",
+    display_name: "MiniMax-M2.5",
+    tier: "max",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/minimax-m2.5-highspeed",
+    display_name: "MiniMax-M2.5 Highspeed",
+    tier: "max",
+    input_per_million: 0.193,
+    output_per_million: 1.238,
+  },
+  {
+    model: "route/minimax-m2.7",
+    display_name: "MiniMax-M2.7",
+    tier: "max",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/minimax-m2.7-highspeed",
+    display_name: "MiniMax-M2.7 Highspeed",
+    tier: "max",
+    input_per_million: 0.33,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/kimi-k2.5",
+    display_name: "Kimi-K2.5",
+    tier: "max",
+    input_per_million: 0.462,
+    output_per_million: 2.42,
+  },
+  {
+    model: "route/nemotron-3-super-120b",
+    display_name: "Nemotron-3-Super-120B",
+    tier: "max",
+    input_per_million: 0.11,
+    output_per_million: 0.55,
+  },
+  {
+    model: "route/trinity-large-preview",
+    display_name: "Trinity-Large-Preview",
+    tier: "max",
+    input_per_million: 0.0,
+    output_per_million: 0.0,
+  },
+  {
+    model: "route/nemotron-3-nano-30b",
+    display_name: "Nemotron-3-Nano-30B",
+    tier: "max",
+    input_per_million: 0.055,
+    output_per_million: 0.22,
+  },
+  {
+    model: "route/gpt-oss-120b",
+    display_name: "GPT-OSS-120B",
+    tier: "max",
+    input_per_million: 0.043,
+    output_per_million: 0.209,
+  },
+  {
+    model: "route/hermes-3-llama-3.1-405b",
+    display_name: "Hermes-3-Llama-3.1-405B",
+    tier: "max",
+    input_per_million: 1.1,
+    output_per_million: 1.1,
+  },
+  {
+    model: "route/llama-3.2-3b-instruct",
+    display_name: "Llama-3.2-3B-Instruct",
+    tier: "max",
+    input_per_million: 0.056,
+    output_per_million: 0.374,
+  },
+  {
+    model: "route/gemma-3-27b-it",
+    display_name: "Gemma-3-27B-IT",
+    tier: "max",
+    input_per_million: 0.088,
+    output_per_million: 0.176,
+  },
+  {
+    model: "route/glm-5",
+    display_name: "GLM-5",
+    tier: "max",
+    input_per_million: 0.792,
+    output_per_million: 2.53,
+  },
+  {
+    model: "route/glm-5-turbo",
+    display_name: "GLM-5-Turbo",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-5.1-precision",
+    display_name: "GLM-5.1-Precision",
+    tier: "max",
+    input_per_million: 1.2,
+    output_per_million: 3.5,
+  },
+  {
+    model: "route/glm-4.5-air",
+    display_name: "GLM-4.5-Air",
+    tier: "max",
+    input_per_million: 0.143,
+    output_per_million: 0.935,
+  },
+  {
+    model: "route/glm-4.5-airx",
+    display_name: "GLM-4.5-AirX",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.5-flash",
+    display_name: "GLM-4.5-Flash",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.7-flashx",
+    display_name: "GLM-4.7-FlashX",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/glm-4.6v-flashx",
+    display_name: "GLM-4.6V-FlashX",
+    tier: "max",
+    input_per_million: 1.32,
+    output_per_million: 4.4,
+  },
+  {
+    model: "route/deepseek-v3.2",
+    display_name: "DeepSeek-V3.2",
+    tier: "max",
+    input_per_million: 0.286,
+    output_per_million: 0.418,
+  },
+  {
+    model: "route/deepseek-v3.2-speciale",
+    display_name: "DeepSeek-V3.2-Speciale",
+    tier: "max",
+    input_per_million: 0.44,
+    output_per_million: 1.32,
+  },
+  {
+    model: "route/deepseek-r1",
+    display_name: "DeepSeek-R1",
+    tier: "max",
+    input_per_million: 0.495,
+    output_per_million: 2.365,
+  },
+  {
+    model: "route/qwen3-coder",
+    display_name: "Qwen3-Coder",
+    tier: "max",
+    input_per_million: 0.242,
+    output_per_million: 1.1,
+  },
+  {
+    model: "route/qwen3-coder-next",
+    display_name: "Qwen3-Coder-Next",
+    tier: "max",
+    input_per_million: 0.132,
+    output_per_million: 0.825,
+  },
+  {
+    model: "route/qwen3-32b",
+    display_name: "Qwen3-32B",
+    tier: "max",
+    input_per_million: 0.088,
+    output_per_million: 0.264,
+  },
+  {
+    model: "route/qwen3-next-80b",
+    display_name: "Qwen3-Next-80B",
+    tier: "max",
+    input_per_million: 0.099,
+    output_per_million: 1.21,
+  },
+  {
+    model: "route/grok-4-fast",
+    display_name: "Grok-4-Fast",
+    tier: "max",
+    input_per_million: 0.22,
+    output_per_million: 0.55,
+  },
+  {
+    model: "route/grok-4.20-beta",
+    display_name: "Grok-4.20-Beta",
+    tier: "max",
+    input_per_million: 2.2,
+    output_per_million: 6.6,
+  },
+  {
+    model: "route/grok-4.20-multi-agent-beta",
+    display_name: "Grok-4.20-Multi-Agent-Beta",
+    tier: "max",
+    input_per_million: 2.2,
+    output_per_million: 6.6,
+  },
+  {
+    model: "route/minimax-image-1",
+    display_name: "MiniMax-Image-1",
+    tier: "max",
+    input_per_million: 0.0,
+    output_per_million: 0.05,
+  },
+  {
+    model: "route/mimo-v2-omni",
+    display_name: "Mimo-V2-Omni",
+    tier: "max",
+    input_per_million: 0.55,
+    output_per_million: 1.65,
+  },
+  {
+    model: "route/mimo-v2-pro",
+    display_name: "Mimo-V2-Pro",
+    tier: "max",
+    input_per_million: 0.45,
+    output_per_million: 1.35,
+  },
+  {
+    model: "route/mimo-v2-flash",
+    display_name: "Mimo-V2-Flash",
+    tier: "max",
+    input_per_million: 0.099,
+    output_per_million: 0.319,
+  },
 ];
 
 const plans = [
@@ -244,6 +772,7 @@ const plans = [
     period: "/month",
     requests: 100,
     credits: 20,
+    checkoutUrl: "https://whop.com/tropic-6587/routing-pro/",
     badge: "bg-indigo-600",
     border: "border-indigo-500/30",
     popular: true,
@@ -284,10 +813,34 @@ const plans = [
 ];
 
 const tierGroups = [
-  { tier: "free", label: "Free", models: staticModelPricing.filter(m => m.tier === "free"), badge: "bg-zinc-600", name: "Free Models" },
-  { tier: "lite", label: "Lite", models: staticModelPricing.filter(m => m.tier === "lite"), badge: "bg-blue-600", name: "Lite Models" },
-  { tier: "pro", label: "Pro", models: staticModelPricing.filter(m => m.tier === "pro"), badge: "bg-indigo-600", name: "Pro Models" },
-  { tier: "max", label: "Max", models: staticModelPricing.filter(m => m.tier === "max"), badge: "bg-violet-600", name: "Max Models" },
+  {
+    tier: "free",
+    label: "Free",
+    models: staticModelPricing.filter((m) => m.tier === "free"),
+    badge: "bg-zinc-600",
+    name: "Free Models",
+  },
+  {
+    tier: "lite",
+    label: "Lite",
+    models: staticModelPricing.filter((m) => m.tier === "lite"),
+    badge: "bg-blue-600",
+    name: "Lite Models",
+  },
+  {
+    tier: "pro",
+    label: "Pro",
+    models: staticModelPricing.filter((m) => m.tier === "pro"),
+    badge: "bg-indigo-600",
+    name: "Pro Models",
+  },
+  {
+    tier: "max",
+    label: "Max",
+    models: staticModelPricing.filter((m) => m.tier === "max"),
+    badge: "bg-violet-600",
+    name: "Max Models",
+  },
 ];
 
 export default function PricingPage() {
@@ -296,40 +849,62 @@ export default function PricingPage() {
   return (
     <div className="w-full px-4 py-12 md:py-20">
       <div className="max-w-7xl mx-auto space-y-20">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center space-y-6"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 mb-4">
             <Sparkles className="h-4 w-4 text-indigo-500" />
-            <span className="text-sm font-medium text-indigo-500">Simple, transparent pricing</span>
+            <span className="text-sm font-medium text-indigo-500">
+              Simple, transparent pricing
+            </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tight bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
             Choose Your Plan
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Pay only for what you use. All plans include access to our OpenAI-compatible API with automatic provider fallback.
+            Pay only for what you use. All plans include access to our
+            OpenAI-compatible API with automatic provider fallback.
           </p>
-          
+
           <div className="flex items-center justify-center gap-4 pt-4">
-            <span className={cn("text-sm", !isAnnual ? "text-foreground font-medium" : "text-muted-foreground")}>Monthly</span>
+            <span
+              className={cn(
+                "text-sm",
+                !isAnnual
+                  ? "text-foreground font-medium"
+                  : "text-muted-foreground",
+              )}
+            >
+              Monthly
+            </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
               className="relative w-14 h-7 rounded-full bg-muted transition-colors"
             >
-              <div className={cn(
-                "absolute top-1 w-5 h-5 rounded-full bg-foreground transition-all",
-                isAnnual ? "left-8" : "left-1"
-              )} />
+              <div
+                className={cn(
+                  "absolute top-1 w-5 h-5 rounded-full bg-foreground transition-all",
+                  isAnnual ? "left-8" : "left-1",
+                )}
+              />
             </button>
-            <span className={cn("text-sm", isAnnual ? "text-foreground font-medium" : "text-muted-foreground")}>
-              Annual <span className="text-emerald-500 font-medium">(-20%)</span>
+            <span
+              className={cn(
+                "text-sm",
+                isAnnual
+                  ? "text-foreground font-medium"
+                  : "text-muted-foreground",
+              )}
+            >
+              Annual{" "}
+              <span className="text-emerald-500 font-medium">(-20%)</span>
             </span>
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -343,24 +918,32 @@ export default function PricingPage() {
               transition={{ delay: 0.1 + i * 0.05 }}
               className={cn(
                 "relative rounded-2xl border bg-card p-8 text-card-foreground overflow-hidden",
-                plan.popular && "border-indigo-500/50 shadow-xl shadow-indigo-500/10",
-                plan.border
+                plan.popular &&
+                  "border-indigo-500/50 shadow-xl shadow-indigo-500/10",
+                plan.border,
               )}
             >
               {plan.popular && (
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-violet-500" />
               )}
-              
+
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px]" />
-              
+
               <div className="relative">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className={cn("p-2 rounded-lg", plan.badge, "text-white")}>
+                  <div
+                    className={cn("p-2 rounded-lg", plan.badge, "text-white")}
+                  >
                     {plan.icon}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold">{plan.name}</h3>
-                    <span className={cn("px-2 py-0.5 text-xs font-medium rounded text-white", plan.badge)}>
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 text-xs font-medium rounded text-white",
+                        plan.badge,
+                      )}
+                    >
                       {plan.label}
                     </span>
                   </div>
@@ -373,7 +956,8 @@ export default function PricingPage() {
                   </div>
                   {isAnnual && plan.id !== "free" && (
                     <p className="text-sm text-emerald-500 mt-1">
-                      ${Math.round(parseInt(plan.price.replace("$", "")) * 0.8)}/month billed annually
+                      ${Math.round(parseInt(plan.price.replace("$", "")) * 0.8)}
+                      /month billed annually
                     </p>
                   )}
                 </div>
@@ -381,28 +965,56 @@ export default function PricingPage() {
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <div className="bg-muted/50 rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold">{plan.requests}</p>
-                    <p className="text-xs text-muted-foreground mt-1">requests/hr</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      requests/hr
+                    </p>
                   </div>
                   <div className="bg-muted/50 rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold">${plan.credits}</p>
-                    <p className="text-xs text-muted-foreground mt-1">credits/mo</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      credits/mo
+                    </p>
                   </div>
                 </div>
 
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-sm">
+                    <li
+                      key={feature}
+                      className="flex items-start gap-3 text-sm"
+                    >
                       <Check className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <Button 
-                  className={cn("w-full", plan.popular && "bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600")} 
+                <Button
+                  asChild={Boolean(plan.checkoutUrl)}
+                  className={cn(
+                    "w-full",
+                    plan.popular &&
+                      "bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600",
+                  )}
                   variant={plan.popular ? "default" : "outline"}
                 >
-                  {plan.id === "free" ? "Start Free" : plan.id === "max" ? "Get Max" : "Get Started"}
+                  {plan.checkoutUrl ? (
+                    <a href={plan.checkoutUrl} rel="noopener" target="_blank">
+                      {plan.id === "free"
+                        ? "Start Free"
+                        : plan.id === "max"
+                          ? "Get Max"
+                          : "Get Started"}
+                    </a>
+                  ) : (
+                    <span>
+                      {plan.id === "free"
+                        ? "Start Free"
+                        : plan.id === "max"
+                          ? "Get Max"
+                          : "Get Started"}
+                    </span>
+                  )}
                 </Button>
               </div>
             </motion.div>
@@ -417,30 +1029,41 @@ export default function PricingPage() {
         >
           <div className="text-center space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Model Pricing</h2>
-            <p className="text-muted-foreground">Prices per million tokens (input / output)</p>
+            <p className="text-muted-foreground">
+              Prices per million tokens (input / output)
+            </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {tierGroups.map((group, groupIndex) => (
-              <motion.div 
+              <motion.div
                 key={group.tier}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + groupIndex * 0.05 }}
                 className="rounded-2xl border bg-card overflow-hidden"
               >
-                <div className={cn("p-4 border-b", group.badge, "bg-opacity-10")}>
+                <div
+                  className={cn("p-4 border-b", group.badge, "bg-opacity-10")}
+                >
                   <div className="flex items-center gap-2">
-                    <span className={cn("px-3 py-1 text-xs font-medium rounded-full text-white", group.badge)}>
+                    <span
+                      className={cn(
+                        "px-3 py-1 text-xs font-medium rounded-full text-white",
+                        group.badge,
+                      )}
+                    >
                       {group.label}
                     </span>
-                    <span className="text-sm font-medium">{group.models.length} models</span>
+                    <span className="text-sm font-medium">
+                      {group.models.length} models
+                    </span>
                   </div>
                 </div>
                 <div className="p-4 space-y-2">
                   {group.models.map((m) => (
-                    <div 
-                      key={m.model} 
+                    <div
+                      key={m.model}
                       className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                     >
                       {modelLogos[m.model] ? (
@@ -455,15 +1078,31 @@ export default function PricingPage() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{m.display_name}</p>
+                        <p className="text-sm font-semibold truncate">
+                          {m.display_name}
+                        </p>
                       </div>
                       <div className="text-right shrink-0">
                         <div className="flex items-center gap-1">
-                          <span className="text-sm font-mono font-medium">${m.input_per_million.toFixed(m.input_per_million < 1 ? 3 : 2)}</span>
-                          <span className="text-xs text-muted-foreground">/</span>
-                          <span className="text-xs text-muted-foreground font-mono">${m.output_per_million.toFixed(m.output_per_million < 1 ? 3 : 2)}</span>
+                          <span className="text-sm font-mono font-medium">
+                            $
+                            {m.input_per_million.toFixed(
+                              m.input_per_million < 1 ? 3 : 2,
+                            )}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            /
+                          </span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            $
+                            {m.output_per_million.toFixed(
+                              m.output_per_million < 1 ? 3 : 2,
+                            )}
+                          </span>
                         </div>
-                        <p className="text-[10px] text-muted-foreground">in / out</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          in / out
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -486,10 +1125,14 @@ export default function PricingPage() {
             <div className="flex-1 space-y-2">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 Usage-Based Billing
-                <Badge variant="secondary" className="text-xs">Recommended</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  Recommended
+                </Badge>
               </h3>
               <p className="text-muted-foreground max-w-2xl">
-                All models are billed per million tokens processed. Your plan determines which models you can access and your rate limits. Upgrade or downgrade anytime - no commitments.
+                All models are billed per million tokens processed. Your plan
+                determines which models you can access and your rate limits.
+                Upgrade or downgrade anytime - no commitments.
               </p>
             </div>
           </div>
@@ -502,11 +1145,23 @@ export default function PricingPage() {
           className="grid gap-4 md:grid-cols-3"
         >
           {[
-            { icon: <Zap className="h-5 w-5" />, title: "OpenAI-compatible API", desc: "Drop-in replacement for your existing code" },
-            { icon: <Sparkles className="h-5 w-5" />, title: "Automatic provider fallback", desc: "99.9% uptime with intelligent routing" },
-            { icon: <Crown className="h-5 w-5" />, title: "Usage analytics", desc: "Track spend with detailed dashboards" },
+            {
+              icon: <Zap className="h-5 w-5" />,
+              title: "OpenAI-compatible API",
+              desc: "Drop-in replacement for your existing code",
+            },
+            {
+              icon: <Sparkles className="h-5 w-5" />,
+              title: "Automatic provider fallback",
+              desc: "99.9% uptime with intelligent routing",
+            },
+            {
+              icon: <Crown className="h-5 w-5" />,
+              title: "Usage analytics",
+              desc: "Track spend with detailed dashboards",
+            },
           ].map((item, i) => (
-            <div 
+            <div
               key={item.title}
               className="rounded-xl border bg-card p-6 hover:bg-muted/30 transition-colors"
             >
@@ -528,7 +1183,11 @@ export default function PricingPage() {
           className="text-center py-8"
         >
           <p className="text-muted-foreground">
-            Need a custom enterprise plan? <Button variant="link" className="text-primary">Contact us</Button> for volume discounts and dedicated support.
+            Need a custom enterprise plan?{" "}
+            <Button variant="link" className="text-primary">
+              Contact us
+            </Button>{" "}
+            for volume discounts and dedicated support.
           </p>
         </motion.div>
       </div>
