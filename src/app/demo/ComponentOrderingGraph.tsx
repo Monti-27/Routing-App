@@ -48,7 +48,7 @@ const NODE_WIDTH = 112;
 const NODE_HEIGHT = 34;
 const NODE_HALO_INSET = 0;
 const INITIAL_DELAY_MS = 80;
-const PROCESS_DELAY_MS = 950;
+const PROCESS_DELAY_MS = 150;
 const ROOT_ROW_Y = 28;
 const PROVIDER_ROW_Y = 212;
 const MODEL_ROW_BASE_Y = 380;
@@ -461,13 +461,23 @@ export default function ComponentOrderingGraph() {
   const activeProviderData = getProviderById(activeProvider);
 
   return (
-    <section
-      className={[
-        "component-shell component-enter flex min-h-screen w-full items-start justify-center overflow-x-auto px-8 sm:px-10",
-        "overflow-hidden",
-        useTightVerticalSpacing ? "py-4 sm:py-3" : "py-10 sm:py-8",
-      ].join(" ")}
-    >
+    <>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes tree-dash-flow {
+          from { stroke-dashoffset: 0; }
+          to { stroke-dashoffset: -24; }
+        }
+        .animate-tree-dash-flow {
+          animation: tree-dash-flow 1.2s linear infinite;
+        }
+      `}} />
+      <section
+        className={[
+          "component-shell component-enter flex min-h-screen w-full items-start justify-center overflow-x-auto px-8 sm:px-10",
+          "overflow-hidden",
+          useTightVerticalSpacing ? "py-4 sm:py-3" : "py-10 sm:py-8",
+        ].join(" ")}
+      >
       <div className={[
         "flex w-full flex-col items-center justify-center",
         useTightVerticalSpacing ? "gap-2" : "gap-4",
@@ -591,22 +601,33 @@ export default function ComponentOrderingGraph() {
                       d={edge.path}
                       fill="none"
                       stroke="#d9d2ca"
+                      className="transition-colors dark:stroke-zinc-800/80"
                       strokeLinecap="round"
                       strokeWidth="2"
                     />
                     <path
                       d={edge.path}
                       fill="none"
-                      pathLength={1}
                       stroke="#00d492"
+                      strokeOpacity="0.2"
                       strokeLinecap="round"
                       strokeWidth="2"
                       style={{
                         opacity: isActive ? 1 : 0,
-                        strokeDasharray: 1,
-                        strokeDashoffset: isActive ? 0 : 1,
-                        transition:
-                          "opacity 180ms ease, stroke-dashoffset 1100ms cubic-bezier(0.22, 1, 0.36, 1)",
+                        transition: "opacity 300ms ease",
+                      }}
+                    />
+                    <path
+                      d={edge.path}
+                      fill="none"
+                      stroke="#00d492"
+                      strokeLinecap="round"
+                      strokeWidth="2"
+                      strokeDasharray="6 6"
+                      className={isActive ? "animate-tree-dash-flow" : ""}
+                      style={{
+                        opacity: isActive ? 1 : 0,
+                        transition: "opacity 300ms ease",
                       }}
                     />
                   </g>
@@ -781,5 +802,6 @@ export default function ComponentOrderingGraph() {
         </div>
       </div>
     </section>
+    </>
   );
 }
