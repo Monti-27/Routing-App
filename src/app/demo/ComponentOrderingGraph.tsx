@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   HoverCard,
@@ -385,6 +385,8 @@ export default function ComponentOrderingGraph() {
   const [activeProvider, setActiveProvider] = useState<ProviderId | null>(null);
   const [useCompactMode, setUseCompactMode] = useState(false);
   const [useTightVerticalSpacing, setUseTightVerticalSpacing] = useState(false);
+  const [scale, setScale] = useState(1);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const { graphEdges, graphNodes, graphWidth, maxStage } = useMemo(
     () => buildGraph(activeProvider),
@@ -407,10 +409,8 @@ export default function ComponentOrderingGraph() {
     const updateLayoutMode = () => {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const desktopSidebarAllowance = viewportWidth >= 1024 ? 420 : 32;
-      const availableWidth = viewportWidth - desktopSidebarAllowance;
 
-      setUseCompactMode(availableWidth < graphWidth + 48);
+      setUseCompactMode(viewportWidth < 1024);
       setUseTightVerticalSpacing(viewportHeight < 860);
     };
 
@@ -419,6 +419,23 @@ export default function ComponentOrderingGraph() {
 
     return () => {
       window.removeEventListener("resize", updateLayoutMode);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    
+    const observer = new ResizeObserver((entries) => {
+      const containerWidth = entries[0].contentRect.width;
+      if (containerWidth > 0 && graphWidth > 0) {
+        setScale(Math.min(1, (containerWidth - 8) / graphWidth));
+      }
+    });
+
+    observer.observe(wrapperRef.current);
+    
+    return () => {
+      observer.disconnect();
     };
   }, [graphWidth]);
 
@@ -538,19 +555,28 @@ export default function ComponentOrderingGraph() {
         </div>
 
         <div
+          ref={wrapperRef}
           className={
             useCompactMode
               ? "hidden"
-              : "relative w-full min-w-max px-8 sm:px-12"
+              : "relative w-full flex justify-center px-4 min-w-0"
           }
         >
           <div
-            className="relative mx-auto"
+            className="relative"
             style={{
-              height: `${GRAPH_HEIGHT}px`,
-              width: `${graphWidth}px`,
+              width: `${graphWidth * scale}px`,
+              height: `${GRAPH_HEIGHT * scale}px`,
             }}
           >
+            <div
+              className="absolute left-0 top-0 origin-top-left"
+              style={{
+                height: `${GRAPH_HEIGHT}px`,
+                width: `${graphWidth}px`,
+                transform: `scale(${scale})`,
+              }}
+            >
             <svg
               aria-hidden="true"
               className="absolute inset-0 h-full w-full overflow-visible"
@@ -750,6 +776,7 @@ export default function ComponentOrderingGraph() {
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
