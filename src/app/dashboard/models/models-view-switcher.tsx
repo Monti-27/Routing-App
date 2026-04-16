@@ -11,7 +11,7 @@ import { LegacyModelsView } from "./legacy-models-view";
 type ModelsView = "graph" | "catalog";
 
 export function ModelsViewSwitcher() {
-  const [view, setView] = useState<ModelsView>("graph");
+  const [view, setView] = useState<ModelsView>("catalog");
 
   return (
     <div className="space-y-4">
