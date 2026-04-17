@@ -111,7 +111,7 @@ const allModels: Model[] = [
   },
   {
     id: "route/glm-5",
-    name: "GLM-5",
+    name: "glm-5",
     description: "Latest generation GLM with enhanced reasoning",
     provider: "zai",
     context_length: "200K",
@@ -123,7 +123,7 @@ const allModels: Model[] = [
   },
   {
     id: "route/glm-5.1",
-    name: "GLM-5.1",
+    name: "glm-5.1",
     description: "Enhanced GLM with improved capabilities",
     provider: "zai",
     context_length: "128K",

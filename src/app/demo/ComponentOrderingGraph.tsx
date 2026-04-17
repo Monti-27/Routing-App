@@ -122,7 +122,7 @@ const providerTree = [
       {
         contextLength: "200K",
         inputPrice: 1.1088,
-        label: "GLM-5 Highspeed",
+        label: "glm-5 highspeed",
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-5-highspeed",
         outputPrice: 3.542,
@@ -130,7 +130,7 @@ const providerTree = [
       {
         contextLength: "203K",
         inputPrice: 1.2,
-        label: "GLM-5.1 Precision",
+        label: "glm-5.1 precision",
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-5.1-precision",
         outputPrice: 3.5,
@@ -138,7 +138,7 @@ const providerTree = [
       {
         contextLength: "128K",
         inputPrice: 1,
-        label: "GLM-5.1",
+        label: "glm-5.1",
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-5.1",
         outputPrice: 3,
@@ -146,7 +146,7 @@ const providerTree = [
       {
         contextLength: "80K",
         inputPrice: 0.792,
-        label: "GLM-5",
+        label: "glm-5",
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-5",
         outputPrice: 2.53,
@@ -154,7 +154,7 @@ const providerTree = [
       {
         contextLength: "200K",
         inputPrice: 1.32,
-        label: "GLM-4.7 Flash",
+        label: "glm-4.7 flash",
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-4.7-flash",
         outputPrice: 4.4,
@@ -162,7 +162,7 @@ const providerTree = [
       {
         contextLength: "200K",
         inputPrice: 1.32,
-        label: "GLM-4.7",
+        label: "glm-4.7",
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-4.7",
         outputPrice: 4.4,
