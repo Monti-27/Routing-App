@@ -60,7 +60,7 @@ const providerTree = [
     label: "MiniMax",
     models: [
       {
-        contextLength: "100K",
+        contextLength: "100000",
         inputPrice: 0.33,
         label: "MiniMax M2.7 Highspeed",
         logo: "/model-logos/route-minimax.png",
@@ -68,7 +68,7 @@ const providerTree = [
         outputPrice: 1.32,
       },
       {
-        contextLength: "100K",
+        contextLength: "100000",
         inputPrice: 0.33,
         label: "MiniMax M2.7",
         logo: "/model-logos/route-minimax.png",
@@ -76,7 +76,7 @@ const providerTree = [
         outputPrice: 1.32,
       },
       {
-        contextLength: "100K",
+        contextLength: "100000",
         inputPrice: 0.193,
         label: "MiniMax M2.5 Highspeed",
         logo: "/model-logos/route-minimax.png",
@@ -84,7 +84,7 @@ const providerTree = [
         outputPrice: 1.238,
       },
       {
-        contextLength: "100K",
+        contextLength: "100000",
         inputPrice: 0.193,
         label: "MiniMax M2.5",
         logo: "/model-logos/route-minimax.png",
@@ -174,7 +174,7 @@ const providerTree = [
     label: "Qwen",
     models: [
       {
-        contextLength: "262K",
+        contextLength: "131072",
         inputPrice: 1.1,
         label: "Qwen3.5 397B A17B",
         logo: "/model-logos/route-qwen.png",
@@ -182,7 +182,7 @@ const providerTree = [
         outputPrice: 3.3,
       },
       {
-        contextLength: "131K",
+        contextLength: "131072",
         inputPrice: 0.55,
         label: "Qwen3.5 Plus",
         logo: "/model-logos/route-qwen.png",
@@ -190,7 +190,7 @@ const providerTree = [
         outputPrice: 1.65,
       },
       {
-        contextLength: "131K",
+        contextLength: "131072",
         inputPrice: 0.6,
         label: "Qwen3.6 Plus",
         logo: "/model-logos/route-qwen.png",
@@ -198,7 +198,7 @@ const providerTree = [
         outputPrice: 1.8,
       },
       {
-        contextLength: "1000K",
+        contextLength: "131072",
         inputPrice: 0.2,
         label: "Qwen3.5 9B",
         logo: "/model-logos/route-qwen.png",
@@ -242,7 +242,7 @@ const providerTree = [
     label: "MiMo",
     models: [
       {
-        contextLength: "256K",
+        contextLength: "256000",
         inputPrice: 0.55,
         label: "MiMo V2 Omni",
         logo: "/model-logos/route-xiaomi.png",
@@ -250,7 +250,7 @@ const providerTree = [
         outputPrice: 1.65,
       },
       {
-        contextLength: "256K",
+        contextLength: "256000",
         inputPrice: 0.45,
         label: "MiMo V2 Pro",
         logo: "/model-logos/route-xiaomi.png",
