@@ -128,7 +128,7 @@ const providerTree = [
         outputPrice: 3.542,
       },
       {
-        contextLength: "203K",
+        contextLength: "200K",
         inputPrice: 1.2,
         label: "glm-5.1 precision",
         logo: "/model-logos/route-zai.svg",
@@ -136,7 +136,7 @@ const providerTree = [
         outputPrice: 3.5,
       },
       {
-        contextLength: "128K",
+        contextLength: "200K",
         inputPrice: 1,
         label: "glm-5.1",
         logo: "/model-logos/route-zai.svg",
@@ -144,7 +144,7 @@ const providerTree = [
         outputPrice: 3,
       },
       {
-        contextLength: "80K",
+        contextLength: "200K",
         inputPrice: 0.792,
         label: "glm-5",
         logo: "/model-logos/route-zai.svg",
@@ -262,7 +262,10 @@ const providerTree = [
 ] as const;
 
 function slugify(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function buildGraph(activeProvider: ProviderId | null) {
@@ -271,7 +274,9 @@ function buildGraph(activeProvider: ProviderId | null) {
   const horizontalPadding = 24;
   const graphWidth = Math.max(
     920,
-    providerStartX * 2 + providerSpacing * (providerTree.length - 1) + NODE_WIDTH,
+    providerStartX * 2 +
+      providerSpacing * (providerTree.length - 1) +
+      NODE_WIDTH,
   );
   const rootX = Math.round(graphWidth / 2 - NODE_WIDTH / 2);
 
@@ -302,7 +307,10 @@ function buildGraph(activeProvider: ProviderId | null) {
     const centeredStartX = Math.round(providerCenterX - groupWidth / 2);
     const minStartX = horizontalPadding;
     const maxStartX = graphWidth - horizontalPadding - groupWidth;
-    const groupStartX = Math.max(minStartX, Math.min(centeredStartX, maxStartX));
+    const groupStartX = Math.max(
+      minStartX,
+      Math.min(centeredStartX, maxStartX),
+    );
 
     graphEdges.push({
       from: ROOT_ID,
@@ -365,10 +373,7 @@ function getProviderById(providerId: ProviderId | null) {
   return providerTree.find((provider) => provider.id === providerId) ?? null;
 }
 
-const getNodeState = (
-  level: number,
-  step: number,
-): NodeState => {
+const getNodeState = (level: number, step: number): NodeState => {
   if (step > level) {
     return "complete";
   }
@@ -424,7 +429,7 @@ export default function ComponentOrderingGraph() {
 
   useEffect(() => {
     if (!wrapperRef.current) return;
-    
+
     const observer = new ResizeObserver((entries) => {
       const containerWidth = entries[0].contentRect.width;
       if (containerWidth > 0 && graphWidth > 0) {
@@ -433,7 +438,7 @@ export default function ComponentOrderingGraph() {
     });
 
     observer.observe(wrapperRef.current);
-    
+
     return () => {
       observer.disconnect();
     };
@@ -444,9 +449,12 @@ export default function ComponentOrderingGraph() {
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      setStep(step + 1);
-    }, step === 0 ? INITIAL_DELAY_MS : PROCESS_DELAY_MS);
+    const timeoutId = setTimeout(
+      () => {
+        setStep(step + 1);
+      },
+      step === 0 ? INITIAL_DELAY_MS : PROCESS_DELAY_MS,
+    );
 
     return () => {
       clearTimeout(timeoutId);
@@ -462,7 +470,9 @@ export default function ComponentOrderingGraph() {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes tree-dash-flow {
           from { stroke-dashoffset: 0; }
           to { stroke-dashoffset: -24; }
@@ -470,7 +480,9 @@ export default function ComponentOrderingGraph() {
         .animate-tree-dash-flow {
           animation: tree-dash-flow 1.2s linear infinite;
         }
-      `}} />
+      `,
+        }}
+      />
       <section
         className={[
           "component-shell component-enter flex min-h-screen w-full items-start justify-center overflow-x-auto px-8 sm:px-10",
@@ -478,259 +490,239 @@ export default function ComponentOrderingGraph() {
           useTightVerticalSpacing ? "py-4 sm:py-3" : "py-10 sm:py-8",
         ].join(" ")}
       >
-      <div className={[
-        "flex w-full flex-col items-center justify-center",
-        useTightVerticalSpacing ? "gap-2" : "gap-4",
-      ].join(" ")}>
-        <header className="max-w-xl text-center">
-          <h1 className="gradient-title text-2xl font-[520] leading-none tracking-tight sm:text-3xl">
-            Models available
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
-            For more info, check plans.
-          </p>
-        </header>
-
-        <div className={useCompactMode ? "grid w-full max-w-3xl gap-3" : "hidden"}>
-          <div className="mx-auto rounded-[8px] border border-[#79bd96] bg-[#edf8f0] px-4 py-2 text-sm font-medium text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]">
-            routing.run
-          </div>
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            {providerTree.map((provider) => {
-              const isActive = activeProvider === provider.id;
-
-              return (
-                <button
-                  key={provider.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveProvider((current) => {
-                      const nextProvider =
-                        current === provider.id ? null : provider.id;
-                      setStep(nextProvider ? 1 : 0);
-                      return nextProvider;
-                    });
-                  }}
-                  className={[
-                    "rounded-[8px] border px-3 py-2 text-sm font-medium transition-all duration-300 ease-out",
-                    isActive
-                      ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
-                      : "border-[#ddd6cd] bg-[#fffcf8] text-[#8d877f] dark:border-[#3f3f46] dark:bg-[#18181b] dark:text-[#9f9fa9]",
-                  ].join(" ")}
-                >
-                  {provider.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {activeProviderData ? (
-            <div className="grid gap-3 pt-2">
-              {activeProviderData.models.map((model) => (
-                <div
-                  key={model.modelId}
-                  className="rounded-[10px] border border-[#ddd6cd] bg-[#fffcf8] p-3 text-left dark:border-[#3f3f46] dark:bg-[#18181b]"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="relative size-12 shrink-0 overflow-hidden rounded-[6px] border border-zinc-200 bg-background dark:border-zinc-800">
-                      <Image
-                        src={model.logo}
-                        alt={model.label}
-                        fill
-                        sizes="48px"
-                        className="object-contain p-2"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-foreground">
-                        {model.label}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {activeProviderData.label}
-                      </p>
-                      <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                        <p>Input: ${model.inputPrice.toFixed(4)}/1M</p>
-                        <p>Output: ${model.outputPrice.toFixed(4)}/1M</p>
-                        <p>Context: {model.contextLength}</p>
-                        <p className="truncate font-mono">{model.modelId}</p>
-                      </div>
-                    </div>
-                    <CopyButton text={model.modelId} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-
         <div
-          ref={wrapperRef}
-          className={
-            useCompactMode
-              ? "hidden"
-              : "relative w-full flex justify-center px-4 min-w-0"
-          }
+          className={[
+            "flex w-full flex-col items-center justify-center",
+            useTightVerticalSpacing ? "gap-2" : "gap-4",
+          ].join(" ")}
         >
+          <header className="max-w-xl text-center">
+            <h1 className="gradient-title text-2xl font-[520] leading-none tracking-tight sm:text-3xl">
+              Models available
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+              For more info, check plans.
+            </p>
+          </header>
+
           <div
-            className="relative"
-            style={{
-              width: `${graphWidth * scale}px`,
-              height: `${GRAPH_HEIGHT * scale}px`,
-            }}
+            className={
+              useCompactMode ? "grid w-full max-w-3xl gap-3" : "hidden"
+            }
           >
-            <div
-              className="absolute left-0 top-0 origin-top-left"
-              style={{
-                height: `${GRAPH_HEIGHT}px`,
-                width: `${graphWidth}px`,
-                transform: `scale(${scale})`,
-              }}
-            >
-            <svg
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full overflow-visible"
-              viewBox={`0 0 ${graphWidth} ${GRAPH_HEIGHT}`}
-            >
-              {graphEdges.map((edge) => {
-                const isActive = step >= edge.level;
+            <div className="mx-auto rounded-[8px] border border-[#79bd96] bg-[#edf8f0] px-4 py-2 text-sm font-medium text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]">
+              routing.run
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              {providerTree.map((provider) => {
+                const isActive = activeProvider === provider.id;
 
                 return (
-                  <g key={`${edge.from}-${edge.to}`}>
-                    <path
-                      d={edge.path}
-                      fill="none"
-                      stroke="#d9d2ca"
-                      className="transition-colors dark:stroke-zinc-800/80"
-                      strokeLinecap="round"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d={edge.path}
-                      fill="none"
-                      stroke="#00d492"
-                      strokeOpacity="0.2"
-                      strokeLinecap="round"
-                      strokeWidth="2"
-                      style={{
-                        opacity: isActive ? 1 : 0,
-                        transition: "opacity 300ms ease",
-                      }}
-                    />
-                    <path
-                      d={edge.path}
-                      fill="none"
-                      stroke="#00d492"
-                      strokeLinecap="round"
-                      strokeWidth="2"
-                      strokeDasharray="6 6"
-                      className={isActive ? "animate-tree-dash-flow" : ""}
-                      style={{
-                        opacity: isActive ? 1 : 0,
-                        transition: "opacity 300ms ease",
-                      }}
-                    />
-                  </g>
+                  <button
+                    key={provider.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveProvider((current) => {
+                        const nextProvider =
+                          current === provider.id ? null : provider.id;
+                        setStep(nextProvider ? 1 : 0);
+                        return nextProvider;
+                      });
+                    }}
+                    className={[
+                      "rounded-[8px] border px-3 py-2 text-sm font-medium transition-all duration-300 ease-out",
+                      isActive
+                        ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
+                        : "border-[#ddd6cd] bg-[#fffcf8] text-[#8d877f] dark:border-[#3f3f46] dark:bg-[#18181b] dark:text-[#9f9fa9]",
+                    ].join(" ")}
+                  >
+                    {provider.label}
+                  </button>
                 );
               })}
-            </svg>
-            {graphNodes.map((node) => {
-              const state = nodeStates.get(node.id) ?? "pending";
-              const isComplete = state === "complete";
-              const isProcessing = state === "processing";
-              const isProvider = node.isProvider ?? false;
-              const isActiveProvider = activeProvider === node.id;
-              const isRootNode = node.id === ROOT_ID;
+            </div>
 
-              return (
-                <div
-                  key={node.id}
-                  className="absolute"
-                  style={{
-                    left: `${node.x}px`,
-                    top: `${node.y}px`,
-                    height: `${NODE_HEIGHT}px`,
-                    width: `${NODE_WIDTH}px`,
-                  }}
-                >
+            {activeProviderData ? (
+              <div className="grid gap-3 pt-2">
+                {activeProviderData.models.map((model) => (
                   <div
-                    className={[
-                      "absolute rounded-[8px] transition-all duration-700 ease-out",
-                      isRootNode
-                        ? isComplete
-                          ? "bg-[#dff3e6] shadow-[0_0_0_1px_rgba(121,189,150,0.14)] dark:bg-[#163427]"
-                          : isProcessing
-                            ? "bg-[#efebe5] shadow-[0_0_0_1px_rgba(17,17,17,0.03)] dark:bg-[#232323]"
-                            : "bg-[#faf8f4] dark:bg-[#1c1c1c]"
-                        : isProvider
-                        ? isComplete
-                          ? "bg-[#dff3e6] shadow-[0_0_0_1px_rgba(121,189,150,0.14)] dark:bg-[#163427]"
-                          : isProcessing
-                            ? "bg-[#efebe5] shadow-[0_0_0_1px_rgba(17,17,17,0.03)] dark:bg-[#232323]"
-                            : "bg-[#faf8f4] dark:bg-[#1c1c1c]"
-                        : isComplete
-                          ? "bg-[#dff3e6] shadow-[0_0_0_1px_rgba(121,189,150,0.14)] dark:bg-[#163427]"
-                          : isProcessing
-                            ? "bg-[#efebe5] shadow-[0_0_0_1px_rgba(17,17,17,0.03)] dark:bg-[#232323]"
-                            : "bg-[#faf8f4] dark:bg-[#1c1c1c]",
-                    ].join(" ")}
-                    style={{
-                      inset: `${((-NODE_HALO_INSET * 100) / NODE_WIDTH).toFixed(3)}%`,
-                      opacity: isProcessing || isComplete ? 1 : 0,
-                    }}
-                  />
-                  {isProvider ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveProvider((current) => {
-                          const nextProvider =
-                            current === node.id ? null : (node.id as ProviderId);
-                          setStep(nextProvider ? 1 : 0);
-                          return nextProvider;
-                        });
-                      }}
-                      className={[
-                       "absolute inset-0 rounded-[8px] border px-2 text-center text-[0.78rem] font-medium tracking-[-0.02em] transition-all duration-700 ease-out",
-                       "flex items-center justify-center shadow-[0_1px_0_rgba(17,17,17,0.02)]",
-                       isRootNode
-                          ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
-                          : isActiveProvider
-                            ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
-                           : isComplete
-                             ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
-                            : isProcessing
-                              ? "border-[#c9c2b8] bg-[#f2efe9] text-[#292522] dark:border-[#4b5563] dark:bg-[#27272a] dark:text-[#fafafa]"
-                              : "border-[#ddd6cd] bg-[#fffcf8] text-[#8d877f] dark:border-[#3f3f46] dark:bg-[#18181b] dark:text-[#9f9fa9]",
-                        isProvider ? "cursor-pointer" : "",
-                      ].join(" ")}
+                    key={model.modelId}
+                    className="rounded-[10px] border border-[#ddd6cd] bg-[#fffcf8] p-3 text-left dark:border-[#3f3f46] dark:bg-[#18181b]"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="relative size-12 shrink-0 overflow-hidden rounded-[6px] border border-zinc-200 bg-background dark:border-zinc-800">
+                        <Image
+                          src={model.logo}
+                          alt={model.label}
+                          fill
+                          sizes="48px"
+                          className="object-contain p-2"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {model.label}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {activeProviderData.label}
+                        </p>
+                        <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                          <p>Input: ${model.inputPrice.toFixed(4)}/1M</p>
+                          <p>Output: ${model.outputPrice.toFixed(4)}/1M</p>
+                          <p>Context: {model.contextLength}</p>
+                          <p className="truncate font-mono">{model.modelId}</p>
+                        </div>
+                      </div>
+                      <CopyButton text={model.modelId} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div
+            ref={wrapperRef}
+            className={
+              useCompactMode
+                ? "hidden"
+                : "relative w-full flex justify-center px-4 min-w-0"
+            }
+          >
+            <div
+              className="relative"
+              style={{
+                width: `${graphWidth * scale}px`,
+                height: `${GRAPH_HEIGHT * scale}px`,
+              }}
+            >
+              <div
+                className="absolute left-0 top-0 origin-top-left"
+                style={{
+                  height: `${GRAPH_HEIGHT}px`,
+                  width: `${graphWidth}px`,
+                  transform: `scale(${scale})`,
+                }}
+              >
+                <svg
+                  aria-hidden="true"
+                  className="absolute inset-0 h-full w-full overflow-visible"
+                  viewBox={`0 0 ${graphWidth} ${GRAPH_HEIGHT}`}
+                >
+                  {graphEdges.map((edge) => {
+                    const isActive = step >= edge.level;
+
+                    return (
+                      <g key={`${edge.from}-${edge.to}`}>
+                        <path
+                          d={edge.path}
+                          fill="none"
+                          stroke="#d9d2ca"
+                          className="transition-colors dark:stroke-zinc-800/80"
+                          strokeLinecap="round"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d={edge.path}
+                          fill="none"
+                          stroke="#00d492"
+                          strokeOpacity="0.2"
+                          strokeLinecap="round"
+                          strokeWidth="2"
+                          style={{
+                            opacity: isActive ? 1 : 0,
+                            transition: "opacity 300ms ease",
+                          }}
+                        />
+                        <path
+                          d={edge.path}
+                          fill="none"
+                          stroke="#00d492"
+                          strokeLinecap="round"
+                          strokeWidth="2"
+                          strokeDasharray="6 6"
+                          className={isActive ? "animate-tree-dash-flow" : ""}
+                          style={{
+                            opacity: isActive ? 1 : 0,
+                            transition: "opacity 300ms ease",
+                          }}
+                        />
+                      </g>
+                    );
+                  })}
+                </svg>
+                {graphNodes.map((node) => {
+                  const state = nodeStates.get(node.id) ?? "pending";
+                  const isComplete = state === "complete";
+                  const isProcessing = state === "processing";
+                  const isProvider = node.isProvider ?? false;
+                  const isActiveProvider = activeProvider === node.id;
+                  const isRootNode = node.id === ROOT_ID;
+
+                  return (
+                    <div
+                      key={node.id}
+                      className="absolute"
                       style={{
-                        opacity: isProcessing || isComplete ? 1 : 0.5,
-                        transform:
-                          isProcessing || isComplete
-                            ? "translateY(0px) scale(1)"
-                            : "translateY(-8px) scale(0.98)",
+                        left: `${node.x}px`,
+                        top: `${node.y}px`,
+                        height: `${NODE_HEIGHT}px`,
+                        width: `${NODE_WIDTH}px`,
                       }}
                     >
-                      <span className="line-clamp-2 block w-full overflow-hidden text-center text-[0.72rem] leading-tight break-words">
-                        {node.label}
-                      </span>
-                    </button>
-                  ) : (
-                    <HoverCard closeDelay={75} openDelay={0}>
-                      <HoverCardTrigger asChild>
-                          <div
-                       className={[
-                             "absolute inset-0 rounded-[8px] border px-2 text-center text-[0.78rem] font-medium tracking-[-0.02em] transition-all duration-700 ease-out",
+                      <div
+                        className={[
+                          "absolute rounded-[8px] transition-all duration-700 ease-out",
+                          isRootNode
+                            ? isComplete
+                              ? "bg-[#dff3e6] shadow-[0_0_0_1px_rgba(121,189,150,0.14)] dark:bg-[#163427]"
+                              : isProcessing
+                                ? "bg-[#efebe5] shadow-[0_0_0_1px_rgba(17,17,17,0.03)] dark:bg-[#232323]"
+                                : "bg-[#faf8f4] dark:bg-[#1c1c1c]"
+                            : isProvider
+                              ? isComplete
+                                ? "bg-[#dff3e6] shadow-[0_0_0_1px_rgba(121,189,150,0.14)] dark:bg-[#163427]"
+                                : isProcessing
+                                  ? "bg-[#efebe5] shadow-[0_0_0_1px_rgba(17,17,17,0.03)] dark:bg-[#232323]"
+                                  : "bg-[#faf8f4] dark:bg-[#1c1c1c]"
+                              : isComplete
+                                ? "bg-[#dff3e6] shadow-[0_0_0_1px_rgba(121,189,150,0.14)] dark:bg-[#163427]"
+                                : isProcessing
+                                  ? "bg-[#efebe5] shadow-[0_0_0_1px_rgba(17,17,17,0.03)] dark:bg-[#232323]"
+                                  : "bg-[#faf8f4] dark:bg-[#1c1c1c]",
+                        ].join(" ")}
+                        style={{
+                          inset: `${((-NODE_HALO_INSET * 100) / NODE_WIDTH).toFixed(3)}%`,
+                          opacity: isProcessing || isComplete ? 1 : 0,
+                        }}
+                      />
+                      {isProvider ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveProvider((current) => {
+                              const nextProvider =
+                                current === node.id
+                                  ? null
+                                  : (node.id as ProviderId);
+                              setStep(nextProvider ? 1 : 0);
+                              return nextProvider;
+                            });
+                          }}
+                          className={[
+                            "absolute inset-0 rounded-[8px] border px-2 text-center text-[0.78rem] font-medium tracking-[-0.02em] transition-all duration-700 ease-out",
                             "flex items-center justify-center shadow-[0_1px_0_rgba(17,17,17,0.02)]",
-                            node.copyText ? "pr-8" : "",
                             isRootNode
                               ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
-                              : isComplete
-                              ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
-                              : isProcessing
-                                ? "border-[#c9c2b8] bg-[#f2efe9] text-[#292522] dark:border-[#4b5563] dark:bg-[#27272a] dark:text-[#fafafa]"
-                                : "border-[#ddd6cd] bg-[#fffcf8] text-[#8d877f] dark:border-[#3f3f46] dark:bg-[#18181b] dark:text-[#9f9fa9]",
+                              : isActiveProvider
+                                ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
+                                : isComplete
+                                  ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
+                                  : isProcessing
+                                    ? "border-[#c9c2b8] bg-[#f2efe9] text-[#292522] dark:border-[#4b5563] dark:bg-[#27272a] dark:text-[#fafafa]"
+                                    : "border-[#ddd6cd] bg-[#fffcf8] text-[#8d877f] dark:border-[#3f3f46] dark:bg-[#18181b] dark:text-[#9f9fa9]",
+                            isProvider ? "cursor-pointer" : "",
                           ].join(" ")}
                           style={{
                             opacity: isProcessing || isComplete ? 1 : 0.5,
@@ -743,65 +735,94 @@ export default function ComponentOrderingGraph() {
                           <span className="line-clamp-2 block w-full overflow-hidden text-center text-[0.72rem] leading-tight break-words">
                             {node.label}
                           </span>
-                          {node.copyText ? (
-                            <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
-                              <CopyButton text={node.copyText} />
-                            </div>
-                          ) : null}
-                        </div>
-                      </HoverCardTrigger>
-                      {node.meta ? (
-                        <HoverCardContent
-                          align="start"
-                          className="w-80 rounded-none border-zinc-200 bg-background p-4 dark:border-zinc-800"
-                          side="top"
-                        >
-                          <div className="flex flex-col items-start justify-start gap-3">
-                            <div className="relative size-14 overflow-hidden border border-zinc-200 bg-background dark:border-zinc-800">
-                              <Image
-                                src={node.meta.logo}
-                                alt={node.label}
-                                fill
-                                sizes="56px"
-                                className="object-contain p-2"
-                              />
-                            </div>
-                            <div className="flex flex-col">
-                              <h4 className="text-base font-semibold text-foreground">
+                        </button>
+                      ) : (
+                        <HoverCard closeDelay={75} openDelay={0}>
+                          <HoverCardTrigger asChild>
+                            <div
+                              className={[
+                                "absolute inset-0 rounded-[8px] border px-2 text-center text-[0.78rem] font-medium tracking-[-0.02em] transition-all duration-700 ease-out",
+                                "flex items-center justify-center shadow-[0_1px_0_rgba(17,17,17,0.02)]",
+                                node.copyText ? "pr-8" : "",
+                                isRootNode
+                                  ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
+                                  : isComplete
+                                    ? "border-[#79bd96] bg-[#edf8f0] text-[#3f7e5c] dark:border-[#4d8c68] dark:bg-[#13281d] dark:text-[#8fd0a8]"
+                                    : isProcessing
+                                      ? "border-[#c9c2b8] bg-[#f2efe9] text-[#292522] dark:border-[#4b5563] dark:bg-[#27272a] dark:text-[#fafafa]"
+                                      : "border-[#ddd6cd] bg-[#fffcf8] text-[#8d877f] dark:border-[#3f3f46] dark:bg-[#18181b] dark:text-[#9f9fa9]",
+                              ].join(" ")}
+                              style={{
+                                opacity: isProcessing || isComplete ? 1 : 0.5,
+                                transform:
+                                  isProcessing || isComplete
+                                    ? "translateY(0px) scale(1)"
+                                    : "translateY(-8px) scale(0.98)",
+                              }}
+                            >
+                              <span className="line-clamp-2 block w-full overflow-hidden text-center text-[0.72rem] leading-tight break-words">
                                 {node.label}
-                              </h4>
-                              <p className="text-sm text-muted-foreground">
-                                {node.meta.providerLabel}
-                              </p>
+                              </span>
+                              {node.copyText ? (
+                                <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
+                                  <CopyButton text={node.copyText} />
+                                </div>
+                              ) : null}
                             </div>
-                            <div className="space-y-1 text-sm">
-                              <p>
-                                Input: ${node.meta.inputPrice.toFixed(4)}/1M
-                              </p>
-                              <p>
-                                Output: ${node.meta.outputPrice.toFixed(4)}/1M
-                              </p>
-                              <p>Context: {node.meta.contextLength}</p>
-                              <p className="truncate text-muted-foreground">
-                                {node.meta.modelId}
-                              </p>
-                            </div>
-                            <div>
-                              <CopyButton text={node.meta.modelId} />
-                            </div>
-                          </div>
-                        </HoverCardContent>
-                      ) : null}
-                    </HoverCard>
-                  )}
-                </div>
-              );
-            })}
+                          </HoverCardTrigger>
+                          {node.meta ? (
+                            <HoverCardContent
+                              align="start"
+                              className="w-80 rounded-none border-zinc-200 bg-background p-4 dark:border-zinc-800"
+                              side="top"
+                            >
+                              <div className="flex flex-col items-start justify-start gap-3">
+                                <div className="relative size-14 overflow-hidden border border-zinc-200 bg-background dark:border-zinc-800">
+                                  <Image
+                                    src={node.meta.logo}
+                                    alt={node.label}
+                                    fill
+                                    sizes="56px"
+                                    className="object-contain p-2"
+                                  />
+                                </div>
+                                <div className="flex flex-col">
+                                  <h4 className="text-base font-semibold text-foreground">
+                                    {node.label}
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    {node.meta.providerLabel}
+                                  </p>
+                                </div>
+                                <div className="space-y-1 text-sm">
+                                  <p>
+                                    Input: ${node.meta.inputPrice.toFixed(4)}/1M
+                                  </p>
+                                  <p>
+                                    Output: ${node.meta.outputPrice.toFixed(4)}
+                                    /1M
+                                  </p>
+                                  <p>Context: {node.meta.contextLength}</p>
+                                  <p className="truncate text-muted-foreground">
+                                    {node.meta.modelId}
+                                  </p>
+                                </div>
+                                <div>
+                                  <CopyButton text={node.meta.modelId} />
+                                </div>
+                              </div>
+                            </HoverCardContent>
+                          ) : null}
+                        </HoverCard>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
     </>
   );
 }
