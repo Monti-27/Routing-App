@@ -19,7 +19,7 @@ const plans = [
     buttonVariant: "outline" as const,
     badge: "bg-zinc-600",
     features: [
-      "50 requests/day",
+      "20 requests/day",
       "DeepSeek-V3.2, Qwen3.5, Gemma-4-31B",
       "MiniMax-M2.7 & M2.5",
       "Kimi-K2.5",
@@ -244,7 +244,8 @@ export default function PricingSection4() {
           customVariants={revealVariants}
           className="text-gray-400"
         >
-          OpenAI-compatible API with automatic provider fallback. Choose the plan that fits your needs.
+          OpenAI-compatible API with automatic provider fallback. Choose the
+          plan that fits your needs.
         </TimelineContent>
 
         <TimelineContent
@@ -282,7 +283,7 @@ export default function PricingSection4() {
                 "relative text-white border-neutral-800 h-full",
                 plan.popular
                   ? "bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 shadow-[0px_-13px_300px_0px_#4f46e5] z-20 border-indigo-500/50"
-                  : "bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 z-10"
+                  : "bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 z-10",
               )}
             >
               {plan.popular && (
@@ -290,11 +291,16 @@ export default function PricingSection4() {
                   Most Popular
                 </div>
               )}
-              
+
               <CardHeader className="text-left">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-2xl font-bold">{plan.name}</h3>
-                  <span className={cn("px-2 py-0.5 text-xs font-medium rounded text-white", plan.badge)}>
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 text-xs font-medium rounded text-white",
+                      plan.badge,
+                    )}
+                  >
                     {plan.name.toUpperCase()}
                   </span>
                 </div>
@@ -322,7 +328,7 @@ export default function PricingSection4() {
                     "w-full mb-6 p-4 text-lg font-medium rounded-xl transition-all",
                     plan.popular
                       ? "bg-gradient-to-t from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-800 border border-indigo-500 text-white hover:from-indigo-600 hover:to-indigo-700"
-                      : "bg-gradient-to-t from-neutral-800 to-neutral-700 shadow-lg shadow-neutral-900 border border-neutral-700 text-white hover:from-neutral-700 hover:to-neutral-600"
+                      : "bg-gradient-to-t from-neutral-800 to-neutral-700 shadow-lg shadow-neutral-900 border border-neutral-700 text-white hover:from-neutral-700 hover:to-neutral-600",
                   )}
                 >
                   {plan.buttonText}

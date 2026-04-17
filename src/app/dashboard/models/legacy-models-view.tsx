@@ -50,7 +50,7 @@ const iconBgClasses = {
 };
 
 const tierRequestsPerDay = {
-  free: 50,
+  free: 20,
   lite: 400,
   premium: 1000,
   max: 2500,
@@ -550,7 +550,7 @@ export function LegacyModelsView() {
               <h3 className="text-lg font-semibold">Plan-Based Access</h3>
               <p className="text-muted-foreground">
                 Your plan determines which models you can access. Free tier gets
-                50 requests/day, Lite gets 400/day, Premium gets 1,000/day, and
+                20 requests/day, Lite gets 400/day, Premium gets 1,000/day, and
                 Max gets 2,500/day. Upgrade anytime to unlock more models and
                 higher limits.
               </p>

@@ -1,47 +1,8 @@
 "use client"
-import { Activity, Cpu, Globe, MessageCircle, Route, Shield, TrendingDown, Zap } from 'lucide-react'
+import { Activity, MessageCircle, Route } from 'lucide-react'
 import DottedMap from 'dotted-map'
 import { Area, AreaChart, CartesianGrid } from 'recharts'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-
-const features = [
-  {
-    icon: Route,
-    title: 'Intelligent Routing',
-    description: 'Automatically route requests to the best provider based on cost, latency, and availability.',
-    span: 'md:col-span-1'
-  },
-  {
-    icon: Cpu,
-    title: '50+ Models',
-    description: 'Access models from OpenAI, Anthropic, Google, Meta, Mistral, DeepSeek, and more.',
-    span: 'md:col-span-1'
-  },
-  {
-    icon: TrendingDown,
-    title: 'Best Prices',
-    description: 'We negotiate volume discounts and pass the savings to you. Save up to 80% on API costs.',
-    span: 'md:col-span-1'
-  },
-  {
-    icon: Shield,
-    title: 'High Availability',
-    description: 'Built-in fallbacks ensure your applications never go down, even when providers do.',
-    span: 'md:col-span-1'
-  },
-  {
-    icon: Globe,
-    title: 'Unified API',
-    description: 'One simple API to rule them all. No more managing multiple provider credentials.',
-    span: 'md:col-span-1'
-  },
-  {
-    icon: Zap,
-    title: 'Real-time Analytics',
-    description: 'Track usage, costs, and performance across all providers with detailed analytics.',
-    span: 'md:col-span-1'
-  },
-]
 
 export function Features() {
     return (
@@ -49,10 +10,10 @@ export function Features() {
             <div className="mx-auto max-w-5xl">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl sm:text-4xl font-display font-bold tracking-tight mb-4">
-                        Everything you need to build with AI
+                        Infrastructure for teams shipping with AI
                     </h2>
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Powerful features to help you build, scale, and optimize your AI applications.
+                        routing.run keeps your app stable while models, providers, prices, and latency keep changing.
                     </p>
                 </div>
             </div>
@@ -64,13 +25,13 @@ export function Features() {
                             Intelligent Routing
                         </span>
 
-                        <p className="mt-8 text-2xl font-semibold">Automatically route requests to the best provider.</p>
+                        <p className="mt-8 text-2xl font-semibold">Route every request to the right model path for cost, speed, and uptime.</p>
                     </div>
 
                     <div aria-hidden className="relative">
                         <div className="absolute inset-0 z-10 m-auto size-fit">
                             <div className="rounded-[--radius] bg-background z-[1] dark:bg-muted relative flex size-fit w-fit items-center gap-2 border px-3 py-1 text-xs font-medium shadow-md shadow-black/5">
-                                <span className="text-lg">⚡</span> Routing to lowest latency provider
+                                <span className="text-lg">⚡</span> Routing to the best live path
                             </div>
                             <div className="rounded-[--radius] bg-background absolute inset-2 -bottom-2 mx-auto border px-3 py-4 text-xs font-medium shadow-md shadow-black/5 dark:bg-zinc-900"></div>
                         </div>
@@ -88,7 +49,7 @@ export function Features() {
                             Unified API
                         </span>
 
-                        <p className="my-8 text-2xl font-semibold">One simple API to rule them all.</p>
+                        <p className="my-8 text-2xl font-semibold">One OpenAI-compatible API while providers and model layers keep moving.</p>
                     </div>
                     <div aria-hidden className="flex flex-col gap-8">
                         <div>
@@ -102,7 +63,7 @@ export function Features() {
                         </div>
 
                         <div>
-                            <div className="rounded-[--radius] mb-1 ml-auto w-3/5 bg-blue-600 p-3 text-xs text-white">Response from any provider unified</div>
+                            <div className="rounded-[--radius] mb-1 ml-auto w-3/5 bg-blue-600 p-3 text-xs text-white">Same response shape, different route underneath</div>
                             <span className="text-muted-foreground block text-right text-xs">Now</span>
                         </div>
                     </div>
@@ -118,7 +79,7 @@ export function Features() {
                         </span>
 
                         <p className="my-8 text-2xl font-semibold">
-                            Track usage, costs, and performance. <span className="text-muted-foreground">Instantly identify optimization opportunities.</span>
+                            Track spend, latency, and route quality. <span className="text-muted-foreground">See what changed before your users do.</span>
                         </p>
                     </div>
                     <MonitoringChart />

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Coins, Zap, Sparkles, Crown, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,44 +15,6 @@ interface ModelPricing {
   input_per_million: number;
   output_per_million: number;
 }
-
-const modelDisplayNames: Record<string, string> = {
-  "route/minimax-m2.5": "MiniMax-M2.5",
-  "route/minimax-m2.7": "MiniMax-M2.7",
-  "route/minimax-m2.5-highspeed": "MiniMax-M2.5 Highspeed",
-  "route/minimax-m2.7-highspeed": "MiniMax-M2.7 Highspeed",
-  "route/kimi-k2.5": "Kimi-K2.5",
-  "route/nemotron-3-super-120b": "Nemotron-3-Super-120B",
-  "route/trinity-large-preview": "Trinity-Large-Preview",
-  "route/glm-4.5-air": "glm-4.5-air",
-  "route/glm-4.5-airx": "glm-4.5-airx",
-  "route/glm-4.5-flash": "glm-4.5-flash",
-  "route/glm-4.7-flashx": "glm-4.7-flashx",
-  "route/glm-4.6v-flashx": "glm-4.6v-flashx",
-  "route/glm-5": "glm-5",
-  "route/glm-5-turbo": "glm-5-turbo",
-  "route/glm-5.1-precision": "glm-5.1-precision",
-  "route/nemotron-3-nano-30b": "Nemotron-3-Nano-30B",
-  "route/qwen3-coder": "Qwen3-Coder",
-  "route/qwen3-coder-next": "Qwen3-Coder-Next",
-  "route/qwen3-32b": "Qwen3-32B",
-  "route/qwen3-next-80b": "Qwen3-Next-80B",
-  "route/gpt-oss-120b": "GPT-OSS-120B",
-  "route/hermes-3-llama-3.1-405b": "Hermes-3-Llama-3.1-405B",
-  "route/llama-3.2-3b-instruct": "Llama-3.2-3B-Instruct",
-  "route/gemma-3-27b-it": "Gemma-3-27B-IT",
-  "route/gemma-4-31b-it": "Gemma-4-31B-IT",
-  "route/deepseek-v3.2": "DeepSeek-V3.2",
-  "route/deepseek-v3.2-speciale": "DeepSeek-V3.2-Speciale",
-  "route/deepseek-r1": "DeepSeek-R1",
-  "route/minimax-image-1": "MiniMax-Image-1",
-  "route/mimo-v2-omni": "Mimo-V2-Omni",
-  "route/mimo-v2-pro": "Mimo-V2-Pro",
-  "route/mimo-v2-flash": "Mimo-V2-Flash",
-  "route/grok-4-fast": "Grok-4-Fast",
-  "route/grok-4.20-beta": "Grok-4.20-Beta",
-  "route/grok-4.20-multi-agent-beta": "Grok-4.20-Multi-Agent-Beta",
-};
 
 const modelLogos: Record<string, string> = {
   "route/minimax-m2.5": "/model-logos/route-minimax.png",
@@ -857,15 +819,16 @@ export default function PricingPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 mb-4">
             <Sparkles className="h-4 w-4 text-indigo-500" />
             <span className="text-sm font-medium text-indigo-500">
-              Simple, transparent pricing
+              One stable endpoint, transparent pricing
             </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tight bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
-            Choose Your Plan
+            Pricing for teams shipping with AI routing
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Pay only for what you use. All plans include access to our
-            OpenAI-compatible API with automatic provider fallback.
+            Pay for tokens, not rewrites. Every plan includes the same
+            OpenAI-compatible integration, built-in failover, and access to
+            routing.run routes for MiniMax, GLM, Kimi, and more.
           </p>
 
           <div className="flex items-center justify-center gap-4 pt-4">
@@ -1067,9 +1030,11 @@ export default function PricingPage() {
                       className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                     >
                       {modelLogos[m.model] ? (
-                        <img
+                        <Image
                           src={modelLogos[m.model]}
                           alt={m.display_name}
+                          width={32}
+                          height={32}
                           className="w-8 h-8 object-contain"
                         />
                       ) : (
@@ -1124,15 +1089,16 @@ export default function PricingPage() {
             </div>
             <div className="flex-1 space-y-2">
               <h3 className="text-xl font-bold flex items-center gap-2">
-                Usage-Based Billing
+                One integration, flexible model access
                 <Badge variant="secondary" className="text-xs">
                   Recommended
                 </Badge>
               </h3>
               <p className="text-muted-foreground max-w-2xl">
-                All models are billed per million tokens processed. Your plan
-                determines which models you can access and your rate limits.
-                Upgrade or downgrade anytime - no commitments.
+                All routed models are billed per million tokens processed. Your
+                plan controls route access and request limits, while your app
+                keeps the same integration surface as you move between providers
+                and faster routes.
               </p>
             </div>
           </div>
@@ -1152,15 +1118,15 @@ export default function PricingPage() {
             },
             {
               icon: <Sparkles className="h-5 w-5" />,
-              title: "Automatic provider fallback",
-              desc: "99.9% uptime with intelligent routing",
+              title: "Failover that actually works",
+              desc: "Absorb provider outages, latency spikes, and degradation before users notice",
             },
             {
               icon: <Crown className="h-5 w-5" />,
-              title: "Usage analytics",
-              desc: "Track spend with detailed dashboards",
+              title: "Route visibility",
+              desc: "See which model handled each request and why, with production-ready traceability",
             },
-          ].map((item, i) => (
+          ].map((item) => (
             <div
               key={item.title}
               className="rounded-xl border bg-card p-6 hover:bg-muted/30 transition-colors"

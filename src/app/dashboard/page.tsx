@@ -79,7 +79,7 @@ const DEV_USER_DATA: UserData = {
 };
 
 const PLAN_LIMITS: Record<string, number> = {
-  free: 50,
+  free: 20,
   lite: 400,
   premium: 1000,
   max: 2500,
@@ -163,8 +163,8 @@ export default function DashboardPage() {
   }, [isDevBypassEnabled]);
 
   const dailyLimit = plan
-    ? PLAN_LIMITS[plan.plan_tier?.toLowerCase()] || 50
-    : 50;
+    ? PLAN_LIMITS[plan.plan_tier?.toLowerCase()] || 20
+    : 20;
   const requestsUsedToday =
     plan?.requests_used_today || usage?.daily_requests_used || 0;
   const requestsRemaining = Math.max(0, dailyLimit - requestsUsedToday);

@@ -2,13 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Coins,
-  CreditCard,
-  Loader2,
-  Shield,
-  UserRound,
-} from "lucide-react";
+import { Coins, CreditCard, Loader2, Shield, UserRound } from "lucide-react";
 
 import {
   PageHeader,
@@ -46,9 +40,9 @@ const PLANS = [
     name: "Free",
     price: "$0",
     priceDetail: "forever",
-    requestsPerDay: 50,
+    requestsPerDay: 20,
     features: [
-      "50 requests per day",
+      "20 requests per day",
       "Basic model access",
       "Standard routing",
       "Community support",
