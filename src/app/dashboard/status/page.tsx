@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Bot, Clock, RefreshCw, Server } from "lucide-react";
 
 import {
@@ -12,6 +12,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
+import {
+  getDashboardModelsForTier,
+  type PlanTier,
+} from "@/lib/dashboard-model-catalog";
 
 interface ProviderStatus {
   name: string;
@@ -44,12 +48,36 @@ interface StatusData {
   last_updated: string;
 }
 
-const tierColors: Record<string, string> = {
+const tierColors: Record<PlanTier, string> = {
   free: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
   lite: "bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
-  pro: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
+  premium:
+    "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
   max: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
 };
+
+const tierOrder: PlanTier[] = ["free", "lite", "premium", "max"];
+
+const tierLabels: Record<PlanTier, string> = {
+  free: "Free",
+  lite: "Lite",
+  premium: "Premium (Pro)",
+  max: "Max",
+};
+
+function normalizeTier(tier: string): PlanTier | null {
+  if (tier === "pro") return "premium";
+  if (
+    tier === "free" ||
+    tier === "lite" ||
+    tier === "premium" ||
+    tier === "max"
+  ) {
+    return tier;
+  }
+
+  return null;
+}
 
 function StatusBadge({ status }: { status: string }) {
   if (["online", "healthy", "operational"].includes(status)) {
@@ -132,16 +160,50 @@ export default function StatusPage() {
     return () => window.clearInterval(interval);
   }, []);
 
+  const modelStatusById = useMemo(() => {
+    const statuses = new Map<string, ModelStatus>();
+
+    for (const model of status?.models ?? []) {
+      statuses.set(model.id, {
+        ...model,
+        tier: normalizeTier(model.tier) ?? model.tier,
+      });
+    }
+
+    return statuses;
+  }, [status]);
+
+  const tierSections = useMemo(
+    () =>
+      tierOrder.map((tier) => ({
+        tier,
+        label: tierLabels[tier],
+        models: getDashboardModelsForTier(tier).map((model) => {
+          const liveStatus = modelStatusById.get(model.id);
+
+          return {
+            id: model.id,
+            name: model.name,
+            provider: liveStatus?.provider ?? model.provider,
+            status: liveStatus?.status ?? "unknown",
+          };
+        }),
+      })),
+    [modelStatusById],
+  );
+
   const onlineProviders =
     status?.providers.filter((provider) =>
       ["online", "healthy"].includes(provider.status),
     ).length || 0;
   const totalProviders = status?.providers.length || 0;
-  const onlineModels =
-    status?.models.filter((model) =>
-      ["online", "healthy"].includes(model.status),
-    ).length || 0;
-  const totalModels = status?.models.length || 0;
+  const onlineModels = tierSections
+    .flatMap((section) => section.models)
+    .filter((model) => ["online", "healthy"].includes(model.status)).length;
+  const totalModels = tierSections.reduce(
+    (sum, section) => sum + section.models.length,
+    0,
+  );
   const activeIncidents =
     status?.incidents.filter((incident) => incident.status === "ongoing")
       .length || 0;
@@ -287,24 +349,19 @@ export default function StatusPage() {
                   ? Array.from({ length: 4 }).map((_, index) => (
                       <Skeleton className="h-24 w-full" key={index} />
                     ))
-                  : ["free", "lite", "pro", "max"].map((tier) => {
-                      const tierModels =
-                        status?.models.filter((model) => model.tier === tier) ||
-                        [];
-                      if (tierModels.length === 0) return null;
+                  : tierSections.map(({ tier, label, models }) => {
+                      if (models.length === 0) return null;
 
                       return (
                         <div className="space-y-3" key={tier}>
                           <div className="flex items-center gap-2">
-                            <Badge className={tierColors[tier]}>
-                              {tier.toUpperCase()}
-                            </Badge>
+                            <Badge className={tierColors[tier]}>{label}</Badge>
                             <span className="text-sm text-muted-foreground">
-                              {tierModels.length} models
+                              {models.length} models
                             </span>
                           </div>
                           <div className="space-y-2">
-                            {tierModels.map((model) => (
+                            {models.map((model) => (
                               <div
                                 className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3"
                                 key={model.id}
