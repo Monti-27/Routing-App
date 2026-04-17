@@ -121,14 +121,6 @@ const providerTree = [
     models: [
       {
         contextLength: "200K",
-        inputPrice: 1.1088,
-        label: "glm-5 highspeed",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-5-highspeed",
-        outputPrice: 3.542,
-      },
-      {
-        contextLength: "200K",
         inputPrice: 1.2,
         label: "glm-5.1 precision",
         logo: "/model-logos/route-zai.svg",
@@ -150,6 +142,14 @@ const providerTree = [
         logo: "/model-logos/route-zai.svg",
         modelId: "route/glm-5",
         outputPrice: 2.53,
+      },
+      {
+        contextLength: "200K",
+        inputPrice: 1.1088,
+        label: "glm-5 highspeed",
+        logo: "/model-logos/route-zai.svg",
+        modelId: "route/glm-5-highspeed",
+        outputPrice: 3.542,
       },
       {
         contextLength: "200K",
@@ -175,11 +175,11 @@ const providerTree = [
     models: [
       {
         contextLength: "131072",
-        inputPrice: 1.1,
-        label: "Qwen3.5 397B A17B",
+        inputPrice: 0.6,
+        label: "Qwen3.6 Plus",
         logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.5-397b-a17b",
-        outputPrice: 3.3,
+        modelId: "route/qwen3.6-plus",
+        outputPrice: 1.8,
       },
       {
         contextLength: "131072",
@@ -190,12 +190,12 @@ const providerTree = [
         outputPrice: 1.65,
       },
       {
-        contextLength: "131072",
-        inputPrice: 0.6,
-        label: "Qwen3.6 Plus",
+        contextLength: "262K",
+        inputPrice: 1.1,
+        label: "Qwen3.5 397B A17B",
         logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.6-plus",
-        outputPrice: 1.8,
+        modelId: "route/qwen3.5-397b-a17b",
+        outputPrice: 3.3,
       },
       {
         contextLength: "131072",
