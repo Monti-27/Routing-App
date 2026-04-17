@@ -173,7 +173,7 @@ function ModelCard({ model }: { model: Model }) {
   return (
     <Card className="rounded-xl border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-[#181818]">
       <div className="space-y-4 p-5">
-        <div className="flex items-start gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <ModelAvatar
               gradient={model.gradient}
@@ -181,13 +181,15 @@ function ModelCard({ model }: { model: Model }) {
               name={model.name}
             />
             <div className="min-w-0 space-y-1">
-              <h3 className="truncate text-base font-semibold">{model.name}</h3>
+              <h3 className="text-base font-semibold leading-tight break-words">
+                {model.name}
+              </h3>
               <p className="line-clamp-2 text-xs text-muted-foreground">
                 {model.description}
               </p>
             </div>
           </div>
-          <div className="ml-auto flex max-w-[9rem] shrink-0 flex-wrap justify-end gap-1.5">
+          <div className="flex max-w-full shrink-0 flex-wrap gap-1.5 sm:ml-auto sm:max-w-[9rem] sm:justify-end">
             {model.tiers.map((tier) => (
               <Badge
                 className={`h-6 rounded-full px-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] shadow-sm ${tierBadgeColors[tier]}`}
