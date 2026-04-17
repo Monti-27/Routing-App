@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
-  ArrowRight,
   Check,
   Coins,
   Crown,
@@ -24,362 +23,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth-context";
+import {
+  getDashboardModelsForTier,
+  type PlanTier,
+} from "@/lib/dashboard-model-catalog";
 import { cn } from "@/lib/utils";
-
-const modelLogos: Record<string, string> = {
-  "route/minimax-m2.5": "/model-logos/route-minimax.png",
-  "route/minimax-m2.7": "/model-logos/route-minimax.png",
-  "route/minimax-m2.5-highspeed": "/model-logos/route-minimax.png",
-  "route/minimax-m2.7-highspeed": "/model-logos/route-minimax.png",
-  "route/kimi-k2.5": "/model-logos/route-kimi.png",
-  "route/kimi-k2.5-highspeed": "/model-logos/route-kimi.png",
-  "route/glm-5": "/model-logos/route-zai.svg",
-  "route/glm-5.1": "/model-logos/route-zai.svg",
-  "route/glm-4.7": "/model-logos/route-zai.svg",
-  "route/glm-4.7-flash": "/model-logos/route-zai.svg",
-  "route/glm-5-highspeed": "/model-logos/route-zai.svg",
-  "route/deepseek-v3.2": "/model-logos/route-deepseek.png",
-  "route/deepseek-v3.2-speciale": "/model-logos/route-deepseek.png",
-  "route/deepseek-r1": "/model-logos/route-deepseek.png",
-  "route/qwen3.5-9b": "/model-logos/route-qwen.png",
-  "route/qwen3.5-397b-a17b": "/model-logos/route-qwen.png",
-  "route/mimo-v2-omni": "/model-logos/route-xiaomi.png",
-  "route/mimo-v2-pro": "/model-logos/route-xiaomi.png",
-  "route/gemma-4-31b-it": "/model-logos/route-google.svg",
-};
-
-interface ModelPricing {
-  model: string;
-  display_name: string;
-  tier: "free" | "lite" | "premium" | "max";
-  input_per_million: number;
-  output_per_million: number;
-}
-
-const staticModelPricing: ModelPricing[] = [
-  // Free tier models
-  {
-    model: "route/kimi-k2.5",
-    display_name: "Kimi-K2.5",
-    tier: "free",
-    input_per_million: 0.462,
-    output_per_million: 2.42,
-  },
-  {
-    model: "route/glm-5",
-    display_name: "glm-5",
-    tier: "free",
-    input_per_million: 0.792,
-    output_per_million: 2.53,
-  },
-  {
-    model: "route/deepseek-v3.2",
-    display_name: "DeepSeek-V3.2",
-    tier: "free",
-    input_per_million: 0.4928,
-    output_per_million: 0.7392,
-  },
-  {
-    model: "route/qwen3.5-9b",
-    display_name: "Qwen3.5-9B",
-    tier: "free",
-    input_per_million: 0.2,
-    output_per_million: 0.6,
-  },
-  {
-    model: "route/qwen3.5-397b-a17b",
-    display_name: "Qwen3.5-397B-A17B",
-    tier: "free",
-    input_per_million: 1.1,
-    output_per_million: 3.3,
-  },
-  {
-    model: "route/gemma-4-31b-it",
-    display_name: "Gemma-4-31B-IT",
-    tier: "free",
-    input_per_million: 0.10,
-    output_per_million: 0.30,
-  },
-
-  // Lite tier models (includes free models)
-  {
-    model: "route/minimax-m2.5",
-    display_name: "MiniMax-M2.5",
-    tier: "lite",
-    input_per_million: 0.193,
-    output_per_million: 1.238,
-  },
-  {
-    model: "route/kimi-k2.5",
-    display_name: "Kimi-K2.5",
-    tier: "lite",
-    input_per_million: 0.462,
-    output_per_million: 2.42,
-  },
-  {
-    model: "route/minimax-m2.7-highspeed",
-    display_name: "MiniMax-M2.7-Highspeed",
-    tier: "lite",
-    input_per_million: 0.33,
-    output_per_million: 1.32,
-  },
-  {
-    model: "route/kimi-k2.5-highspeed",
-    display_name: "Kimi-K2.5-Highspeed",
-    tier: "lite",
-    input_per_million: 0.6468,
-    output_per_million: 3.388,
-  },
-  {
-    model: "route/glm-5",
-    display_name: "glm-5",
-    tier: "lite",
-    input_per_million: 0.792,
-    output_per_million: 2.53,
-  },
-  {
-    model: "route/glm-5.1",
-    display_name: "glm-5.1",
-    tier: "lite",
-    input_per_million: 1.0,
-    output_per_million: 3.0,
-  },
-  {
-    model: "route/glm-5.1-precision",
-    display_name: "glm-5.1-precision",
-    tier: "lite",
-    input_per_million: 1.2,
-    output_per_million: 3.5,
-  },
-  {
-    model: "route/glm-4.7",
-    display_name: "glm-4.7",
-    tier: "lite",
-    input_per_million: 1.32,
-    output_per_million: 4.4,
-  },
-  {
-    model: "route/glm-4.7-flash",
-    display_name: "glm-4.7-flash",
-    tier: "lite",
-    input_per_million: 1.32,
-    output_per_million: 4.4,
-  },
-  {
-    model: "route/qwen3.5-9b",
-    display_name: "Qwen3.5-9B",
-    tier: "lite",
-    input_per_million: 0.2,
-    output_per_million: 0.6,
-  },
-  {
-    model: "route/qwen3.5-397b-a17b",
-    display_name: "Qwen3.5-397B-A17B",
-    tier: "lite",
-    input_per_million: 1.1,
-    output_per_million: 3.3,
-  },
-  {
-    model: "route/deepseek-v3.2",
-    display_name: "DeepSeek-V3.2",
-    tier: "lite",
-    input_per_million: 0.4928,
-    output_per_million: 0.7392,
-  },
-
-  // Premium tier models (includes lite and free models)
-  {
-    model: "route/minimax-m2.5",
-    display_name: "MiniMax-M2.5",
-    tier: "premium",
-    input_per_million: 0.193,
-    output_per_million: 1.238,
-  },
-  {
-    model: "route/minimax-m2.5-highspeed",
-    display_name: "MiniMax-M2.5 Highspeed",
-    tier: "premium",
-    input_per_million: 0.193,
-    output_per_million: 1.238,
-  },
-  {
-    model: "route/minimax-m2.7",
-    display_name: "MiniMax-M2.7",
-    tier: "premium",
-    input_per_million: 0.33,
-    output_per_million: 1.32,
-  },
-  {
-    model: "route/minimax-m2.7-highspeed",
-    display_name: "MiniMax-M2.7 Highspeed",
-    tier: "premium",
-    input_per_million: 0.33,
-    output_per_million: 1.32,
-  },
-  {
-    model: "route/kimi-k2.5",
-    display_name: "Kimi-K2.5",
-    tier: "premium",
-    input_per_million: 0.462,
-    output_per_million: 2.42,
-  },
-  {
-    model: "route/kimi-k2.5-highspeed",
-    display_name: "Kimi-K2.5-Highspeed",
-    tier: "premium",
-    input_per_million: 0.6468,
-    output_per_million: 3.388,
-  },
-  {
-    model: "route/glm-5",
-    display_name: "glm-5",
-    tier: "premium",
-    input_per_million: 0.792,
-    output_per_million: 2.53,
-  },
-  {
-    model: "route/glm-5.1",
-    display_name: "glm-5.1",
-    tier: "premium",
-    input_per_million: 1.0,
-    output_per_million: 3.0,
-  },
-  {
-    model: "route/glm-4.7",
-    display_name: "glm-4.7",
-    tier: "premium",
-    input_per_million: 1.32,
-    output_per_million: 4.4,
-  },
-  {
-    model: "route/glm-4.7-flash",
-    display_name: "glm-4.7-flash",
-    tier: "premium",
-    input_per_million: 1.32,
-    output_per_million: 4.4,
-  },
-  {
-    model: "route/qwen3.5-9b",
-    display_name: "Qwen3.5-9B",
-    tier: "premium",
-    input_per_million: 0.2,
-    output_per_million: 0.6,
-  },
-  {
-    model: "route/qwen3.5-397b-a17b",
-    display_name: "Qwen3.5-397B-A17B",
-    tier: "premium",
-    input_per_million: 1.1,
-    output_per_million: 3.3,
-  },
-  {
-    model: "route/deepseek-v3.2",
-    display_name: "DeepSeek-V3.2",
-    tier: "premium",
-    input_per_million: 0.4928,
-    output_per_million: 0.7392,
-  },
-  {
-    model: "route/mimo-v2-omni",
-    display_name: "MiMo-V2-Omni",
-    tier: "premium",
-    input_per_million: 0.55,
-    output_per_million: 1.65,
-  },
-  {
-    model: "route/mimo-v2-pro",
-    display_name: "MiMo-V2-Pro",
-    tier: "premium",
-    input_per_million: 0.45,
-    output_per_million: 1.35,
-  },
-
-  // Max tier models (all models)
-  {
-    model: "route/minimax-m2.7-highspeed",
-    display_name: "MiniMax-M2.7-Highspeed",
-    tier: "max",
-    input_per_million: 0.33,
-    output_per_million: 1.32,
-  },
-  {
-    model: "route/glm-5.1",
-    display_name: "glm-5.1",
-    tier: "max",
-    input_per_million: 1.0,
-    output_per_million: 3.0,
-  },
-  {
-    model: "route/glm-4.7",
-    display_name: "glm-4.7",
-    tier: "max",
-    input_per_million: 1.32,
-    output_per_million: 4.4,
-  },
-  {
-    model: "route/glm-4.7-flash",
-    display_name: "glm-4.7-flash",
-    tier: "max",
-    input_per_million: 1.32,
-    output_per_million: 4.4,
-  },
-  {
-    model: "route/qwen3.5-9b",
-    display_name: "Qwen3.5-9B",
-    tier: "max",
-    input_per_million: 0.2,
-    output_per_million: 0.6,
-  },
-  {
-    model: "route/qwen3.5-397b-a17b",
-    display_name: "Qwen3.5-397B-A17B",
-    tier: "max",
-    input_per_million: 1.1,
-    output_per_million: 3.3,
-  },
-  {
-    model: "route/glm-5-highspeed",
-    display_name: "glm-5-highspeed",
-    tier: "max",
-    input_per_million: 1.1088,
-    output_per_million: 3.542,
-  },
-  {
-    model: "route/kimi-k2.5-highspeed",
-    display_name: "Kimi-K2.5-Highspeed",
-    tier: "max",
-    input_per_million: 0.6468,
-    output_per_million: 3.388,
-  },
-  {
-    model: "route/deepseek-v3.2-speciale",
-    display_name: "DeepSeek-V3.2-Speciale",
-    tier: "max",
-    input_per_million: 0.55,
-    output_per_million: 0.82,
-  },
-  {
-    model: "route/deepseek-r1",
-    display_name: "DeepSeek-R1",
-    tier: "max",
-    input_per_million: 0.495,
-    output_per_million: 2.365,
-  },
-  {
-    model: "route/mimo-v2-omni",
-    display_name: "MiMo-V2-Omni",
-    tier: "max",
-    input_per_million: 0.55,
-    output_per_million: 1.65,
-  },
-  {
-    model: "route/mimo-v2-pro",
-    display_name: "MiMo-V2-Pro",
-    tier: "max",
-    input_per_million: 0.45,
-    output_per_million: 1.35,
-  },
-];
 
 const plans = [
   {
@@ -503,14 +151,12 @@ function formatPrice(perMillion: number) {
 }
 
 function ModelAvatar({
-  model,
   displayName,
+  logo,
 }: {
-  model: string;
   displayName: string;
+  logo?: string;
 }) {
-  const logo = modelLogos[model];
-
   if (logo) {
     return (
       <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
@@ -639,8 +285,7 @@ function PricingPlanCard({
 }
 
 export default function PricingPage() {
-  const [selectedTier, setSelectedTier] =
-    useState<(typeof plans)[number]["id"]>("free");
+  const [selectedTier, setSelectedTier] = useState<PlanTier>("free");
   const { user } = useAuth();
 
   const currentTier =
@@ -649,7 +294,7 @@ export default function PricingPage() {
       | undefined) ?? "free";
 
   const filteredModels = useMemo(
-    () => staticModelPricing.filter((model) => model.tier === selectedTier),
+    () => getDashboardModelsForTier(selectedTier),
     [selectedTier],
   );
 
@@ -732,25 +377,25 @@ export default function PricingPage() {
             </thead>
             <tbody>
               {filteredModels.map((model) => {
-                const tierStyles = tierMeta[model.tier];
+                const tierStyles = tierMeta[selectedTier];
 
                 return (
                   <tr
                     className="border-b border-zinc-200/80 last:border-0 dark:border-zinc-800/80"
-                    key={`${model.tier}-${model.model}`}
+                    key={`${selectedTier}-${model.id}`}
                   >
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <ModelAvatar
-                          displayName={model.display_name}
-                          model={model.model}
+                          displayName={model.name}
+                          logo={model.logo}
                         />
                         <div>
                           <p className="font-medium text-foreground">
-                            {model.display_name}
+                            {model.name}
                           </p>
                           <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-                            {model.model}
+                            {model.id}
                           </p>
                         </div>
                       </div>
@@ -763,14 +408,14 @@ export default function PricingPage() {
                         )}
                         variant="outline"
                       >
-                        {model.tier}
+                        {selectedTier}
                       </Badge>
                     </td>
                     <td className="px-5 py-4 text-sm font-medium text-foreground">
-                      {formatPrice(model.input_per_million)}
+                      {formatPrice(model.input_price)}
                     </td>
                     <td className="px-5 py-4 text-sm font-medium text-foreground">
-                      {formatPrice(model.output_per_million)}
+                      {formatPrice(model.output_price)}
                     </td>
                   </tr>
                 );
