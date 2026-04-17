@@ -2,7 +2,6 @@
 
 import {
   ChartBar,
-  CirclesThree,
   CreditCard,
   Gauge,
   GearSix,
@@ -24,7 +23,6 @@ const navigation: SidebarMenuItem[] = [
 const billingItems: SidebarMenuItem[] = [
   { href: "/dashboard/pricing", name: "Plans", icon: CreditCard },
   { href: "/dashboard/usage", name: "Usage", icon: ChartBar },
-  { href: "/dashboard/status", name: "Status", icon: CirclesThree },
 ];
 
 const footerItems: SidebarMenuItem[] = [
