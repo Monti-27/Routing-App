@@ -297,7 +297,7 @@ function ModelSection({
             <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {models.map((model) => (
                 <div
-                  className="flex items-center justify-between p-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
+                  className="flex flex-col gap-4 p-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
                   key={model.id}
                 >
                   <div className="flex items-center gap-3">
@@ -313,8 +313,8 @@ function ModelSection({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
+                  <div className="flex flex-col gap-2 pl-15">
+                    <div>
                       <p className="text-xs font-medium">
                         {model.context_length}
                       </p>
@@ -322,13 +322,13 @@ function ModelSection({
                         context
                       </p>
                     </div>
-                    <div className="min-w-[60px] text-right">
+                    <div>
                       <p className="text-xs font-medium">
                         ${model.input_price.toFixed(2)}
                       </p>
                       <p className="text-[10px] text-muted-foreground">input</p>
                     </div>
-                    <div className="min-w-[60px] text-right">
+                    <div>
                       <p className="text-xs font-medium">
                         ${model.output_price.toFixed(2)}
                       </p>
@@ -336,7 +336,7 @@ function ModelSection({
                         output
                       </p>
                     </div>
-                    <code className="hidden rounded bg-muted/50 px-1.5 py-1 font-mono text-[9px] text-muted-foreground lg:inline-block">
+                    <code className="w-fit rounded bg-muted/50 px-1.5 py-1 font-mono text-[9px] text-muted-foreground">
                       {model.id}
                     </code>
                   </div>
