@@ -183,6 +183,18 @@ export const dashboardModels: DashboardModel[] = [
     logo: "/model-logos/route-qwen.png",
   },
   {
+    id: "route/qwen3.5-plus",
+    name: "Qwen3.5 Plus",
+    description: "Premium Qwen model for stronger general-purpose output",
+    provider: "qwen",
+    context_length: "131072",
+    input_price: 0.55,
+    output_price: 1.65,
+    tiers: ["premium", "max"],
+    gradient: "amber",
+    logo: "/model-logos/route-qwen.png",
+  },
+  {
     id: "route/qwen3.6-plus",
     name: "Qwen3.6 Plus",
     description: "Premium Qwen model with stronger general-purpose performance",
