@@ -68,18 +68,18 @@ const DEV_USAGE_MODELS: ModelUsage[] = [
 
 const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
   daily: [
-    { date: "Mon", requests: 1480 },
-    { date: "Tue", requests: 1720 },
-    { date: "Wed", requests: 1580 },
-    { date: "Thu", requests: 1940 },
-    { date: "Fri", requests: 2210 },
+    { date: "00:00", requests: 1480 },
+    { date: "06:00", requests: 1720 },
+    { date: "12:00", requests: 1580 },
+    { date: "18:00", requests: 1940 },
+    { date: "Now", requests: 2210 },
   ],
   hourly: [
-    { date: "08:00", requests: 82 },
-    { date: "10:00", requests: 134 },
-    { date: "12:00", requests: 168 },
-    { date: "14:00", requests: 121 },
-    { date: "16:00", requests: 156 },
+    { date: "-50m", requests: 82 },
+    { date: "-40m", requests: 134 },
+    { date: "-30m", requests: 168 },
+    { date: "-20m", requests: 121 },
+    { date: "-10m", requests: 156 },
   ],
   monthly: [
     { date: "Week 1", requests: 4820 },
@@ -90,8 +90,8 @@ const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
 };
 
 const FALLBACK_PERIOD_BUCKETS: Record<Period, string[]> = {
-  daily: ["Mon", "Tue", "Wed", "Thu", "Fri"],
-  hourly: ["08:00", "10:00", "12:00", "14:00", "16:00"],
+  daily: ["00:00", "06:00", "12:00", "18:00", "Now"],
+  hourly: ["-50m", "-40m", "-30m", "-20m", "-10m"],
   monthly: ["Week 1", "Week 2", "Week 3", "Week 4"],
 };
 
@@ -326,6 +326,12 @@ export default function UsagePage() {
     () => usageByModelChartData.reduce((sum, item) => sum + item.value, 0),
     [usageByModelChartData],
   );
+  const requestDistributionDescription =
+    period === "daily"
+      ? "Breakdown of today's total requests across time-of-day buckets."
+      : period === "hourly"
+        ? "Breakdown of the current hour's total requests across recent minute buckets."
+        : "Breakdown of this month's total requests across weekly buckets.";
 
   return (
     <div className="space-y-6">
@@ -433,7 +439,7 @@ export default function UsagePage() {
               className="h-full"
               contentClassName="flex flex-1 flex-col px-4 pb-2 pt-3"
               title="Request distribution"
-              description="Relative request volume for the current reporting selection."
+              description={requestDistributionDescription}
             >
               <div className="mt-auto flex h-[380px] items-end gap-3">
                 {chartData.map((entry) => (
