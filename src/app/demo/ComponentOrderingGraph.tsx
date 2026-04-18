@@ -8,6 +8,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { dashboardModels } from "@/lib/dashboard-model-catalog";
 import { CopyButton } from "./CopyButton";
 
 type NodeId = string;
@@ -40,7 +41,14 @@ type GraphEdge = {
   path: string;
 };
 
-type ProviderId = (typeof providerTree)[number]["id"];
+type ProviderId =
+  | "minimax"
+  | "kimi"
+  | "zai"
+  | "qwen"
+  | "deepseek"
+  | "mimo"
+  | "google";
 
 const ROOT_ID = "routing-run";
 const GRAPH_HEIGHT = 620;
@@ -54,212 +62,50 @@ const PROVIDER_ROW_Y = 212;
 const MODEL_ROW_BASE_Y = 380;
 const MODEL_ROW_STAGGER = 20;
 
-const providerTree = [
-  {
-    id: "minimax",
-    label: "MiniMax",
-    models: [
-      {
-        contextLength: "100000",
-        inputPrice: 0.33,
-        label: "MiniMax M2.7 Highspeed",
-        logo: "/model-logos/route-minimax.png",
-        modelId: "route/minimax-m2.7-highspeed",
-        outputPrice: 1.32,
-      },
-      {
-        contextLength: "100000",
-        inputPrice: 0.33,
-        label: "MiniMax M2.7",
-        logo: "/model-logos/route-minimax.png",
-        modelId: "route/minimax-m2.7",
-        outputPrice: 1.32,
-      },
-      {
-        contextLength: "100000",
-        inputPrice: 0.193,
-        label: "MiniMax M2.5 Highspeed",
-        logo: "/model-logos/route-minimax.png",
-        modelId: "route/minimax-m2.5-highspeed",
-        outputPrice: 1.238,
-      },
-      {
-        contextLength: "100000",
-        inputPrice: 0.193,
-        label: "MiniMax M2.5",
-        logo: "/model-logos/route-minimax.png",
-        modelId: "route/minimax-m2.5",
-        outputPrice: 1.238,
-      },
-    ],
-  },
-  {
-    id: "kimi",
-    label: "Kimi",
-    models: [
-      {
-        contextLength: "131K",
-        inputPrice: 0.6468,
-        label: "Kimi K2.5 Highspeed",
-        logo: "/model-logos/route-kimi.png",
-        modelId: "route/kimi-k2.5-highspeed",
-        outputPrice: 3.388,
-      },
-      {
-        contextLength: "262K",
-        inputPrice: 0.462,
-        label: "Kimi K2.5",
-        logo: "/model-logos/route-kimi.png",
-        modelId: "route/kimi-k2.5",
-        outputPrice: 2.42,
-      },
-    ],
-  },
-  {
-    id: "zai",
-    label: "Z.ai",
-    models: [
-      {
-        contextLength: "200K",
-        inputPrice: 1.2,
-        label: "glm-5.1 precision",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-5.1-precision",
-        outputPrice: 3.5,
-      },
-      {
-        contextLength: "200K",
-        inputPrice: 1,
-        label: "glm-5.1",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-5.1",
-        outputPrice: 3,
-      },
-      {
-        contextLength: "200K",
-        inputPrice: 0.792,
-        label: "glm-5",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-5",
-        outputPrice: 2.53,
-      },
-      {
-        contextLength: "200K",
-        inputPrice: 1.1088,
-        label: "glm-5 highspeed",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-5-highspeed",
-        outputPrice: 3.542,
-      },
-      {
-        contextLength: "200K",
-        inputPrice: 1.32,
-        label: "glm-4.7 flash",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-4.7-flash",
-        outputPrice: 4.4,
-      },
-      {
-        contextLength: "200K",
-        inputPrice: 1.32,
-        label: "glm-4.7",
-        logo: "/model-logos/route-zai.svg",
-        modelId: "route/glm-4.7",
-        outputPrice: 4.4,
-      },
-    ],
-  },
-  {
-    id: "qwen",
-    label: "Qwen",
-    models: [
-      {
-        contextLength: "131072",
-        inputPrice: 0.6,
-        label: "Qwen3.6 Plus",
-        logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.6-plus",
-        outputPrice: 1.8,
-      },
-      {
-        contextLength: "131072",
-        inputPrice: 0.55,
-        label: "Qwen3.5 Plus",
-        logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.5-plus",
-        outputPrice: 1.65,
-      },
-      {
-        contextLength: "262K",
-        inputPrice: 1.1,
-        label: "Qwen3.5 397B A17B",
-        logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.5-397b-a17b",
-        outputPrice: 3.3,
-      },
-      {
-        contextLength: "131072",
-        inputPrice: 0.2,
-        label: "Qwen3.5 9B",
-        logo: "/model-logos/route-qwen.png",
-        modelId: "route/qwen3.5-9b",
-        outputPrice: 0.6,
-      },
-    ],
-  },
-  {
-    id: "deepseek",
-    label: "DeepSeek",
-    models: [
-      {
-        contextLength: "163K",
-        inputPrice: 0.495,
-        label: "DeepSeek R1",
-        logo: "/model-logos/route-deepseek.png",
-        modelId: "route/deepseek-r1",
-        outputPrice: 2.365,
-      },
-      {
-        contextLength: "164K",
-        inputPrice: 0.55,
-        label: "DeepSeek V3.2 Speciale",
-        logo: "/model-logos/route-deepseek.png",
-        modelId: "route/deepseek-v3.2-speciale",
-        outputPrice: 0.82,
-      },
-      {
-        contextLength: "164K",
-        inputPrice: 0.4928,
-        label: "DeepSeek V3.2",
-        logo: "/model-logos/route-deepseek.png",
-        modelId: "route/deepseek-v3.2",
-        outputPrice: 0.7392,
-      },
-    ],
-  },
-  {
-    id: "mimo",
-    label: "MiMo",
-    models: [
-      {
-        contextLength: "256000",
-        inputPrice: 0.55,
-        label: "MiMo V2 Omni",
-        logo: "/model-logos/route-xiaomi.png",
-        modelId: "route/mimo-v2-omni",
-        outputPrice: 1.65,
-      },
-      {
-        contextLength: "256000",
-        inputPrice: 0.45,
-        label: "MiMo V2 Pro",
-        logo: "/model-logos/route-xiaomi.png",
-        modelId: "route/mimo-v2-pro",
-        outputPrice: 1.35,
-      },
-    ],
-  },
-] as const;
+const providerConfigs: Array<{ id: ProviderId; label: string }> = [
+  { id: "minimax", label: "MiniMax" },
+  { id: "kimi", label: "Kimi" },
+  { id: "zai", label: "Z.ai" },
+  { id: "qwen", label: "Qwen" },
+  { id: "deepseek", label: "DeepSeek" },
+  { id: "mimo", label: "MiMo" },
+  { id: "google", label: "Google" },
+];
+
+const getProviderId = (provider: string): ProviderId => {
+  switch (provider) {
+    case "chutes":
+    case "deepseek":
+      return "deepseek";
+    case "opencode":
+      return "mimo";
+    case "google":
+    case "kimi":
+    case "minimax":
+    case "qwen":
+    case "zai":
+      return provider;
+    default:
+      throw new Error(`Unknown provider: ${provider}`);
+  }
+};
+
+const providerTree = providerConfigs
+  .map((provider) => ({
+    id: provider.id,
+    label: provider.label,
+    models: dashboardModels
+      .filter((model) => getProviderId(model.provider) === provider.id)
+      .map((model) => ({
+        contextLength: model.context_length,
+        inputPrice: model.input_price,
+        label: model.name,
+        logo: model.logo ?? "",
+        modelId: model.id,
+        outputPrice: model.output_price,
+      })),
+  }))
+  .filter((provider) => provider.models.length > 0);
 
 function slugify(value: string) {
   return value
