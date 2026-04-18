@@ -4,77 +4,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { api, type User } from "@/lib/api";
 
-const PLAN_TIER_PRIORITY = {
-  free: 0,
-  lite: 1,
-  premium: 2,
-  max: 3,
-} as const;
-
-type PlanTier = keyof typeof PLAN_TIER_PRIORITY;
-
-function normalizePlanTier(value: string | null | undefined): PlanTier | null {
-  const tier = value?.toLowerCase();
-
-  if (!tier) {
-    return null;
-  }
-
-  return tier in PLAN_TIER_PRIORITY ? (tier as PlanTier) : null;
-}
-
-function inferPlanTierFromLimit(
-  limit: number | null | undefined,
-): PlanTier | null {
-  if (typeof limit !== "number") {
-    return null;
-  }
-
-  if (limit >= 2500) {
-    return "max";
-  }
-
-  if (limit >= 1000) {
-    return "premium";
-  }
-
-  if (limit >= 400) {
-    return "lite";
-  }
-
-  return "free";
-}
-
-async function withEffectivePlanTier(userData: User): Promise<User> {
-  try {
-    const requestsData = await api.requests.get();
-    const candidates = [
-      normalizePlanTier(userData.plan_tier),
-      normalizePlanTier(requestsData.plan_tier),
-      inferPlanTierFromLimit(requestsData.requests_limit_today),
-    ].filter((tier): tier is PlanTier => tier !== null);
-
-    const effectiveTier = candidates.reduce<PlanTier>(
-      (highestTier, tier) =>
-        PLAN_TIER_PRIORITY[tier] > PLAN_TIER_PRIORITY[highestTier]
-          ? tier
-          : highestTier,
-      "free",
-    );
-
-    if (effectiveTier === userData.plan_tier.toLowerCase()) {
-      return userData;
-    }
-
-    return {
-      ...userData,
-      plan_tier: effectiveTier,
-    };
-  } catch {
-    return userData;
-  }
-}
-
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -139,10 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Clean URL of any OAuth params on mount
-    if (
-      typeof window !== "undefined" &&
-      window.location.search.includes("user=")
-    ) {
+    if (typeof window !== "undefined" && window.location.search.includes("user=")) {
       window.history.replaceState({}, "", window.location.pathname);
     }
 
@@ -153,13 +79,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sessionStorage.removeItem("oauth_user");
         try {
           const userData = JSON.parse(oauthUser);
-          void withEffectivePlanTier(userData)
-            .then((normalizedUser) => {
-              setUser(normalizedUser);
-            })
-            .finally(() => {
-              setIsLoading(false);
-            });
+          setUser(userData);
+          setIsLoading(false);
           return;
         } catch (e) {
           console.error("Failed to parse oauth_user:", e);
@@ -173,7 +94,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (accessToken && refreshToken) {
       api.auth
         .me()
-        .then(withEffectivePlanTier)
         .then((userData) => {
           setUser(userData);
         })
@@ -188,6 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoading(false);
         });
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -198,8 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const { user: userData } = await api.auth.login(email, otp);
-    const normalizedUser = await withEffectivePlanTier(userData);
-    setUser(normalizedUser);
+    setUser(userData);
   };
 
   const register = async (
@@ -223,8 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       name,
     );
-    const normalizedUser = await withEffectivePlanTier(userData);
-    setUser(normalizedUser);
+    setUser(userData);
   };
 
   const logout = async () => {
@@ -245,8 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const userData = await api.auth.me();
-      const normalizedUser = await withEffectivePlanTier(userData);
-      setUser(normalizedUser);
+      setUser(userData);
     } catch {}
   };
 
