@@ -831,6 +831,27 @@ export default function PricingPage() {
             routing.run routes for MiniMax, GLM, Kimi, and more.
           </p>
 
+          <p className="mx-auto max-w-3xl text-sm leading-6 text-muted-foreground">
+            Whop is currently having issues, so plan purchases are not auto-
+            upgrading accounts right now. After you buy, please message us on{" "}
+            <a
+              href="https://discord.gg/routing"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="text-foreground underline underline-offset-4"
+            >
+              Discord
+            </a>{" "}
+            for instant support so we can upgrade your account, or email{" "}
+            <a
+              href="mailto:support@routing.run"
+              className="text-foreground underline underline-offset-4"
+            >
+              support@routing.run
+            </a>{" "}
+            and we will reply within 24 hours.
+          </p>
+
           <div className="flex items-center justify-center gap-4 pt-4">
             <span
               className={cn(
@@ -980,27 +1001,6 @@ export default function PricingPage() {
                    )}
                  </Button>
 
-                 {plan.id !== "free" && (
-                   <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                     If you buy a plan and Whop gives you trouble, message us on{" "}
-                     <a
-                       href="https://discord.gg/routing"
-                       rel="noopener noreferrer"
-                       target="_blank"
-                       className="text-foreground underline underline-offset-4"
-                     >
-                       Discord
-                     </a>{" "}
-                     for instant support or email{" "}
-                     <a
-                       href="mailto:support@routing.run"
-                       className="text-foreground underline underline-offset-4"
-                     >
-                       support@routing.run
-                     </a>{" "}
-                     and we will reply within 24 hours.
-                   </p>
-                 )}
                </div>
              </motion.div>
            ))}

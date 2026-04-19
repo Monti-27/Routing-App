@@ -281,27 +281,6 @@ function PricingPlanCard({
             : `Upgrade to ${plan.name}`}
       </Button>
 
-      {plan.id !== "free" && !isCurrentPlan && (
-        <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          If Whop gives you trouble after buying, message us on{" "}
-          <a
-            className="text-foreground underline underline-offset-4"
-            href="https://discord.gg/routing"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Discord
-          </a>{" "}
-          for instant support or email{" "}
-          <a
-            className="text-foreground underline underline-offset-4"
-            href="mailto:support@routing.run"
-          >
-            support@routing.run
-          </a>{" "}
-          and we will reply within 24 hours.
-        </p>
-      )}
     </div>
   );
 }
@@ -330,6 +309,27 @@ export default function PricingPage() {
         meta={<SubtleBadge>Current: {currentTier}</SubtleBadge>}
         title="Pricing"
       />
+
+      <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-6 text-muted-foreground dark:border-zinc-800 dark:bg-zinc-900/40">
+        Whop is currently having issues, so plan purchases are not auto-
+        upgrading accounts right now. After you buy, please message us on{" "}
+        <a
+          className="text-foreground underline underline-offset-4"
+          href="https://discord.gg/routing"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Discord
+        </a>{" "}
+        for instant support so we can upgrade your account, or email{" "}
+        <a
+          className="text-foreground underline underline-offset-4"
+          href="mailto:support@routing.run"
+        >
+          support@routing.run
+        </a>{" "}
+        and we will reply within 24 hours.
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => (
