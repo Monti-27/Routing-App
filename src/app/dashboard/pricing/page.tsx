@@ -280,6 +280,28 @@ function PricingPlanCard({
             ? "Manage plan"
             : `Upgrade to ${plan.name}`}
       </Button>
+
+      {plan.id !== "free" && !isCurrentPlan && (
+        <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          If Whop gives you trouble after buying, message us on{" "}
+          <a
+            className="text-foreground underline underline-offset-4"
+            href="https://discord.gg/routing"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Discord
+          </a>{" "}
+          for instant support or email{" "}
+          <a
+            className="text-foreground underline underline-offset-4"
+            href="mailto:support@routing.run"
+          >
+            support@routing.run
+          </a>{" "}
+          and we will reply within 24 hours.
+        </p>
+      )}
     </div>
   );
 }

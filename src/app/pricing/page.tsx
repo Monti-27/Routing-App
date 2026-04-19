@@ -960,29 +960,51 @@ export default function PricingPage() {
                       "bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600",
                   )}
                   variant={plan.popular ? "default" : "outline"}
-                >
-                  {plan.checkoutUrl ? (
-                    <a href={plan.checkoutUrl} rel="noopener" target="_blank">
-                      {plan.id === "free"
-                        ? "Start Free"
+                 >
+                   {plan.checkoutUrl ? (
+                     <a href={plan.checkoutUrl} rel="noopener" target="_blank">
+                       {plan.id === "free"
+                         ? "Start Free"
                         : plan.id === "max"
                           ? "Get Max"
                           : "Get Started"}
                     </a>
                   ) : (
-                    <span>
-                      {plan.id === "free"
-                        ? "Start Free"
-                        : plan.id === "max"
-                          ? "Get Max"
+                     <span>
+                       {plan.id === "free"
+                         ? "Start Free"
+                         : plan.id === "max"
+                           ? "Get Max"
                           : "Get Started"}
-                    </span>
-                  )}
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+                     </span>
+                   )}
+                 </Button>
+
+                 {plan.id !== "free" && (
+                   <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                     If you buy a plan and Whop gives you trouble, message us on{" "}
+                     <a
+                       href="https://discord.gg/routing"
+                       rel="noopener noreferrer"
+                       target="_blank"
+                       className="text-foreground underline underline-offset-4"
+                     >
+                       Discord
+                     </a>{" "}
+                     for instant support or email{" "}
+                     <a
+                       href="mailto:support@routing.run"
+                       className="text-foreground underline underline-offset-4"
+                     >
+                       support@routing.run
+                     </a>{" "}
+                     and we will reply within 24 hours.
+                   </p>
+                 )}
+               </div>
+             </motion.div>
+           ))}
+         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
