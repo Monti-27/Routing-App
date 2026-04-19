@@ -118,7 +118,7 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "200K",
     input_price: 1,
     output_price: 3,
-    tiers: ["premium", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-zai.svg",
   },
