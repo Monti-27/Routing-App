@@ -184,6 +184,11 @@ function ModelCard({ model }: { model: Model }) {
               <h3 className="text-base font-semibold leading-tight break-words">
                 {model.name}
               </h3>
+              {model.request_multiplier ? (
+                <Badge className="w-fit" variant="secondary">
+                  {model.request_multiplier}x requests
+                </Badge>
+              ) : null}
               <p className="line-clamp-2 text-xs text-muted-foreground">
                 {model.description}
               </p>
@@ -308,6 +313,11 @@ function ModelSection({
                     />
                     <div>
                       <p className="text-sm font-medium">{model.name}</p>
+                      {model.request_multiplier ? (
+                        <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-brand-coral">
+                          {model.request_multiplier}x requests
+                        </p>
+                      ) : null}
                       <p className="text-xs text-muted-foreground">
                         {model.provider}
                       </p>

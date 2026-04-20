@@ -17,7 +17,7 @@ import {
 
 const modelLogos: Record<
   string,
-  { logo: string; name: string; provider: string }
+  { logo: string; name: string; provider: string; requestMultiplier?: number }
 > = {
   "route/minimax-m2.5": {
     logo: "/model-logos/route-minimax.png",
@@ -88,11 +88,13 @@ const modelLogos: Record<
     logo: "/model-logos/route-qwen.png",
     name: "Qwen3.5-Plus",
     provider: "Qwen",
+    requestMultiplier: 2,
   },
   "route/qwen3.6-plus": {
     logo: "/model-logos/route-qwen.png",
     name: "Qwen3.6-Plus",
     provider: "Qwen",
+    requestMultiplier: 2,
   },
   "route/deepseek-v3.2": {
     logo: "/model-logos/route-deepseek.png",
@@ -113,11 +115,19 @@ const modelLogos: Record<
     logo: "/model-logos/route-xiaomi.png",
     name: "MiMo-V2-Pro",
     provider: "Xiaomi",
+    requestMultiplier: 2,
   },
   "route/mimo-v2-omni": {
     logo: "/model-logos/route-xiaomi.png",
     name: "MiMo-V2-Omni",
     provider: "Xiaomi",
+    requestMultiplier: 2,
+  },
+  "route/mimo-v2-flash": {
+    logo: "/model-logos/route-xiaomi.png",
+    name: "MiMo-V2-Flash",
+    provider: "Xiaomi",
+    requestMultiplier: 2,
   },
   "route/gemma-4-31b-it": {
     logo: "/model-logos/route-google.svg",
@@ -370,13 +380,18 @@ export default function ModelsPage() {
                         height={48}
                         className="w-12 h-12 object-contain rounded-lg bg-white/5 p-1"
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold truncate">
-                          {model.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {model.provider}
-                        </p>
+                       <div className="flex-1 min-w-0">
+                         <p className="text-white font-semibold truncate">
+                           {model.name}
+                         </p>
+                         {model.requestMultiplier ? (
+                           <p className="text-[10px] font-medium uppercase tracking-wide text-amber-300">
+                             {model.requestMultiplier}x requests
+                           </p>
+                         ) : null}
+                         <p className="text-xs text-gray-500">
+                           {model.provider}
+                         </p>
                       </div>
                       <Check className="h-5 w-5 text-emerald-500 flex-shrink-0" />
                     </div>
@@ -403,6 +418,11 @@ export default function ModelsPage() {
                           <p className="text-white font-semibold truncate">
                             {model.name}
                           </p>
+                          {model.requestMultiplier ? (
+                            <p className="text-[10px] font-medium uppercase tracking-wide text-amber-300">
+                              {model.requestMultiplier}x requests
+                            </p>
+                          ) : null}
                           <p className="text-xs text-gray-500">
                             {model.provider}
                           </p>

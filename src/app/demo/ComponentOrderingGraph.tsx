@@ -21,6 +21,7 @@ type ModelNodeMeta = {
   modelId: string;
   outputPrice: number;
   providerLabel: string;
+  requestMultiplier?: number;
 };
 
 type GraphNode = {
@@ -103,6 +104,7 @@ const providerTree = providerConfigs
         logo: model.logo ?? "",
         modelId: model.id,
         outputPrice: model.output_price,
+        requestMultiplier: model.request_multiplier,
       })),
   }))
   .filter((provider) => provider.models.length > 0);
@@ -185,6 +187,7 @@ function buildGraph(activeProvider: ProviderId | null) {
           modelId: model.modelId,
           outputPrice: model.outputPrice,
           providerLabel: provider.label,
+          requestMultiplier: model.requestMultiplier,
         },
         level: 2,
         x,
@@ -410,6 +413,11 @@ export default function ComponentOrderingGraph() {
                         <p className="truncate text-sm font-semibold text-foreground">
                           {model.label}
                         </p>
+                        {model.requestMultiplier ? (
+                          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-brand-coral">
+                            {model.requestMultiplier}x requests
+                          </p>
+                        ) : null}
                         <p className="text-xs text-muted-foreground">
                           {activeProviderData.label}
                         </p>
@@ -639,6 +647,11 @@ export default function ComponentOrderingGraph() {
                                   <p className="text-sm text-muted-foreground">
                                     {node.meta.providerLabel}
                                   </p>
+                                  {node.meta.requestMultiplier ? (
+                                    <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-brand-coral">
+                                      {node.meta.requestMultiplier}x requests
+                                    </p>
+                                  ) : null}
                                 </div>
                                 <div className="space-y-1 text-sm">
                                   <p>

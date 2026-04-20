@@ -8,6 +8,7 @@ export interface DashboardModel {
   context_length: string;
   input_price: number;
   output_price: number;
+  request_multiplier?: number;
   tiers: PlanTier[];
   gradient: "purple" | "amber" | "coral";
   logo?: string;
@@ -190,6 +191,7 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "131072",
     input_price: 0.55,
     output_price: 1.65,
+    request_multiplier: 2,
     tiers: ["premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-qwen.png",
@@ -202,6 +204,7 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "131072",
     input_price: 0.6,
     output_price: 1.8,
+    request_multiplier: 2,
     tiers: ["premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-qwen.png",
@@ -250,6 +253,7 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "256000",
     input_price: 0.55,
     output_price: 1.65,
+    request_multiplier: 2,
     tiers: ["premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-xiaomi.png",
@@ -262,6 +266,7 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "256000",
     input_price: 0.45,
     output_price: 1.35,
+    request_multiplier: 2,
     tiers: ["premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-xiaomi.png",

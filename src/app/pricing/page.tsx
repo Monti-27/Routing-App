@@ -14,6 +14,7 @@ interface ModelPricing {
   tier: string;
   input_per_million: number;
   output_per_million: number;
+  request_multiplier?: number;
 }
 
 const modelLogos: Record<string, string> = {
@@ -37,6 +38,8 @@ const modelLogos: Record<string, string> = {
   "route/qwen3-coder-next": "/model-logos/route-qwen.png",
   "route/qwen3-32b": "/model-logos/route-qwen.png",
   "route/qwen3-next-80b": "/model-logos/route-qwen.png",
+  "route/qwen3.5-plus": "/model-logos/route-qwen.png",
+  "route/qwen3.6-plus": "/model-logos/route-qwen.png",
   "route/gpt-oss-120b": "/model-logos/route-openai.svg",
   "route/hermes-3-llama-3.1-405b": "/model-logos/route-nous.png",
   "route/llama-3.2-3b-instruct": "/model-logos/route-meta.png",
@@ -411,6 +414,22 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 1.21,
   },
   {
+    model: "route/qwen3.5-plus",
+    display_name: "Qwen3.5-Plus",
+    tier: "pro",
+    input_per_million: 0.55,
+    output_per_million: 1.65,
+    request_multiplier: 2,
+  },
+  {
+    model: "route/qwen3.6-plus",
+    display_name: "Qwen3.6-Plus",
+    tier: "pro",
+    input_per_million: 0.6,
+    output_per_million: 1.8,
+    request_multiplier: 2,
+  },
+  {
     model: "route/grok-4-fast",
     display_name: "Grok-4-Fast",
     tier: "pro",
@@ -430,6 +449,7 @@ const staticModelPricing: ModelPricing[] = [
     tier: "pro",
     input_per_million: 0.55,
     output_per_million: 1.65,
+    request_multiplier: 2,
   },
   {
     model: "route/mimo-v2-pro",
@@ -437,6 +457,7 @@ const staticModelPricing: ModelPricing[] = [
     tier: "pro",
     input_per_million: 0.45,
     output_per_million: 1.35,
+    request_multiplier: 2,
   },
 
   // Max tier models
@@ -630,6 +651,22 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 1.21,
   },
   {
+    model: "route/qwen3.5-plus",
+    display_name: "Qwen3.5-Plus",
+    tier: "max",
+    input_per_million: 0.55,
+    output_per_million: 1.65,
+    request_multiplier: 2,
+  },
+  {
+    model: "route/qwen3.6-plus",
+    display_name: "Qwen3.6-Plus",
+    tier: "max",
+    input_per_million: 0.6,
+    output_per_million: 1.8,
+    request_multiplier: 2,
+  },
+  {
     model: "route/grok-4-fast",
     display_name: "Grok-4-Fast",
     tier: "max",
@@ -663,6 +700,7 @@ const staticModelPricing: ModelPricing[] = [
     tier: "max",
     input_per_million: 0.55,
     output_per_million: 1.65,
+    request_multiplier: 2,
   },
   {
     model: "route/mimo-v2-pro",
@@ -670,6 +708,7 @@ const staticModelPricing: ModelPricing[] = [
     tier: "max",
     input_per_million: 0.45,
     output_per_million: 1.35,
+    request_multiplier: 2,
   },
   {
     model: "route/mimo-v2-flash",
@@ -677,6 +716,7 @@ const staticModelPricing: ModelPricing[] = [
     tier: "max",
     input_per_million: 0.099,
     output_per_million: 0.319,
+    request_multiplier: 2,
   },
 ];
 
@@ -742,7 +782,9 @@ const plans = [
     features: [
       "All lite models",
       "glm-4.5-air & variants",
+      "Qwen3.5 Plus & Qwen3.6 Plus (2x requests)",
       "Qwen3-Coder & Coder-Next",
+      "MiMo-V2-Omni & MiMo-V2-Pro (2x requests)",
       "MiniMax-Image-1 generation",
       "Grok-4-Fast & Grok-4.20-Beta",
       "Grok-4.20-Multi-Agent-Beta",
@@ -764,7 +806,8 @@ const plans = [
     features: [
       "All models unlocked",
       "MiniMax-M2.7 Highspeed (~100 tps)",
-      "Mimo-V2-Omni/Pro/Flash",
+      "MiMo-V2-Omni/Pro/Flash (2x requests)",
+      "Qwen3.5 Plus & Qwen3.6 Plus (2x requests)",
       "DeepSeek-V3.2-Speciale",
       "DeepSeek-R1",
       "Grok-4.20-Beta & Multi-Agent",
@@ -1068,6 +1111,11 @@ export default function PricingPage() {
                         <p className="text-sm font-semibold truncate">
                           {m.display_name}
                         </p>
+                        {m.request_multiplier ? (
+                          <p className="text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                            {m.request_multiplier}x requests
+                          </p>
+                        ) : null}
                       </div>
                       <div className="text-right shrink-0">
                         <div className="flex items-center gap-1">
