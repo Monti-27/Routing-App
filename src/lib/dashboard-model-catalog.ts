@@ -6,6 +6,8 @@ export interface DashboardModel {
   description: string;
   provider: string;
   context_length: string;
+  context_size?: number;
+  max_output_tokens?: number;
   input_price: number;
   output_price: number;
   request_multiplier?: number;
@@ -92,7 +94,9 @@ export const dashboardModels: DashboardModel[] = [
     name: "Kimi K2.6 Precision (INT4)",
     description: "Kimi K2.6 precision variant with INT4 quantization",
     provider: "kimi",
-    context_length: "131K",
+    context_length: "262144",
+    context_size: 262144,
+    max_output_tokens: 262144,
     input_price: 0.462,
     output_price: 2.42,
     request_multiplier: 2,
