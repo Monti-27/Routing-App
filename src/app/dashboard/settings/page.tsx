@@ -2,22 +2,29 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Coins, CreditCard, Loader2, Shield, UserRound } from "lucide-react";
-
 import {
-  PageHeader,
-  StatCard,
-  SurfaceCard,
-} from "@/components/dashboard/page-ui";
+  Bell,
+  CreditCard,
+  KeyRound,
+  Loader2,
+  Lock,
+  LogOut,
+  Shield,
+  Trash2,
+  User,
+} from "lucide-react";
+
+import { PageHeader, SurfaceCard } from "@/components/dashboard/page-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -27,131 +34,25 @@ import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
 
-const CREDITS_PACKAGES = [
-  { amount: 5, price: 5.0 },
-  { amount: 10, price: 9.5 },
-  { amount: 25, price: 22.0 },
-  { amount: 50, price: 40.0 },
+const PLANS = [
+  { id: "free", name: "Free", price: "$0", period: "forever", rpm: 20 },
+  { id: "lite", name: "Lite", price: "$10", period: "/mo", rpm: 400 },
+  { id: "premium", name: "Premium", price: "$20", period: "/mo", rpm: 1000 },
+  { id: "max", name: "Max", price: "$50", period: "/mo", rpm: 2500 },
 ] as const;
 
-const PLANS = [
-  {
-    id: "free",
-    name: "Free",
-    price: "$0",
-    priceDetail: "forever",
-    requestsPerDay: 20,
-    features: [
-      "20 requests per day",
-      "Basic model access",
-      "Standard routing",
-      "Community support",
-    ],
-  },
-  {
-    id: "lite",
-    name: "Lite",
-    price: "$10",
-    priceDetail: "/month",
-    requestsPerDay: 400,
-    features: [
-      "400 requests per day",
-      "Extended model access",
-      "Priority routing",
-      "Email support",
-    ],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: "$20",
-    priceDetail: "/month",
-    requestsPerDay: 1000,
-    features: [
-      "1,000 requests per day",
-      "All Lite models + more",
-      "Fastest routing",
-      "Priority support",
-    ],
-  },
-  {
-    id: "max",
-    name: "Max",
-    price: "$50",
-    priceDetail: "/month",
-    requestsPerDay: 2500,
-    features: [
-      "2,500 requests per day",
-      "All models access",
-      "Fastest routing",
-      "Dedicated support",
-    ],
-  },
+const TABS = [
+  { id: "general", label: "General", icon: User },
+  { id: "billing", label: "Billing", icon: CreditCard },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "security", label: "Security", icon: Shield },
 ] as const;
+
+type Tab = (typeof TABS)[number]["id"];
 
 function getAccessToken(): string | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
+  if (typeof window === "undefined") return null;
   return localStorage.getItem("access_token");
-}
-
-function planTone(planTier: string): string {
-  if (planTier === "max") return "border-[#8350e8]/30 bg-[#8350e8]/10";
-  if (planTier === "premium") return "border-[#1470e3]/30 bg-[#1470e3]/10";
-  if (planTier === "lite") return "border-[#1470e3]/18 bg-[#1470e3]/7";
-  return "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]";
-}
-
-function ModalShell({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <Card className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-[#181818]">
-        <CardHeader>
-          <CardTitle className="text-xl text-foreground">{title}</CardTitle>
-          <CardDescription className="leading-6">{description}</CardDescription>
-        </CardHeader>
-        <CardContent>{children}</CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function SettingRow({
-  label,
-  description,
-  action,
-  danger = false,
-}: {
-  label: string;
-  description: string;
-  action: React.ReactNode;
-  danger?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818] md:flex-row md:items-center md:justify-between">
-      <div className="space-y-1">
-        <p
-          className={`text-sm font-medium ${danger ? "text-red-400" : "text-foreground"}`}
-        >
-          {label}
-        </p>
-        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-          {description}
-        </p>
-      </div>
-      <div className="shrink-0">{action}</div>
-    </div>
-  );
 }
 
 export default function SettingsPage() {
@@ -163,31 +64,25 @@ export default function SettingsPage() {
     isDevBypassEnabled,
   } = useAuth();
   const router = useRouter();
+  const [tab, setTab] = useState<Tab>("general");
 
   const [isSaving, setIsSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [credits] = useState(0);
-  const [isPayg] = useState(false);
-  const [isAddingCredits, setIsAddingCredits] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const [showDeleteKeysModal, setShowDeleteKeysModal] = useState(false);
-  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [deleteKeysOpen, setDeleteKeysOpen] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [isDeletingKeys, setIsDeletingKeys] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/auth/login");
-    }
+    if (!authLoading && !isAuthenticated) router.push("/auth/login");
   }, [authLoading, isAuthenticated, router]);
 
   useEffect(() => {
@@ -198,43 +93,23 @@ export default function SettingsPage() {
 
   const activePlan = useMemo(
     () =>
-      PLANS.find((plan) => plan.id === user?.plan_tier?.toLowerCase()) ||
-      PLANS[0],
+      PLANS.find((p) => p.id === user?.plan_tier?.toLowerCase()) || PLANS[0],
     [user?.plan_tier],
   );
 
-  const closePasswordModal = () => {
-    setShowPasswordModal(false);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 900));
+    await new Promise((r) => setTimeout(r, 900));
     setIsSaving(false);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
-  };
-
-  const handleAddCredits = async (pkg: { amount: number; price: number }) => {
-    setIsAddingCredits(true);
-    setSelectedPackage(pkg.amount);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setIsAddingCredits(false);
-    setSelectedPackage(null);
-    toast.success(`Queued ${pkg.amount} credits for checkout`);
+    toast.success("Profile updated");
   };
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
-
     setIsChangingPassword(true);
-
     try {
       const token = getAccessToken();
       await fetch(`${API_URL}/v1/user/password`, {
@@ -248,8 +123,11 @@ export default function SettingsPage() {
           new_password: newPassword,
         }),
       });
-      toast.success("Password changed successfully");
-      closePasswordModal();
+      toast.success("Password changed");
+      setPasswordOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Failed to change password",
@@ -261,7 +139,6 @@ export default function SettingsPage() {
 
   const handleDeleteAllKeys = async () => {
     setIsDeletingKeys(true);
-
     try {
       const token = getAccessToken();
       await fetch(`${API_URL}/v1/user/key/revoke-all`, {
@@ -271,11 +148,11 @@ export default function SettingsPage() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
-      toast.success("All API keys deleted successfully");
-      setShowDeleteKeysModal(false);
+      toast.success("All API keys revoked");
+      setDeleteKeysOpen(false);
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to delete API keys",
+        err instanceof Error ? err.message : "Failed to delete keys",
       );
     } finally {
       setIsDeletingKeys(false);
@@ -284,7 +161,6 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     setIsDeletingAccount(true);
-
     try {
       const token = getAccessToken();
       await fetch(`${API_URL}/v1/user`, {
@@ -294,7 +170,7 @@ export default function SettingsPage() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
-      toast.success("Account deleted successfully");
+      toast.success("Account deleted");
       await logout();
       router.push("/auth/login");
     } catch (err) {
@@ -314,461 +190,457 @@ export default function SettingsPage() {
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <>
       <div className="space-y-6">
         <PageHeader
           title="Settings"
-          description="Manage your profile, plan, notifications, and security from a single place."
+          description="Manage your account, billing, and preferences."
           meta={
             isDevBypassEnabled ? (
               <Badge
-                className="rounded-md border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-100"
+                className="rounded-md border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-[#18181b] dark:text-zinc-100"
                 variant="outline"
               >
-                Dev auth bypass enabled
+                Dev bypass
               </Badge>
             ) : null
           }
         />
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <StatCard
-            icon={UserRound}
-            label="Account"
-            value={user.name || "Unnamed user"}
-            hint={user.email}
-          />
-          <StatCard
-            icon={CreditCard}
-            label="Current plan"
-            value={activePlan.name}
-            hint={`${activePlan.requestsPerDay} requests per day`}
-          />
-          <StatCard
-            icon={Shield}
-            label="Email status"
-            value={user.email_verified ? "Verified" : "Unverified"}
-            hint="Account verification state"
-          />
+        {/* Tab bar */}
+        <div className="overflow-x-auto -mx-1 px-1">
+          <div className="flex gap-1 rounded-lg border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-[#18181b]">
+            {TABS.map((t) => {
+              const Icon = t.icon;
+              const active = tab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
+                    active
+                      ? "bg-zinc-100 text-foreground dark:bg-zinc-800"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <SurfaceCard
-            title="Profile"
-            description="Keep your account details current. Email stays tied to your sign-in identity."
-          >
-            <div className="space-y-5">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    onChange={(event) => setName(event.target.value)}
-                    placeholder="Your name"
-                    value={name}
-                  />
+        {/* General tab */}
+        {tab === "general" && (
+          <div className="space-y-6">
+            <SurfaceCard title="Profile" description="Your personal details.">
+              <div className="space-y-5">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={email}
+                      disabled
+                      className="opacity-60"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    className="opacity-70"
-                    disabled
-                    id="email"
-                    type="email"
-                    value={email}
-                  />
-                </div>
-              </div>
-
-              <div
-                className={`rounded-xl border px-4 py-4 ${planTone(user.plan_tier)}`}
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-medium text-foreground">
-                    {activePlan.name} plan
-                  </p>
-                  <Badge className="rounded-md" variant="outline">
-                    {user.plan_tier.toUpperCase()}
-                  </Badge>
-                  {user.email_verified ? (
+                <div className="flex items-center gap-3">
+                  <Button disabled={isSaving} onClick={handleSave}>
+                    {isSaving && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {isSaving ? "Saving..." : "Save changes"}
+                  </Button>
+                  {user.email_verified && (
                     <Badge
-                      className="rounded-md border-[#1470e3]/25 bg-[#1470e3]/10 text-[#8ebcf3] dark:border-[#1470e3]/30 dark:bg-[#1470e3]/10 dark:text-[#9dc4f4]"
+                      className="rounded-md border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                       variant="outline"
                     >
-                      Verified
+                      Email verified
                     </Badge>
-                  ) : null}
+                  )}
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Your current workspace is configured for{" "}
-                  {activePlan.requestsPerDay} requests per day.
-                </p>
               </div>
+            </SurfaceCard>
 
-              <div className="flex items-center gap-3">
-                <Button disabled={isSaving} onClick={handleSave}>
-                  {isSaving ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
-                  {isSaving ? "Saving" : saved ? "Saved" : "Save changes"}
-                </Button>
-                {saved ? (
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Profile updated locally
-                  </span>
-                ) : null}
+            <SurfaceCard
+              title="Current plan"
+              description="Your active subscription tier."
+            >
+              <div className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-800">
+                    <CreditCard className="h-4 w-4 text-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {activePlan.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {activePlan.rpm} requests/day
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-semibold text-foreground">
+                    {activePlan.price}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {activePlan.period}
+                  </p>
+                </div>
               </div>
-            </div>
-          </SurfaceCard>
+            </SurfaceCard>
+          </div>
+        )}
 
+        {/* Billing tab */}
+        {tab === "billing" && (
           <SurfaceCard
-            title="Plan summary"
-            description="A concise view of what your current tier unlocks."
+            title="Plans"
+            description="Compare tiers and choose the right fit."
           >
-            <div className="space-y-4">
-              <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818]">
-                <p className="text-sm text-muted-foreground">Active tier</p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-foreground">
-                  {activePlan.name}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {activePlan.price} {activePlan.priceDetail}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818]">
-                <p className="text-sm font-medium text-foreground">
-                  Included features
-                </p>
-                <div className="mt-3 space-y-2">
-                  {activePlan.features.map((feature) => (
-                    <div
-                      className="flex items-start gap-3 text-sm text-muted-foreground"
-                      key={feature}
-                    >
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-zinc-500" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </SurfaceCard>
-        </div>
-
-        <SurfaceCard
-          title="Billing & plans"
-          description="Review available plans and compare request limits before changing your subscription."
-        >
-          <div className="space-y-6">
-            <div className="grid gap-4 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {PLANS.map((plan) => {
-                const isCurrentPlan = user.plan_tier.toLowerCase() === plan.id;
-
+                const current =
+                  user.plan_tier.toLowerCase() === plan.id;
                 return (
                   <div
-                    className={cn(
-                      "rounded-xl border px-4 py-4 transition-colors",
-                      isCurrentPlan
-                        ? "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-[#181818]"
-                        : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-[#181818] dark:hover:border-zinc-700",
-                    )}
                     key={plan.id}
+                    className={cn(
+                      "relative rounded-xl border p-4 transition-colors",
+                      current
+                        ? "border-zinc-400 bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900/60"
+                        : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-[#18181b] dark:hover:border-zinc-700",
+                    )}
                   >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-medium text-foreground">
-                        {plan.name}
-                      </p>
-                      {isCurrentPlan ? (
-                        <Badge
-                          className="rounded-md border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-[#181818] dark:text-zinc-100"
-                          variant="outline"
-                        >
-                          Current
-                        </Badge>
-                      ) : null}
-                    </div>
-                    <div className="mt-4 flex items-baseline gap-1">
+                    {current && (
+                      <Badge
+                        className="absolute right-3 top-3 rounded-md"
+                        variant="outline"
+                      >
+                        Current
+                      </Badge>
+                    )}
+                    <p className="text-sm font-medium text-foreground">
+                      {plan.name}
+                    </p>
+                    <div className="mt-3 flex items-baseline gap-1">
                       <span className="text-2xl font-semibold text-foreground">
                         {plan.price}
                       </span>
-                      <span className="text-sm text-muted-foreground">
-                        {plan.priceDetail}
+                      <span className="text-xs text-muted-foreground">
+                        {plan.period}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {plan.requestsPerDay} requests/day
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {plan.rpm.toLocaleString()} requests/day
                     </p>
-                    <div className="mt-4 space-y-2">
-                      {plan.features.map((feature) => (
-                        <div
-                          className="flex items-start gap-3 text-sm text-muted-foreground"
-                          key={feature}
-                        >
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-zinc-500" />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 );
               })}
             </div>
+          </SurfaceCard>
+        )}
 
-            {isPayg ? (
-              <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-[#181818]">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-200">
-                    <Coins className="h-4 w-4" />
-                  </div>
+        {/* Notifications tab */}
+        {tab === "notifications" && (
+          <SurfaceCard
+            title="Email preferences"
+            description="Control what lands in your inbox."
+          >
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+              {[
+                {
+                  id: "usage",
+                  label: "Usage reports",
+                  desc: "Weekly summaries and account alerts.",
+                  on: true,
+                },
+                {
+                  id: "limits",
+                  label: "Limit warnings",
+                  desc: "Alerts when you're close to daily caps.",
+                  on: true,
+                },
+                {
+                  id: "marketing",
+                  label: "Product updates",
+                  desc: "New features and announcements.",
+                  on: false,
+                },
+              ].map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-start justify-between gap-4 py-4 first:pt-0 last:pb-0 sm:items-center"
+                >
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      Credits balance
+                      {item.label}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      ${credits.toFixed(2)} available
-                    </p>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </div>
+                  <Switch defaultChecked={item.on} />
                 </div>
-
-                <div className="mt-4 grid gap-3 sm:grid-cols-4">
-                  {CREDITS_PACKAGES.map((pkg) => (
-                    <button
-                      className="rounded-xl border border-zinc-200 bg-white px-3 py-3 text-left transition-colors hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-800 dark:bg-[#181818] dark:hover:bg-zinc-900"
-                      disabled={isAddingCredits}
-                      key={pkg.amount}
-                      onClick={() => void handleAddCredits(pkg)}
-                      type="button"
-                    >
-                      <p className="text-sm font-medium text-foreground">
-                        {pkg.amount} credits
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        ${pkg.price.toFixed(2)}
-                      </p>
-                      {isAddingCredits && selectedPackage === pkg.amount ? (
-                        <Loader2 className="mt-3 h-4 w-4 animate-spin text-zinc-400" />
-                      ) : null}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </SurfaceCard>
-
-        <div className="grid gap-6 xl:grid-cols-2">
-          <SurfaceCard
-            title="Notifications"
-            description="Choose what the team sends to your inbox."
-          >
-            <div className="space-y-4">
-              <SettingRow
-                action={<Switch defaultChecked />}
-                description="Receive usage reports and important account alerts via email."
-                label="Email notifications"
-              />
-              <SettingRow
-                action={<Switch defaultChecked />}
-                description="Get warned when request limits are close to being exhausted."
-                label="Usage alerts"
-              />
-              <SettingRow
-                action={<Switch />}
-                description="Receive announcements about product updates and new features."
-                label="Marketing emails"
-              />
+              ))}
             </div>
           </SurfaceCard>
+        )}
 
-          <SurfaceCard
-            title="Security"
-            description="Manage the controls that protect your account and sessions."
-          >
-            <div className="space-y-4">
-              <SettingRow
-                action={
-                  <Button disabled variant="outline">
+        {/* Security tab */}
+        {tab === "security" && (
+          <div className="space-y-6">
+            <SurfaceCard
+              title="Authentication"
+              description="Manage how you sign in."
+            >
+              <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                <div className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        Password
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Update your sign-in password.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPasswordOpen(true)}
+                  >
+                    Change
+                  </Button>
+                </div>
+                <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        Two-factor authentication
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Add a second layer of protection.
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" disabled>
                     Coming soon
                   </Button>
-                }
-                description="Add a second factor to protect access to your workspace."
-                label="Two-factor authentication"
-              />
-              <SettingRow
-                action={
+                </div>
+                <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <LogOut className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        Sessions
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Sign out of all devices.
+                      </p>
+                    </div>
+                  </div>
                   <Button
-                    onClick={() => setShowPasswordModal(true)}
                     variant="outline"
-                  >
-                    Change password
-                  </Button>
-                }
-                description="Update the password used for account sign-in."
-                label="Password"
-              />
-              <SettingRow
-                action={
-                  <Button
+                    size="sm"
                     onClick={() => {
                       void logout();
                       router.push("/auth/login");
                     }}
-                    variant="outline"
                   >
-                    Log out all devices
+                    Log out all
                   </Button>
-                }
-                description="Clear active sessions across your devices and browsers."
-                label="Active sessions"
-              />
-            </div>
-          </SurfaceCard>
-        </div>
+                </div>
+              </div>
+            </SurfaceCard>
 
-        <SurfaceCard
-          className="border-red-500/20 dark:border-red-500/20"
-          title="Danger zone"
-          description="These actions are destructive and should be used carefully."
-        >
-          <div className="space-y-4">
-            <SettingRow
-              action={
-                <Button
-                  onClick={() => setShowDeleteKeysModal(true)}
-                  variant="destructive"
-                >
-                  Delete all keys
-                </Button>
-              }
-              danger
-              description="Permanently revoke every API key tied to this account."
-              label="Delete all API keys"
-            />
-            <SettingRow
-              action={
-                <Button
-                  onClick={() => setShowDeleteAccountModal(true)}
-                  variant="destructive"
-                >
-                  Delete account
-                </Button>
-              }
-              danger
-              description="Permanently delete your account and all associated data."
-              label="Delete account"
-            />
+            <SurfaceCard
+              title="Danger zone"
+              description="Irreversible actions."
+              className="border-red-500/20 dark:border-red-500/20"
+            >
+              <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                <div className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <KeyRound className="h-4 w-4 shrink-0 text-red-400" />
+                    <div>
+                      <p className="text-sm font-medium text-red-400">
+                        Revoke all API keys
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Immediately invalidates every key on this account.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteKeysOpen(true)}
+                  >
+                    Revoke
+                  </Button>
+                </div>
+                <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <Trash2 className="h-4 w-4 shrink-0 text-red-400" />
+                    <div>
+                      <p className="text-sm font-medium text-red-400">
+                        Delete account
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Permanently remove your account and all data.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteAccountOpen(true)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </SurfaceCard>
           </div>
-        </SurfaceCard>
+        )}
       </div>
 
-      {showPasswordModal ? (
-        <ModalShell
-          description="Enter your current password and confirm the new one before saving."
-          title="Change password"
-        >
-          <div className="space-y-4">
+      {/* Password dialog */}
+      <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new one.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="current-password">Current password</Label>
+              <Label htmlFor="current-pw">Current password</Label>
               <Input
-                id="current-password"
-                onChange={(event) => setCurrentPassword(event.target.value)}
+                id="current-pw"
                 type="password"
                 value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="new-password">New password</Label>
+              <Label htmlFor="new-pw">New password</Label>
               <Input
-                id="new-password"
-                onChange={(event) => setNewPassword(event.target.value)}
+                id="new-pw"
                 type="password"
                 value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm password</Label>
+              <Label htmlFor="confirm-pw">Confirm password</Label>
               <Input
-                id="confirm-password"
-                onChange={(event) => setConfirmPassword(event.target.value)}
+                id="confirm-pw"
                 type="password"
                 value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button onClick={closePasswordModal} variant="outline">
-                Cancel
-              </Button>
-              <Button
-                disabled={isChangingPassword}
-                onClick={handleChangePassword}
-              >
-                {isChangingPassword ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Change password
-              </Button>
-            </div>
           </div>
-        </ModalShell>
-      ) : null}
-
-      {showDeleteKeysModal ? (
-        <ModalShell
-          description="This revokes every API key immediately. Requests using deleted keys will stop working."
-          title="Delete all API keys"
-        >
-          <div className="flex justify-end gap-2">
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPasswordOpen(false)}>
+              Cancel
+            </Button>
             <Button
-              onClick={() => setShowDeleteKeysModal(false)}
+              disabled={isChangingPassword}
+              onClick={handleChangePassword}
+            >
+              {isChangingPassword && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Change password
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete keys dialog */}
+      <Dialog open={deleteKeysOpen} onOpenChange={setDeleteKeysOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Revoke all API keys</DialogTitle>
+            <DialogDescription>
+              This immediately invalidates every API key. Requests using them
+              will stop working.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
               variant="outline"
+              onClick={() => setDeleteKeysOpen(false)}
             >
               Cancel
             </Button>
             <Button
+              variant="destructive"
               disabled={isDeletingKeys}
               onClick={handleDeleteAllKeys}
-              variant="destructive"
             >
-              {isDeletingKeys ? (
+              {isDeletingKeys && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              Delete all keys
+              )}
+              Revoke all keys
             </Button>
-          </div>
-        </ModalShell>
-      ) : null}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {showDeleteAccountModal ? (
-        <ModalShell
-          description="Your data will be retained for 30 days before permanent deletion. Contact support within that window if you need restoration."
-          title="Delete account"
-        >
-          <div className="flex justify-end gap-2">
+      {/* Delete account dialog */}
+      <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete account</DialogTitle>
+            <DialogDescription>
+              Your data will be retained for 30 days before permanent deletion.
+              Contact support within that window to restore.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
             <Button
-              onClick={() => setShowDeleteAccountModal(false)}
               variant="outline"
+              onClick={() => setDeleteAccountOpen(false)}
             >
               Cancel
             </Button>
             <Button
+              variant="destructive"
               disabled={isDeletingAccount}
               onClick={handleDeleteAccount}
-              variant="destructive"
             >
-              {isDeletingAccount ? (
+              {isDeletingAccount && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
+              )}
               Delete account
             </Button>
-          </div>
-        </ModalShell>
-      ) : null}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

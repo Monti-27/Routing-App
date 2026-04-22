@@ -111,6 +111,37 @@ function getRefreshToken(): string | null {
 
 const isDevBypassEnabled = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true";
 
+const TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000; // refresh every 4 minutes
+
+async function refreshAccessToken(): Promise<boolean> {
+  const refreshToken =
+    getCookie("refresh_token") || localStorage.getItem("refresh_token");
+  if (!refreshToken) return false;
+
+  try {
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+    const response = await fetch(`${apiUrl}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    if (data.csrf_token) {
+      localStorage.setItem("csrf_token", data.csrf_token);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const devBypassUser: User = {
   id: "dev-bypass-user",
   email: "dev@routing.run",
@@ -178,7 +209,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
         })
         .catch(() => {
-          // If token validation fails, clear
           if (typeof window !== "undefined") {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
@@ -190,6 +220,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     }
   }, []);
+
+  useEffect(() => {
+    if (isDevBypassEnabled || !user) return;
+
+    const interval = setInterval(async () => {
+      const success = await refreshAccessToken();
+      if (!success) {
+        setUser(null);
+      }
+    }, TOKEN_REFRESH_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const login = async (email: string, otp: string) => {
     if (isDevBypassEnabled) {

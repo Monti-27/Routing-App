@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
-  Calendar,
-  Download,
   Loader2,
   TrendingUp,
 } from "lucide-react";
@@ -16,55 +14,12 @@ import {
   SurfaceCard,
 } from "@/components/dashboard/page-ui";
 import { Button } from "@/components/ui/button";
-import { PieCenter } from "@/components/charts/pie-center";
-import { PieChart } from "@/components/charts/pie-chart";
-import { PieSlice } from "@/components/charts/pie-slice";
 import { UsageSummaryCard } from "@/components/dashboard/usage-summary-card";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
 type Period = "daily" | "hourly" | "monthly";
 
-interface ModelUsage {
-  model: string;
-  requests: number;
-  tokens: number;
-  cost: number;
-}
-
-interface UsageChartSlice {
-  label: string;
-  value: number;
-  color: string;
-  model: ModelUsage | null;
-}
-
-const usageChartColors = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-] as const;
-
-const DEV_USAGE_MODELS: ModelUsage[] = [
-  { model: "route/minimax-m2.5", requests: 6420, tokens: 686000, cost: 6.86 },
-  { model: "route/kimi-k2.5", requests: 5180, tokens: 597000, cost: 5.97 },
-  { model: "route/glm-5", requests: 4030, tokens: 493000, cost: 4.93 },
-  { model: "route/deepseek-v3.2", requests: 2790, tokens: 324000, cost: 3.24 },
-  {
-    model: "route/qwen3.5-397b-a17b",
-    requests: 1940,
-    tokens: 246000,
-    cost: 2.46,
-  },
-  {
-    model: "route/minimax-m2.7-highspeed",
-    requests: 1210,
-    tokens: 182000,
-    cost: 1.82,
-  },
-];
 
 const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
   daily: [
@@ -124,43 +79,28 @@ function buildFallbackChart(period: Period, totalRequests: number) {
 
 function applyUsageSnapshot({
   chart,
-  cost,
-  costMultiplier,
   inputTokens,
-  models,
   outputTokens,
   requests,
   setChartData,
-  setCostMultiplier,
-  setModelUsage,
-  setTotalCost,
   setTotalInputTokens,
   setTotalOutputTokens,
   setTotalRequests,
 }: {
   chart: { date: string; requests: number }[];
-  cost: number;
-  costMultiplier: number;
   inputTokens: number;
-  models: ModelUsage[];
   outputTokens: number;
   requests: number;
   setChartData: React.Dispatch<
     React.SetStateAction<{ date: string; requests: number }[]>
   >;
-  setCostMultiplier: React.Dispatch<React.SetStateAction<number>>;
-  setModelUsage: React.Dispatch<React.SetStateAction<ModelUsage[]>>;
-  setTotalCost: React.Dispatch<React.SetStateAction<number>>;
   setTotalInputTokens: React.Dispatch<React.SetStateAction<number>>;
   setTotalOutputTokens: React.Dispatch<React.SetStateAction<number>>;
   setTotalRequests: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  setCostMultiplier(costMultiplier);
   setTotalRequests(requests);
   setTotalInputTokens(inputTokens);
   setTotalOutputTokens(outputTokens);
-  setTotalCost(cost);
-  setModelUsage(models.sort((a, b) => b.requests - a.requests));
   setChartData(chart);
 }
 
@@ -172,15 +112,9 @@ export default function UsagePage() {
   const [totalRequests, setTotalRequests] = useState(0);
   const [totalInputTokens, setTotalInputTokens] = useState(0);
   const [totalOutputTokens, setTotalOutputTokens] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
-  const [modelUsage, setModelUsage] = useState<ModelUsage[]>([]);
   const [chartData, setChartData] = useState<
     { date: string; requests: number }[]
   >([]);
-  const [costMultiplier, setCostMultiplier] = useState(1.65);
-  const [hoveredModelIndex, setHoveredModelIndex] = useState<number | null>(
-    null,
-  );
 
   useEffect(() => {
     async function fetchData() {
@@ -190,16 +124,10 @@ export default function UsagePage() {
       if (isDevBypassEnabled) {
         applyUsageSnapshot({
           chart: DEV_USAGE_CHARTS[period],
-          cost: 48.36,
-          costMultiplier: 1.65,
           inputTokens: 1_254_000,
-          models: DEV_USAGE_MODELS,
           outputTokens: 846_000,
           requests: 18_420,
           setChartData,
-          setCostMultiplier,
-          setModelUsage,
-          setTotalCost,
           setTotalInputTokens,
           setTotalOutputTokens,
           setTotalRequests,
@@ -209,55 +137,18 @@ export default function UsagePage() {
       }
 
       try {
-        const [usageData, settingsData] = await Promise.all([
-          api.usage.get(period),
-          api.settings.get(),
-        ]);
+        const usageData = await api.usage.get(period);
 
         const requests = usageData.total_requests || 0;
         const inputTokens = usageData.total_input_tokens || 0;
         const outputTokens = usageData.total_output_tokens || 0;
-        const cost = (usageData.total_cost || 0) * settingsData.cost_multiplier;
-
-        const models: ModelUsage[] = [];
-
-        if (usageData.models && typeof usageData.models === "object") {
-          for (const [modelName, metrics] of Object.entries(usageData.models)) {
-            const metricValues = metrics as Record<string, number>;
-            const isImageModel = Boolean(metricValues.is_image_model);
-            const modelRequests =
-              metricValues.image_requests || metricValues.requests || 0;
-            const input = metricValues.input_tokens || 0;
-            const output = metricValues.output_tokens || 0;
-
-            let modelCost = metricValues.cost || 0;
-            if (isImageModel && !metricValues.cost) {
-              modelCost = 0;
-            } else if (!modelCost && (input > 0 || output > 0)) {
-              modelCost = ((input + output) / 1000) * 0.01;
-            }
-
-            models.push({
-              model: modelName,
-              requests: modelRequests,
-              tokens: input + output,
-              cost: modelCost,
-            });
-          }
-        }
 
         applyUsageSnapshot({
           chart: buildFallbackChart(period, requests),
-          cost,
-          costMultiplier: settingsData.cost_multiplier,
           inputTokens,
-          models,
           outputTokens,
           requests,
           setChartData,
-          setCostMultiplier,
-          setModelUsage,
-          setTotalCost,
           setTotalInputTokens,
           setTotalOutputTokens,
           setTotalRequests,
@@ -266,16 +157,10 @@ export default function UsagePage() {
         if (process.env.NODE_ENV === "development") {
           applyUsageSnapshot({
             chart: DEV_USAGE_CHARTS[period],
-            cost: 48.36,
-            costMultiplier: 1.65,
             inputTokens: 1_254_000,
-            models: DEV_USAGE_MODELS,
             outputTokens: 846_000,
             requests: 18_420,
             setChartData,
-            setCostMultiplier,
-            setModelUsage,
-            setTotalCost,
             setTotalInputTokens,
             setTotalOutputTokens,
             setTotalRequests,
@@ -294,38 +179,6 @@ export default function UsagePage() {
 
   const maxRequests = Math.max(...chartData.map((entry) => entry.requests), 1);
   const totalTokens = totalInputTokens + totalOutputTokens;
-  const usageByModelChartData = useMemo(() => {
-    if (modelUsage.length === 0) {
-      return [] as UsageChartSlice[];
-    }
-
-    const topModels = modelUsage.slice(0, 5);
-    const remainingRequests = modelUsage
-      .slice(5)
-      .reduce((sum, model) => sum + model.requests, 0);
-
-    const items: UsageChartSlice[] = topModels.map((model, index) => ({
-      label: model.model.replace("route/", ""),
-      value: model.requests,
-      color: usageChartColors[index % usageChartColors.length],
-      model,
-    }));
-
-    if (remainingRequests > 0) {
-      items.push({
-        label: "Other",
-        value: remainingRequests,
-        color: "var(--chart-5)",
-        model: null,
-      });
-    }
-
-    return items;
-  }, [modelUsage]);
-  const totalChartRequests = useMemo(
-    () => usageByModelChartData.reduce((sum, item) => sum + item.value, 0),
-    [usageByModelChartData],
-  );
   const requestDistributionDescription =
     period === "daily"
       ? "Breakdown of today's total requests across time-of-day buckets."
@@ -334,22 +187,10 @@ export default function UsagePage() {
         : "Breakdown of this month's total requests across weekly buckets.";
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <PageHeader
         title="Usage"
         description="Request volume, token spend, and estimated cost across the selected reporting window."
-        action={
-          <>
-            <Button size="sm" variant="outline">
-              <Calendar className="mr-2 h-4 w-4" />
-              Last 30 days
-            </Button>
-            <Button size="sm" variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-          </>
-        }
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -402,9 +243,14 @@ export default function UsagePage() {
             />
             <StatCard
               compact
-              hint={`Multiplier ${costMultiplier.toFixed(2)}x applied`}
-              label="Estimated Cost"
-              value={`$${totalCost.toFixed(2)}`}
+              hint="Average daily request volume this period"
+              icon={BarChart3}
+              label="Avg Requests / Day"
+              value={
+                totalRequests > 0
+                  ? Math.round(totalRequests / Math.max(1, new Date().getDate())).toLocaleString()
+                  : "0"
+              }
             />
             <StatCard
               compact
@@ -419,7 +265,7 @@ export default function UsagePage() {
             />
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 xl:grid-cols-2">
             <SurfaceCard
               contentClassName="pt-0"
               title="Total usage"
@@ -441,16 +287,16 @@ export default function UsagePage() {
               title="Request distribution"
               description={requestDistributionDescription}
             >
-              <div className="mt-auto flex h-[380px] items-end gap-3">
+              <div className="mt-auto flex h-[240px] items-end gap-2 sm:h-[380px] sm:gap-3">
                 {chartData.map((entry) => (
                   <div
                     className="flex min-w-0 flex-1 flex-col items-center justify-end gap-2"
                     key={entry.date}
                   >
-                    <span className="text-xs text-muted-foreground">
+                    <span className="truncate text-xs text-muted-foreground">
                       {entry.requests.toLocaleString()}
                     </span>
-                    <div className="flex h-[320px] w-full items-end rounded-lg bg-muted/60 px-2 pb-2">
+                    <div className="flex h-[180px] w-full items-end rounded-lg bg-muted/60 px-1.5 pb-1.5 sm:h-[320px] sm:px-2 sm:pb-2">
                       <div
                         className="w-full rounded-md bg-foreground"
                         style={{
@@ -463,97 +309,6 @@ export default function UsagePage() {
                     </span>
                   </div>
                 ))}
-              </div>
-            </SurfaceCard>
-
-            <SurfaceCard
-              title="Usage by model"
-              description="Highest-volume models sorted by request count."
-              className="xl:col-span-2"
-            >
-              <div className="space-y-6">
-                {usageByModelChartData.length > 0 ? (
-                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex justify-center lg:flex-1">
-                      <PieChart
-                        cornerRadius={4}
-                        data={usageByModelChartData}
-                        hoverOffset={8}
-                        hoveredIndex={hoveredModelIndex}
-                        innerRadius={72}
-                        onHoverChange={setHoveredModelIndex}
-                        padAngle={0.02}
-                        size={260}
-                      >
-                        {usageByModelChartData.map((item, index) => (
-                          <PieSlice
-                            color={item.color}
-                            hoverEffect="grow"
-                            index={index}
-                            key={item.label}
-                            showGlow={false}
-                          />
-                        ))}
-                        <PieCenter
-                          className="rounded-full bg-background/80"
-                          defaultLabel="Requests"
-                          formatOptions={{ notation: "compact" }}
-                          valueClassName="text-xl font-semibold text-foreground"
-                          labelClassName="text-xs text-muted-foreground"
-                        />
-                      </PieChart>
-                    </div>
-
-                    <div className="min-w-0 flex-1 space-y-2 lg:max-w-md">
-                      {usageByModelChartData.map((item, index) => {
-                        const percentage =
-                          totalChartRequests > 0
-                            ? (item.value / totalChartRequests) * 100
-                            : 0;
-
-                        return (
-                          <button
-                            className="flex w-full items-center gap-2.5 rounded-lg border border-border/70 px-3 py-2 text-left transition-colors hover:bg-muted/40"
-                            key={item.label}
-                            onMouseEnter={() => setHoveredModelIndex(index)}
-                            onMouseLeave={() => setHoveredModelIndex(null)}
-                            type="button"
-                          >
-                            <span
-                              className="h-2 w-2 shrink-0 rounded-full"
-                              style={{ backgroundColor: item.color }}
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p
-                                className="truncate text-xs font-medium text-foreground sm:text-sm"
-                                title={item.label}
-                              >
-                                {item.label}
-                              </p>
-                              <p className="mt-0.5 text-[11px] text-muted-foreground sm:text-xs">
-                                {percentage.toFixed(1)}% of requests
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs font-semibold text-foreground sm:text-sm">
-                                {item.value.toLocaleString()}
-                              </p>
-                              <p className="text-[11px] text-muted-foreground sm:text-xs">
-                                {item.model
-                                  ? `${(item.model.tokens / 1000).toFixed(1)}K tokens`
-                                  : "Grouped remainder"}
-                              </p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No model usage data available.
-                  </p>
-                )}
               </div>
             </SurfaceCard>
           </div>

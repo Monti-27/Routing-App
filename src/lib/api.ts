@@ -193,6 +193,7 @@ async function fetchApi<T>(
         if (e instanceof Error && e.message === "Session expired") {
           throw e;
         }
+        throw new ApiError("Token refresh failed", 401);
       } finally {
         isRefreshing = false;
       }
@@ -211,7 +212,7 @@ async function fetchApi<T>(
 
             if (!retryResponse.ok) {
               const error = await retryResponse.json().catch(() => ({ message: "An error occurred" }));
-              reject(new ApiError(error.message || "An error occurred", retryResponse.status));
+              return reject(new ApiError(error.message || "An error occurred", retryResponse.status));
             }
 
             resolve(retryResponse.json());

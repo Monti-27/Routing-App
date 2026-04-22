@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
 import { Line, LineChart, XAxis, YAxis } from "recharts";
 
 import {
@@ -9,7 +8,7 @@ import {
   ChartTooltip,
   type ChartConfig,
 } from "@/components/ui/line-charts-6";
-import { cn } from "@/lib/utils";
+
 
 type UsageData = {
   total_requests: number;
@@ -21,7 +20,6 @@ type UsageData = {
 type Props = {
   remainingRequests: number;
   usage: UsageData | null;
-  dailyUsage: UsageData | null;
   loading: boolean;
 };
 
@@ -69,7 +67,7 @@ function CustomTooltip({
   }
 
   return (
-    <div className="min-w-[180px] rounded-lg border border-zinc-200 bg-white p-3 shadow-sm shadow-black/10 dark:border-zinc-800 dark:bg-[#181818] dark:shadow-black/20">
+    <div className="min-w-[180px] rounded-lg border border-zinc-200 bg-white p-3 shadow-sm shadow-black/10 dark:border-zinc-800 dark:bg-[#18181b] dark:shadow-black/20">
       <div className="mb-2 text-xs font-medium text-zinc-500">{label}</div>
       <div className="space-y-2">
         {payload.map((item) => {
@@ -112,7 +110,6 @@ function formatCompactNumber(value: number) {
 
 export function OverviewPerformanceTrends({
   usage,
-  dailyUsage,
   loading,
   remainingRequests,
 }: Props) {
@@ -163,47 +160,10 @@ export function OverviewPerformanceTrends({
     }));
   }, [usage]);
 
-  const daysElapsedInMonth = Math.max(1, new Date().getDate());
-
-  const metricValueMap = {
-    requests: usage?.total_requests || 0,
-    inputTokens: usage?.total_input_tokens || 0,
-    outputTokens: usage?.total_output_tokens || 0,
-    cost: usage?.total_cost || 0,
-  } as const;
-
-  const dailyMetricValueMap = {
-    requests: dailyUsage?.total_requests || 0,
-    inputTokens: dailyUsage?.total_input_tokens || 0,
-    outputTokens: dailyUsage?.total_output_tokens || 0,
-    cost: dailyUsage?.total_cost || 0,
-  } as const;
-
-  const metrics = metricMeta.map((metric) => {
-    const value = platformData.reduce(
-      (sum, item) =>
-        sum + Number(item[metric.key as keyof (typeof platformData)[number]]),
-      0,
-    );
-    const monthToDateValue = metricValueMap[metric.key];
-    const previousValue = monthToDateValue / daysElapsedInMonth;
-    const currentValue = dailyMetricValueMap[metric.key];
-    const change = previousValue
-      ? ((currentValue - previousValue) / previousValue) * 100
-      : 0;
-
-    return {
-      ...metric,
-      change,
-      value,
-      currentValue,
-      previousValue,
-    };
-  });
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]">
-      <div className="flex flex-col gap-3 border-b border-zinc-200 px-6 py-5 dark:border-zinc-800 md:flex-row md:items-start md:justify-between">
+    <div className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#18181b]">
+      <div className="flex flex-col gap-3 border-b border-zinc-200 px-4 py-4 dark:border-zinc-800 sm:px-6 sm:py-5 md:flex-row md:items-start md:justify-between">
         <div>
           <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
             Usage
@@ -213,48 +173,19 @@ export function OverviewPerformanceTrends({
             {loading ? "..." : formatCompactNumber(remainingRequests)}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {metrics.map((metric) => {
-            const isPositive = metric.change >= 0;
-
-            return (
-              <div
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-[#181818] dark:text-zinc-400",
-                )}
-                key={metric.key}
-              >
-                <span>{metric.label}</span>
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1 text-xs",
-                    isPositive ? "text-emerald-300" : "text-red-300",
-                  )}
-                >
-                  {isPositive ? (
-                    <ArrowUp className="size-3" />
-                  ) : (
-                    <ArrowDown className="size-3" />
-                  )}
-                  {Math.abs(metric.change).toFixed(1)}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
-      <div className="px-3 py-6">
+      <div className="px-2 py-4 sm:px-3 sm:py-6">
         {loading ? (
-          <div className="h-96 w-full animate-pulse rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#181818]" />
+          <div className="h-64 w-full animate-pulse rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#18181b] sm:h-96" />
         ) : (
           <ChartContainer
-            className="h-96 w-full overflow-visible [&_.recharts-curve.recharts-tooltip-cursor]:stroke-initial"
+            className="h-64 w-full overflow-visible sm:h-96 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-initial"
             config={chartConfig}
           >
             <LineChart
               data={platformData}
-              margin={{ top: 20, right: 20, left: 5, bottom: 20 }}
+              margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
               style={{ overflow: "visible" }}
             >
               <defs>
@@ -336,7 +267,7 @@ export function OverviewPerformanceTrends({
                 activeDot={{
                   fill: chartConfig.requests.color,
                   r: 6,
-                  stroke: "white",
+                  stroke: "var(--background)",
                   strokeWidth: 2,
                 }}
                 dataKey="requests"
@@ -354,7 +285,7 @@ export function OverviewPerformanceTrends({
                 activeDot={{
                   fill: chartConfig.inputTokens.color,
                   r: 6,
-                  stroke: "white",
+                  stroke: "var(--background)",
                   strokeWidth: 2,
                 }}
                 dataKey="inputTokens"
@@ -368,7 +299,7 @@ export function OverviewPerformanceTrends({
                 activeDot={{
                   fill: chartConfig.outputTokens.color,
                   r: 6,
-                  stroke: "white",
+                  stroke: "var(--background)",
                   strokeWidth: 2,
                 }}
                 dataKey="outputTokens"

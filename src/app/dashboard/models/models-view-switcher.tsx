@@ -3,46 +3,34 @@
 import { useState } from "react";
 
 import ComponentOrderingGraph from "@/app/demo/ComponentOrderingGraph";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { LegacyModelsView } from "./legacy-models-view";
+import { ModelsCardView } from "./models-card-view";
 
-type ModelsView = "graph" | "catalog";
+type ModelsView = "cards" | "list" | "graph";
 
 export function ModelsViewSwitcher() {
-  const [view, setView] = useState<ModelsView>("catalog");
+  const [view, setView] = useState<ModelsView>("cards");
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          className={cn(
-            view === "graph"
-              ? ""
-              : "border-zinc-300 bg-transparent text-foreground hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900",
-          )}
-          onClick={() => setView("graph")}
-          size="sm"
-          variant={view === "graph" ? "default" : "outline"}
+    <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <Tabs
+          onValueChange={(v) => setView(v as ModelsView)}
+          value={view}
         >
-          Graph view
-        </Button>
-        <Button
-          className={cn(
-            view === "catalog"
-              ? ""
-              : "border-zinc-300 bg-transparent text-foreground hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900",
-          )}
-          onClick={() => setView("catalog")}
-          size="sm"
-          variant={view === "catalog" ? "default" : "outline"}
-        >
-          Classic view
-        </Button>
+          <TabsList>
+            <TabsTrigger value="cards">Cards</TabsTrigger>
+            <TabsTrigger value="list">List</TabsTrigger>
+            <TabsTrigger value="graph">Graph</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
-      {view === "graph" ? <ComponentOrderingGraph /> : <LegacyModelsView />}
+      {view === "cards" && <ModelsCardView />}
+      {view === "list" && <LegacyModelsView />}
+      {view === "graph" && <ComponentOrderingGraph />}
     </div>
   );
 }

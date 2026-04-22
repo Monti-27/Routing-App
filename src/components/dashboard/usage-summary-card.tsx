@@ -108,12 +108,12 @@ export function UsageSummaryCard({
       <motion.div
         className={`${backgroundColor} ${borderColor} overflow-hidden rounded-xl border shadow-sm`}
       >
-          <div className="relative overflow-hidden px-5 pb-4 pt-8">
+          <div className="relative overflow-hidden px-3 pb-4 pt-8 sm:px-5">
           <div
             className={`absolute inset-0 ${backgroundColor} rounded-lg backdrop-blur-[2px]`}
           />
 
-          <div className="relative mx-auto h-[24rem] w-[24rem] max-w-full">
+          <div className="relative mx-auto aspect-square w-[18rem] max-w-full sm:w-[24rem]">
             <svg className="h-full w-full" viewBox="0 0 448 448">
               {outerDots.map((dot, index) => (
                 <motion.circle
@@ -168,7 +168,7 @@ export function UsageSummaryCard({
                       ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
                       : {}
                   }
-                  className="text-5xl font-bold text-foreground"
+                  className="text-3xl font-bold text-foreground sm:text-5xl"
                   initial={
                     shouldAnimate
                       ? { opacity: 0, y: 20, scale: 0.8, filter: "blur(4px)" }
@@ -197,7 +197,7 @@ export function UsageSummaryCard({
             }}
           />
 
-          <div className="absolute bottom-0 left-0 right-0 px-6 pb-2 pt-4" style={{ zIndex: 10 }}>
+          <div className="absolute bottom-0 left-0 right-0 px-3 pb-2 pt-4 sm:px-6" style={{ zIndex: 10 }}>
             <div className="mb-4 flex items-start justify-between">
               <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2">

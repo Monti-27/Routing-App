@@ -19,23 +19,12 @@ function AuthCallbackContent({ provider }: { provider: string }) {
     }
 
     const hash = window.location.hash;
-    console.log("[DEBUG] Full URL:", window.location.href);
-    console.log("[DEBUG] Hash:", hash);
-    console.log("[DEBUG] SearchParams:", searchParams?.toString());
 
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const accessToken = params.get("access_token");
       const refreshToken = params.get("refresh_token");
       const csrfToken = params.get("csrf_token");
-      console.log(
-        "[DEBUG] Parsed from hash - accessToken:",
-        accessToken ? "present" : "missing",
-      );
-      console.log(
-        "[DEBUG] Parsed from hash - refreshToken:",
-        refreshToken ? "present" : "missing",
-      );
 
       if (accessToken && refreshToken) {
         localStorage.setItem("access_token", accessToken);
@@ -43,18 +32,14 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         if (csrfToken) {
           localStorage.setItem("csrf_token", csrfToken);
         }
-        console.log("[DEBUG] Tokens stored, redirecting to dashboard");
         router.push("/dashboard");
         return;
       }
-      console.log("[DEBUG] Hash present but tokens missing - falling through");
     }
 
     const code = searchParams?.get("code");
     const state = searchParams?.get("state");
     const errorParam = searchParams?.get("error");
-    console.log("[DEBUG] code:", code ? "present" : "missing");
-    console.log("[DEBUG] state:", state ? "present" : "missing");
 
     if (errorParam) {
       setError("OAuth authorization was denied");
@@ -63,13 +48,11 @@ function AuthCallbackContent({ provider }: { provider: string }) {
 
     if (!code || !state) {
       setError("Missing code or state parameter");
-      console.log("[DEBUG] Missing code or state - ending up in error state");
       return;
     }
 
     async function handleCallback() {
       try {
-        console.log("[DEBUG] Making fetch to API callback...");
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const encodedProvider = encodeURIComponent(provider);
@@ -80,7 +63,6 @@ function AuthCallbackContent({ provider }: { provider: string }) {
           `${apiUrl}/auth/callback/${encodedProvider}?code=${encodedCode}&state=${encodedState}`,
           { credentials: "include" },
         );
-        console.log("[DEBUG] Response status:", response.status);
 
         if (!response.ok) {
           throw new Error(
@@ -89,7 +71,6 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         }
 
         const data = await response.json();
-        console.log("[DEBUG] Response data:", data);
 
         if (data.user) {
           // Store tokens in localStorage
@@ -107,8 +88,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
         } else {
           throw new Error("No user data in response");
         }
-      } catch (err) {
-        console.error("[DEBUG] Callback error:", err);
+      } catch {
         setError("Authentication failed. Please try again.");
       }
     }

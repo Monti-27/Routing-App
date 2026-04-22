@@ -9,6 +9,9 @@ import {
   SurfaceCard,
 } from "@/components/dashboard/page-ui";
 import { OverviewPerformanceTrends } from "@/components/dashboard/overview-performance-trends";
+
+import { OverviewUsageByModel } from "@/components/dashboard/overview-usage-by-model";
+import { RequestFlightCard } from "@/components/dashboard/request-flight-card";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
@@ -43,22 +46,22 @@ const DEV_USAGE_DATA: UsageData = {
   total_cost: 48.36,
   daily_requests_used: 312,
   models: {
-    "route/gpt-4o": {
+    "route/llama-3.1-70b": {
       requests: 6420,
       input_tokens: 422000,
       output_tokens: 264000,
     },
-    "route/claude-3-5-sonnet": {
+    "route/mistral-large": {
       requests: 5180,
       input_tokens: 356000,
       output_tokens: 241000,
     },
-    "route/gemini-1.5-pro": {
+    "route/qwen-2.5-72b": {
       requests: 4030,
       input_tokens: 288000,
       output_tokens: 205000,
     },
-    "route/llama-3.1-70b": {
+    "route/deepseek-v3": {
       requests: 2790,
       input_tokens: 188000,
       output_tokens: 136000,
@@ -100,7 +103,6 @@ function formatUpgradeExpiry(dateStr: string | null): string {
 export default function DashboardPage() {
   const { user, isDevBypassEnabled } = useAuth();
   const [usage, setUsage] = useState<UsageData | null>(null);
-  const [dailyUsage, setDailyUsage] = useState<UsageData | null>(null);
   const [plan, setPlan] = useState<PlanData | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,13 +112,6 @@ export default function DashboardPage() {
     async function fetchData() {
       if (isDevBypassEnabled) {
         setUsage(DEV_USAGE_DATA);
-        setDailyUsage({
-          ...DEV_USAGE_DATA,
-          total_requests: DEV_PLAN_DATA.requests_used_today,
-          total_input_tokens: 21_000,
-          total_output_tokens: 14_000,
-          total_cost: 1.42,
-        });
         setPlan(DEV_PLAN_DATA);
         setUserData(DEV_USER_DATA);
         setError(null);
@@ -125,7 +120,7 @@ export default function DashboardPage() {
       }
 
       try {
-        const [usageData, dailyUsageData, requestsData, userInfo] =
+        const [usageData, , requestsData, userInfo] =
           await Promise.all([
             api.usage.get("monthly"),
             api.usage.get("daily"),
@@ -134,7 +129,6 @@ export default function DashboardPage() {
           ]);
 
         setUsage(usageData);
-        setDailyUsage(dailyUsageData);
         setPlan({
           plan_tier: requestsData.plan_tier,
           requests_per_day: requestsData.requests_limit_today,
@@ -148,7 +142,6 @@ export default function DashboardPage() {
         setError(null);
       } catch (err) {
         setUsage(null);
-        setDailyUsage(null);
         setPlan(null);
         setUserData(null);
         setError(
@@ -208,12 +201,20 @@ export default function DashboardPage() {
         }
       />
 
+      <RequestFlightCard
+        requestsUsed={requestsUsedToday}
+        requestsTotal={dailyLimit}
+        planTier={plan?.plan_tier || "free"}
+        loading={loading}
+      />
+
       <OverviewPerformanceTrends
-        dailyUsage={dailyUsage}
         loading={loading}
         remainingRequests={requestsRemaining}
         usage={usage}
       />
+
+      <OverviewUsageByModel models={usage?.models ?? null} loading={loading} />
     </div>
   );
 }

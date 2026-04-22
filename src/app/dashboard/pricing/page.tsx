@@ -3,97 +3,80 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
+  ArrowRight,
   Check,
-  Coins,
+  ChevronDown,
   Crown,
   Diamond,
   Leaf,
   Rocket,
-  Sparkles,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
-import {
-  PageHeader,
-  PillStat,
-  SubtleBadge,
-  SurfaceCard,
-} from "@/components/dashboard/page-ui";
-import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/dashboard/page-ui";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth-context";
-import {
-  getDashboardModelsForTier,
-  type PlanTier,
-} from "@/lib/dashboard-model-catalog";
+import { getDashboardModelsForTier } from "@/lib/dashboard-model-catalog";
 import { cn } from "@/lib/utils";
+
+/* ------------------------------------------------------------------ */
+/*  Data                                                               */
+/* ------------------------------------------------------------------ */
 
 const plans = [
   {
-    id: "free",
+    id: "free" as const,
     name: "Free",
-    label: "Free",
-    price: "$0",
-    priceDetail: "forever",
+    price: 0,
     requestsPerDay: 20,
     checkoutUrl: "/auth/register",
-    summary: "Best for trying the router and light personal usage.",
-    popular: false,
+    tagline: "Try the router with zero commitment.",
     features: [
-      "20 requests per day",
+      "20 requests / day",
       "Basic model access",
       "Standard routing",
       "Community support",
     ],
   },
   {
-    id: "lite",
+    id: "lite" as const,
     name: "Lite",
-    label: "Lite",
-    price: "$10",
-    priceDetail: "/month",
+    price: 10,
     requestsPerDay: 400,
     checkoutUrl: "https://whop.com/tropic-6587/routing-lite/",
-    summary: "A stronger daily cap for active prototypes and internal tools.",
-    popular: false,
+    tagline: "For active prototypes and internal tools.",
     features: [
-      "400 requests per day",
-      "Extended model access",
+      "400 requests / day",
+      "Extended model catalog",
       "Priority routing",
       "Email support",
     ],
   },
   {
-    id: "premium",
+    id: "premium" as const,
     name: "Premium",
-    label: "Popular",
-    price: "$20",
-    priceDetail: "/month",
-    requestsPerDay: 1000,
-    checkoutUrl: "https://whop.com/tropic-6587/routing-pro/",
-    summary:
-      "The balanced tier for production apps with broader model coverage.",
+    price: 20,
+    requestsPerDay: 1_000,
     popular: true,
+    checkoutUrl: "https://whop.com/tropic-6587/routing-pro/",
+    tagline: "Production-ready with broader model coverage.",
     features: [
-      "1,000 requests per day",
+      "1,000 requests / day",
       "Highspeed model access",
       "Fastest routing",
       "Priority support",
     ],
   },
   {
-    id: "max",
+    id: "max" as const,
     name: "Max",
-    label: "Max",
-    price: "$50",
-    priceDetail: "/month",
-    requestsPerDay: 2500,
+    price: 50,
+    requestsPerDay: 2_500,
     checkoutUrl: "https://whop.com/tropic-6587/routing-max/",
-    summary: "Full catalog access and the highest daily throughput envelope.",
-    popular: false,
+    tagline: "Full catalog, highest throughput.",
     features: [
-      "2,500 requests per day",
+      "2,500 requests / day",
       "All models access",
       "Fastest routing",
       "Dedicated support",
@@ -101,388 +84,348 @@ const plans = [
   },
 ] as const;
 
-const tierMeta: Record<
-  (typeof plans)[number]["id"],
-  {
-    icon: LucideIcon;
-    iconClassName: string;
-    chipClassName: string;
-    cardClassName: string;
-    accentClassName: string;
-  }
+type PlanId = (typeof plans)[number]["id"];
+
+const tierVisual: Record<
+  PlanId,
+  { icon: LucideIcon; accent: string; bg: string; ring: string }
 > = {
   free: {
     icon: Leaf,
-    iconClassName: "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900",
-    chipClassName:
-      "border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
-    cardClassName: "border-zinc-200 dark:border-zinc-800",
-    accentClassName: "text-zinc-700 dark:text-zinc-200",
+    accent: "text-zinc-500",
+    bg: "bg-zinc-100 dark:bg-zinc-800",
+    ring: "ring-zinc-200 dark:ring-zinc-700",
   },
   lite: {
     icon: Rocket,
-    iconClassName: "bg-[#1470e3] text-white",
-    chipClassName:
-      "border-[#1470e3]/20 bg-[#1470e3]/10 text-[#1470e3] dark:border-[#1470e3]/30",
-    cardClassName: "border-[#1470e3]/20 dark:border-[#1470e3]/25",
-    accentClassName: "text-[#1470e3]",
+    accent: "text-blue-500",
+    bg: "bg-blue-50 dark:bg-blue-950/40",
+    ring: "ring-blue-200 dark:ring-blue-800",
   },
   premium: {
     icon: Crown,
-    iconClassName: "bg-[#8350e8] text-white",
-    chipClassName:
-      "border-[#8350e8]/20 bg-[#8350e8]/10 text-[#8350e8] dark:border-[#8350e8]/30",
-    cardClassName: "border-[#8350e8]/30 dark:border-[#8350e8]/40",
-    accentClassName: "text-[#8350e8]",
+    accent: "text-violet-500",
+    bg: "bg-violet-50 dark:bg-violet-950/40",
+    ring: "ring-violet-300 dark:ring-violet-800",
   },
   max: {
     icon: Diamond,
-    iconClassName: "bg-[#8350e8] text-white",
-    chipClassName:
-      "border-[#8350e8]/20 bg-[#8350e8]/10 text-[#8350e8] dark:border-[#8350e8]/30",
-    cardClassName: "border-[#8350e8]/25 dark:border-[#8350e8]/30",
-    accentClassName: "text-[#8350e8]",
+    accent: "text-amber-500",
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+    ring: "ring-amber-300 dark:ring-amber-800",
   },
 };
 
-function formatPrice(perMillion: number) {
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function formatTokenPrice(perMillion: number) {
   if (perMillion === 0) return "Free";
-  return `$${perMillion.toFixed(3)}/M`;
+  return `$${perMillion.toFixed(3)}`;
 }
 
-function ModelAvatar({
-  displayName,
-  logo,
-}: {
-  displayName: string;
-  logo?: string;
-}) {
-  if (logo) {
-    return (
-      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
-        <Image
-          alt={displayName}
-          className="object-contain p-1.5"
-          fill
-          sizes="36px"
-          src={logo}
-        />
-      </div>
-    );
-  }
+/* ------------------------------------------------------------------ */
+/*  Plan card                                                          */
+/* ------------------------------------------------------------------ */
 
-  return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-[11px] font-semibold text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
-      {displayName.slice(0, 2).toUpperCase()}
-    </div>
-  );
-}
-
-function PricingPlanCard({
+function PlanCard({
   plan,
-  isCurrentPlan,
+  isCurrent,
 }: {
   plan: (typeof plans)[number];
-  isCurrentPlan: boolean;
+  isCurrent: boolean;
 }) {
-  const tierStyles = tierMeta[plan.id];
-  const TierIcon = tierStyles.icon;
+  const v = tierVisual[plan.id];
+  const Icon = v.icon;
+  const isPopular = "popular" in plan && plan.popular;
 
   const handleAction = () => {
     if (plan.checkoutUrl.startsWith("/")) {
       window.location.href = plan.checkoutUrl;
       return;
     }
-
     window.open(plan.checkoutUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
     <div
       className={cn(
-        "group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all hover:border-zinc-300 hover:shadow-lg dark:bg-[#181818] dark:hover:border-zinc-700",
-        tierStyles.cardClassName,
-        plan.popular && "ring-2 ring-[#8350e8]/40",
+        "relative flex flex-col rounded-2xl border bg-white p-5 transition-shadow hover:shadow-md dark:bg-[#18181b]",
+        isPopular
+          ? "border-violet-400/60 dark:border-violet-600/50"
+          : "border-zinc-200 dark:border-zinc-800",
       )}
     >
-      {plan.popular && (
-        <div className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-[#8350e8]" />
+      {isPopular && (
+        <span className="absolute -top-2.5 left-4 rounded-full bg-violet-600 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+          Most popular
+        </span>
       )}
 
       <div className="flex items-center gap-3">
         <div
           className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-xl",
-            tierStyles.iconClassName,
+            "flex h-9 w-9 items-center justify-center rounded-xl",
+            v.bg,
           )}
         >
-          <TierIcon className="h-5 w-5" />
+          <Icon className={cn("h-4 w-4", v.accent)} />
         </div>
-        <div className="flex flex-col">
+        <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-foreground">
+            <span className="text-sm font-semibold text-foreground">
               {plan.name}
-            </h3>
-            {isCurrentPlan && <SubtleBadge>Current</SubtleBadge>}
-            {plan.popular && !isCurrentPlan && (
-              <SubtleBadge>Popular</SubtleBadge>
+            </span>
+            {isCurrent && (
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                Current
+              </span>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {plan.priceDetail === "forever" ? "Free forever" : plan.priceDetail}
-          </p>
+          <p className="text-xs text-muted-foreground">{plan.tagline}</p>
         </div>
       </div>
 
-      <div className="mt-6 flex items-baseline gap-1">
-        <span className="text-4xl font-semibold tracking-tight text-foreground">
-          {plan.price}
+      <div className="mt-5 flex items-baseline gap-0.5">
+        <span className="text-3xl font-bold tracking-tight text-foreground">
+          ${plan.price}
         </span>
-        {plan.priceDetail !== "forever" && (
-          <span className="text-sm text-muted-foreground">/month</span>
-        )}
+        <span className="text-sm text-muted-foreground">
+          {plan.price === 0 ? " forever" : "/mo"}
+        </span>
       </div>
 
-      <p className="mt-3 text-sm text-muted-foreground">{plan.summary}</p>
-
-      <div className="mt-6 rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900/50">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Daily requests</span>
-          <span className="text-lg font-semibold text-foreground">
+      <div className="mt-4 rounded-xl bg-zinc-50 px-3.5 py-2.5 dark:bg-zinc-900/50">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Daily requests</span>
+          <span className="font-semibold tabular-nums text-foreground">
             {plan.requestsPerDay.toLocaleString()}
           </span>
         </div>
       </div>
 
-      <div className="mt-4 flex-1 space-y-2.5">
-        {plan.features.map((feature) => (
-          <div className="flex items-center gap-2.5" key={feature}>
-            <Check className={cn("h-4 w-4", tierStyles.accentClassName)} />
-            <span className="text-sm text-foreground">{feature}</span>
-          </div>
+      <ul className="mt-4 flex-1 space-y-2">
+        {plan.features.map((f) => (
+          <li className="flex items-start gap-2 text-[13px] text-foreground" key={f}>
+            <Check className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", v.accent)} />
+            {f}
+          </li>
         ))}
-      </div>
+      </ul>
 
       <Button
         className={cn(
-          "mt-6 h-11 w-full justify-center rounded-xl text-sm font-medium transition-all",
-          plan.popular
-            ? "bg-[#8350e8] text-white hover:opacity-90"
+          "mt-5 h-10 w-full rounded-xl text-sm font-medium",
+          isPopular
+            ? "bg-violet-600 text-white hover:bg-violet-700"
             : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200",
-          isCurrentPlan && plan.id !== "free" && "opacity-70",
         )}
         onClick={handleAction}
-        type="button"
       >
-        {plan.id === "free"
-          ? "Get started free"
-          : isCurrentPlan
+        {plan.price === 0
+          ? "Get started"
+          : isCurrent
             ? "Manage plan"
-            : `Upgrade to ${plan.name}`}
+            : "Upgrade"}
+        <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
       </Button>
-
     </div>
   );
 }
 
-export default function PricingPage() {
-  const [selectedTier, setSelectedTier] = useState<PlanTier>("free");
-  const { user } = useAuth();
+/* ------------------------------------------------------------------ */
+/*  Model pricing table                                                */
+/* ------------------------------------------------------------------ */
 
-  const currentTier =
-    (user?.plan_tier?.toLowerCase() as
-      | (typeof plans)[number]["id"]
-      | undefined) ?? "free";
-
-  const filteredModels = useMemo(
-    () => getDashboardModelsForTier(selectedTier),
-    [selectedTier],
+function ModelRow({
+  model,
+}: {
+  model: { id: string; name: string; logo?: string; input_price: number; output_price: number };
+}) {
+  return (
+    <tr className="border-b border-zinc-100 last:border-0 dark:border-zinc-800/60">
+      <td className="py-3 pr-4 pl-5">
+        <div className="flex items-center gap-2.5">
+          {model.logo ? (
+            <div className="relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <Image
+                alt={model.name}
+                className="object-contain p-1"
+                fill
+                sizes="28px"
+                src={model.logo}
+              />
+            </div>
+          ) : (
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-[10px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+              {model.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <p className="text-sm font-medium text-foreground">{model.name}</p>
+            <p className="font-mono text-[10px] text-muted-foreground">{model.id}</p>
+          </div>
+        </div>
+      </td>
+      <td className="py-3 px-4 text-right text-sm tabular-nums text-foreground">
+        {formatTokenPrice(model.input_price)}
+      </td>
+      <td className="py-3 pl-4 pr-5 text-right text-sm tabular-nums text-foreground">
+        {formatTokenPrice(model.output_price)}
+      </td>
+    </tr>
   );
+}
 
-  const selectedPlan =
-    plans.find((plan) => plan.id === selectedTier) ?? plans[0];
+function ModelPricingSection({ tier }: { tier: PlanId }) {
+  const models = useMemo(() => getDashboardModelsForTier(tier), [tier]);
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? models : models.slice(0, 6);
+
+  if (models.length === 0) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#18181b]">
+      <table className="w-full min-w-[400px] text-left">
+        <thead>
+          <tr className="border-b border-zinc-200 text-xs uppercase tracking-wider text-muted-foreground dark:border-zinc-800">
+            <th className="py-2.5 pl-5 pr-4 font-medium">Model</th>
+            <th className="py-2.5 px-4 text-right font-medium">Input / M</th>
+            <th className="py-2.5 pl-4 pr-5 text-right font-medium">Output / M</th>
+          </tr>
+        </thead>
+        <tbody>
+          {visible.map((m) => (
+            <ModelRow key={m.id} model={m} />
+          ))}
+        </tbody>
+      </table>
+
+      {models.length > 6 && (
+        <button
+          className="flex w-full items-center justify-center gap-1.5 border-t border-zinc-200 py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground dark:border-zinc-800"
+          onClick={() => setExpanded((e) => !e)}
+          type="button"
+        >
+          {expanded ? "Show less" : `Show all ${models.length} models`}
+          <ChevronDown
+            className={cn(
+              "h-3.5 w-3.5 transition-transform",
+              expanded && "rotate-180",
+            )}
+          />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                               */
+/* ------------------------------------------------------------------ */
+
+export default function PricingPage() {
+  const [selectedTier, setSelectedTier] = useState<PlanId>("free");
+  const { user } = useAuth();
+
+  const currentTier = (user?.plan_tier?.toLowerCase() as PlanId | undefined) ?? "free";
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
       <PageHeader
-        description="Choose a plan that matches your traffic volume and model needs."
-        meta={<SubtleBadge>Current: {currentTier}</SubtleBadge>}
-        title="Pricing"
+        description="Simple, transparent pricing. Upgrade or downgrade anytime."
+        meta={
+          <div className="flex items-center gap-2 pt-0.5">
+            <Zap className="h-3.5 w-3.5 text-amber-500" />
+            <span className="text-xs text-muted-foreground">
+              You&apos;re on the{" "}
+              <span className="font-medium text-foreground">
+                {currentTier.charAt(0).toUpperCase() + currentTier.slice(1)}
+              </span>{" "}
+              plan
+            </span>
+          </div>
+        }
+        title="Plans & Pricing"
       />
 
-      <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm leading-6 text-muted-foreground dark:border-zinc-800 dark:bg-zinc-900/40">
-        Whop is currently having issues, so plan purchases are not auto-
-        upgrading accounts right now. After you buy, please message us on{" "}
-        <a
-          className="text-foreground underline underline-offset-4"
-          href="https://discord.gg/routing"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Discord
-        </a>{" "}
-        for instant support so we can upgrade your account, or email{" "}
-        <a
-          className="text-foreground underline underline-offset-4"
-          href="mailto:support@routing.run"
-        >
-          support@routing.run
-        </a>{" "}
-        and we will reply within 24 hours.
+      {/* Whop notice */}
+      <div className="flex items-start gap-3 rounded-xl border border-amber-200/60 bg-amber-50/50 px-4 py-3 dark:border-amber-800/30 dark:bg-amber-950/20">
+        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
+          <span className="text-[11px]">!</span>
+        </div>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Plan purchases aren&apos;t auto-upgrading right now. After buying, message us on{" "}
+          <a
+            className="font-medium text-foreground underline underline-offset-4"
+            href="https://discord.gg/routing"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Discord
+          </a>{" "}
+          or email{" "}
+          <a
+            className="font-medium text-foreground underline underline-offset-4"
+            href="mailto:support@routing.run"
+          >
+            support@routing.run
+          </a>{" "}
+          and we&apos;ll upgrade you.
+        </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {/* Plan cards */}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => (
-          <PricingPlanCard
-            isCurrentPlan={currentTier === plan.id}
+          <PlanCard
+            isCurrent={currentTier === plan.id}
             key={plan.id}
             plan={plan}
           />
         ))}
       </div>
 
-      <SurfaceCard
-        action={
-          <Tabs
-            className="w-full md:w-auto"
-            onValueChange={(value) =>
-              setSelectedTier(value as (typeof plans)[number]["id"])
-            }
-            value={selectedTier}
-          >
-            <TabsList className="grid h-auto w-full grid-cols-2 gap-2 rounded-xl border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-800 dark:bg-zinc-900/40 md:w-auto md:grid-cols-4">
-              {plans.map((plan) => (
-                <TabsTrigger
-                  className="rounded-lg px-3 py-2 text-xs font-medium data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:bg-[#181818]"
-                  key={plan.id}
-                  value={plan.id}
-                >
-                  {plan.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        }
-        contentClassName="p-0"
-        description="Token pricing for each plan tier. Input and output rates are shown per one million tokens."
-        title="Model Pricing"
-      >
-        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                {selectedPlan.name} tier catalog
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {filteredModels.length} models currently listed for this tier.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <PillStat
-                label="Requests / day"
-                value={selectedPlan.requestsPerDay.toLocaleString()}
-              />
-              <PillStat label="Tier" value={selectedPlan.label} />
-            </div>
+      {/* Model pricing */}
+      <div className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Model Pricing
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Per-million token rates by plan tier.
+            </p>
           </div>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px]">
-            <thead>
-              <tr className="border-b border-zinc-200 text-left text-xs uppercase tracking-[0.18em] text-muted-foreground dark:border-zinc-800">
-                <th className="px-5 py-3 font-medium">Model</th>
-                <th className="px-5 py-3 font-medium">Tier</th>
-                <th className="px-5 py-3 font-medium">Input</th>
-                <th className="px-5 py-3 font-medium">Output</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredModels.map((model) => {
-                const tierStyles = tierMeta[selectedTier];
-
+          <div className="overflow-x-auto">
+            <div className="flex gap-1 rounded-xl border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-800 dark:bg-zinc-900/40">
+              {plans.map((p) => {
+                const active = selectedTier === p.id;
                 return (
-                  <tr
-                    className="border-b border-zinc-200/80 last:border-0 dark:border-zinc-800/80"
-                    key={`${selectedTier}-${model.id}`}
+                  <button
+                    className={cn(
+                      "rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors",
+                      active
+                        ? "bg-white text-foreground shadow-sm dark:bg-[#18181b]"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                    key={p.id}
+                    onClick={() => setSelectedTier(p.id)}
+                    type="button"
                   >
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <ModelAvatar
-                          displayName={model.name}
-                          logo={model.logo}
-                        />
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {model.name}
-                          </p>
-                          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-                            {model.id}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <Badge
-                        className={cn(
-                          "rounded-md border px-2.5 py-1 text-[11px] font-medium shadow-none",
-                          tierStyles.chipClassName,
-                        )}
-                        variant="outline"
-                      >
-                        {selectedTier}
-                      </Badge>
-                    </td>
-                    <td className="px-5 py-4 text-sm font-medium text-foreground">
-                      {formatPrice(model.input_price)}
-                    </td>
-                    <td className="px-5 py-4 text-sm font-medium text-foreground">
-                      {formatPrice(model.output_price)}
-                    </td>
-                  </tr>
+                    {p.name}
+                  </button>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
-      </SurfaceCard>
 
-      <SurfaceCard
-        contentClassName="grid gap-3 md:grid-cols-3"
-        description="A few practical notes so the pricing page answers the common questions without sending you elsewhere."
-        title="Notes"
-      >
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Sparkles className="h-4 w-4 text-[#1470e3]" />
-            Routing behavior
-          </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            All plans use the same router. Higher tiers mainly expand daily
-            limits, model access, and access to faster variants.
-          </p>
-        </div>
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Coins className="h-4 w-4 text-[#1470e3]" />
-            Token billing
-          </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Input and output prices are shown per million tokens so you can
-            compare models directly inside the dashboard before changing tiers.
-          </p>
-        </div>
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Crown className="h-4 w-4 text-[#8350e8]" />
-            Upgrades
-          </div>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            If you outgrow your current cap, you can upgrade from here and keep
-            the same app integration, keys, and routing behavior.
-          </p>
-        </div>
-      </SurfaceCard>
+        <ModelPricingSection tier={selectedTier} />
+      </div>
     </div>
   );
 }

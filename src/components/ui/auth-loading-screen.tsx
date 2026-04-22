@@ -20,8 +20,8 @@ export function AuthLoadingScreen({
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7] p-4 dark:bg-[#141414]">
-      <Card className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-[#181818]">
+    <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7] p-4 dark:bg-[#0f0f10]">
+      <Card className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-[#18181b]">
         <CardContent className="flex flex-col items-center gap-5 px-6 py-8 text-center">
           <Facehash
             enableBlink={mode === "thinking"}

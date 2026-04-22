@@ -287,7 +287,7 @@ export default function StatusPage() {
                       className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-4"
                       key={incident.id}
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-foreground">
@@ -309,7 +309,7 @@ export default function StatusPage() {
             </SurfaceCard>
           ) : null}
 
-          <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+          <div className="grid gap-4 sm:gap-6 xl:grid-cols-[0.95fr_1.05fr]">
             <SurfaceCard
               title="Providers"
               description="Live provider status with observed latency."

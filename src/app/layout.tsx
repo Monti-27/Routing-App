@@ -53,7 +53,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
     >
-      <body className="flex h-full min-h-0 flex-col bg-[#f7f7f7] text-foreground antialiased dark:bg-[#141414]">
+      <body className="flex h-full min-h-0 flex-col bg-[#f7f7f7] text-foreground antialiased dark:bg-[#0f0f10]">
         {isDevelopment ? (
           <Script
             src="//unpkg.com/react-grab/dist/index.global.js"
@@ -80,7 +80,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <main className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f7f7f7] dark:bg-[#141414]">
+            <main className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#f7f7f7] dark:bg-[#0f0f10]">
               {children}
             </main>
           </AuthProvider>

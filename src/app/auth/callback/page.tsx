@@ -27,8 +27,11 @@ function AuthCallbackContent() {
 
     async function handleCallback() {
       try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/callback/${provider}?code=${code}`,
+          `${apiUrl}/auth/callback/${encodeURIComponent(provider!)}?code=${encodeURIComponent(code!)}`,
+          { credentials: "include" },
         );
 
         if (!response.ok) {
@@ -38,8 +41,11 @@ function AuthCallbackContent() {
         const data = await response.json();
 
         if (typeof window !== "undefined") {
-          localStorage.setItem("token", data.access_token);
+          localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("refresh_token", data.refresh_token);
+          if (data.csrf_token) {
+            localStorage.setItem("csrf_token", data.csrf_token);
+          }
         }
 
         router.push("/dashboard");
