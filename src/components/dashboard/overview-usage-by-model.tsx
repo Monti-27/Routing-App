@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Bar, BarChart, Cell, LabelList, XAxis, YAxis } from "recharts";
 
 import { PieCenter } from "@/components/charts/pie-center";
 import { PieChart } from "@/components/charts/pie-chart";
 import { PieSlice } from "@/components/charts/pie-slice";
+import { ChartContainer } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ModelEntry = {
   model: string;
@@ -42,8 +45,15 @@ type Props = {
   loading: boolean;
 };
 
+function formatCompact(value: number): string {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toLocaleString();
+}
+
 export function OverviewUsageByModel({ models, loading }: Props) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   const modelEntries = useMemo(() => {
     if (!models) return [];
@@ -103,38 +113,50 @@ export function OverviewUsageByModel({ models, loading }: Props) {
 
       <div className="p-4 sm:p-6">
         {chartData.length > 0 ? (
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex justify-center lg:flex-1">
-              <div className="sm:hidden">
-                <PieChart
-                  cornerRadius={4}
+          isMobile ? (
+            <div className="space-y-4">
+              <ChartContainer
+                className="aspect-[4/3] w-full"
+                config={Object.fromEntries(
+                  chartData.map((item) => [
+                    item.label,
+                    { label: item.label, color: item.color },
+                  ]),
+                )}
+              >
+                <BarChart
                   data={chartData}
-                  hoverOffset={8}
-                  hoveredIndex={hoveredIndex}
-                  innerRadius={56}
-                  onHoverChange={setHoveredIndex}
-                  padAngle={0.02}
-                  size={200}
+                  margin={{ top: 28, right: 8, bottom: 4, left: 8 }}
+                  barCategoryGap="20%"
                 >
-                  {chartData.map((item, index) => (
-                    <PieSlice
-                      color={item.color}
-                      hoverEffect="grow"
-                      index={index}
-                      key={`sm-${item.label}`}
-                      showGlow={false}
-                    />
-                  ))}
-                  <PieCenter
-                    className="rounded-full bg-background/80"
-                    defaultLabel="Requests"
-                    formatOptions={{ notation: "compact" }}
-                    valueClassName="text-lg font-semibold text-foreground"
-                    labelClassName="text-xs text-muted-foreground"
+                  <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 11 }}
+                    interval={0}
                   />
-                </PieChart>
-              </div>
-              <div className="hidden sm:block">
+                  <YAxis hide />
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={56}>
+                    {chartData.map((item, index) => (
+                      <Cell key={index} fill={item.color} />
+                    ))}
+                    <LabelList
+                      dataKey="value"
+                      position="top"
+                      formatter={formatCompact}
+                      className="fill-foreground text-xs font-semibold"
+                    />
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+              <p className="text-center text-[11px] text-muted-foreground">
+                Requests per model this month
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex justify-center lg:flex-1">
                 <PieChart
                   cornerRadius={4}
                   data={chartData}
@@ -163,7 +185,6 @@ export function OverviewUsageByModel({ models, loading }: Props) {
                   />
                 </PieChart>
               </div>
-            </div>
 
             <div className="min-w-0 flex-1 space-y-2 lg:max-w-md">
               {chartData.map((item, index) => {
@@ -200,7 +221,8 @@ export function OverviewUsageByModel({ models, loading }: Props) {
                 );
               })}
             </div>
-          </div>
+            </div>
+          )
         ) : (
           <p className="text-sm text-muted-foreground">No model usage data available.</p>
         )}
