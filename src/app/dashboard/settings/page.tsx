@@ -82,7 +82,7 @@ export default function SettingsPage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) router.push("/auth/login");
+    if (!authLoading && !isAuthenticated) router.replace("/auth/login");
   }, [authLoading, isAuthenticated, router]);
 
   useEffect(() => {

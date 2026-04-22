@@ -218,6 +218,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .finally(() => {
           setIsLoading(false);
         });
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -227,6 +229,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(async () => {
       const success = await refreshAccessToken();
       if (!success) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("csrf_token");
+        }
         setUser(null);
       }
     }, TOKEN_REFRESH_INTERVAL_MS);

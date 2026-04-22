@@ -13,7 +13,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/auth/login");
+      router.replace("/auth/login");
     }
   }, [isLoading, isAuthenticated, router]);
 

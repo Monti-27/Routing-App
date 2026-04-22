@@ -383,7 +383,7 @@ export const AuthComponent = ({
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      router.push("/dashboard");
+      router.replace("/dashboard");
     }
   }, [authLoading, isAuthenticated, router]);
 

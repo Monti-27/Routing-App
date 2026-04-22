@@ -186,7 +186,6 @@ async function fetchApi<T>(
             localStorage.removeItem("refresh_token");
             localStorage.removeItem("csrf_token");
           }
-          window.location.href = "/auth/login";
           throw new Error("Session expired");
         }
       } catch (e) {

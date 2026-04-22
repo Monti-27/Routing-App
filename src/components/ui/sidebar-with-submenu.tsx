@@ -140,7 +140,7 @@ export default function SidebarWithSubmenu({
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <aside className="flex h-full w-full flex-col bg-[#f7f7f7] p-3 dark:bg-[#141416]">
+    <aside className="flex h-full w-full flex-col bg-[#f7f7f7] p-3 dark:bg-[#0f0f10]">
       <div className="px-2 pb-4 pt-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

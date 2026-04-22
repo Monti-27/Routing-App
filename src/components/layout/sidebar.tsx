@@ -75,7 +75,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { user, isDevBypassEnabled, logout } = useAuth();
   const [topModels, setTopModels] = useState<SidebarModelUsage[]>([]);
   const [requestsRemaining, setRequestsRemaining] = useState<number | undefined>();
-  const [requestsLimit, setRequestsLimit] = useState<number | undefined>();
 
   useEffect(() => {
     if (isDevBypassEnabled) {
@@ -102,19 +101,19 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
         setTopModels(modelEntries);
         setRequestsRemaining(requestsData.requests_remaining);
-        setRequestsLimit(requestsData.requests_limit_today);
       })
       .catch(() => {});
   }, [isDevBypassEnabled]);
 
   const tier = user?.plan_tier?.toLowerCase() ?? "free";
+  const planLimit = PLAN_LIMITS[tier] ?? 20;
   const effectiveTopModels = isDevBypassEnabled ? DEV_TOP_MODELS : topModels;
   const effectiveRequestsRemaining = isDevBypassEnabled
     ? 2188
-    : requestsRemaining ?? 0;
+    : Math.min(requestsRemaining ?? 0, planLimit);
   const effectiveRequestsLimit = isDevBypassEnabled
     ? 2500
-    : requestsLimit ?? PLAN_LIMITS[tier] ?? 20;
+    : planLimit;
 
   return (
     <SidebarWithSubmenu
