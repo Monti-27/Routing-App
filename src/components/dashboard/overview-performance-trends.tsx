@@ -138,19 +138,12 @@ export function OverviewPerformanceTrends({
 
     return labels.map((date, index) => ({
       date,
-      requests: Math.max(
-        1,
-        Math.round((totalRequests / labels.length) * factors[index]),
+      requests: Math.round((totalRequests / labels.length) * factors[index]),
+      inputTokens: Math.round(
+        (totalInputTokens / labels.length) * factors[index],
       ),
-      inputTokens: Math.max(
-        1,
-        Math.round((totalInputTokens / labels.length) * factors[index]),
-      ),
-      outputTokens: Math.max(
-        1,
-        Math.round(
-          (totalOutputTokens / labels.length) * (factors[index] * 0.92 + 0.04),
-        ),
+      outputTokens: Math.round(
+        (totalOutputTokens / labels.length) * (factors[index] * 0.92 + 0.04),
       ),
       cost: Number(
         ((totalCost / labels.length) * (factors[index] * 0.96 + 0.03)).toFixed(
