@@ -29,6 +29,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
       if (accessToken && refreshToken) {
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("refresh_token", refreshToken);
+        localStorage.setItem("session_start", String(Date.now()));
         if (csrfToken) {
           localStorage.setItem("csrf_token", csrfToken);
         }
@@ -77,6 +78,7 @@ function AuthCallbackContent({ provider }: { provider: string }) {
           if (data.access_token && data.refresh_token) {
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
+            localStorage.setItem("session_start", String(Date.now()));
             if (data.csrf_token) {
               localStorage.setItem("csrf_token", data.csrf_token);
             }

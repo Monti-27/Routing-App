@@ -111,35 +111,72 @@ function getRefreshToken(): string | null {
 
 const isDevBypassEnabled = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true";
 
-const TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000; // refresh every 4 minutes
+const TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000;
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const SESSION_START_KEY = "session_start";
+
+function isSessionExpired(): boolean {
+  const start = localStorage.getItem(SESSION_START_KEY);
+  if (!start) return false;
+  return Date.now() - Number(start) > SESSION_MAX_AGE_MS;
+}
+
+function markSessionStart() {
+  if (!localStorage.getItem(SESSION_START_KEY)) {
+    localStorage.setItem(SESSION_START_KEY, String(Date.now()));
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("csrf_token");
+  localStorage.removeItem(SESSION_START_KEY);
+}
 
 async function refreshAccessToken(): Promise<boolean> {
+  if (isSessionExpired()) return false;
+
   const refreshToken =
     getCookie("refresh_token") || localStorage.getItem("refresh_token");
   if (!refreshToken) return false;
 
-  try {
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
-    const response = await fetch(`${apiUrl}/auth/refresh`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const apiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "https://api.routing.run";
+      const response = await fetch(`${apiUrl}/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
 
-    if (!response.ok) return false;
+      if (!response.ok) {
+        if (attempt === 0) {
+          await new Promise((r) => setTimeout(r, 1000));
+          continue;
+        }
+        return false;
+      }
 
-    const data = await response.json();
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
-    if (data.csrf_token) {
-      localStorage.setItem("csrf_token", data.csrf_token);
+      const data = await response.json();
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      if (data.csrf_token) {
+        localStorage.setItem("csrf_token", data.csrf_token);
+      }
+      markSessionStart();
+      return true;
+    } catch {
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 1000));
+        continue;
+      }
+      return false;
     }
-    return true;
-  } catch {
-    return false;
   }
+  return false;
 }
 
 const devBypassUser: User = {
@@ -202,6 +239,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const refreshToken = getRefreshToken();
 
     if (accessToken && refreshToken) {
+      if (isSessionExpired()) {
+        clearSession();
+        setIsLoading(false);
+        return;
+      }
+      markSessionStart();
       api.auth
         .me()
         .then(withEffectivePlanTier)
@@ -210,9 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           if (typeof window !== "undefined") {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            localStorage.removeItem("csrf_token");
+            clearSession();
           }
         })
         .finally(() => {
@@ -230,9 +271,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const success = await refreshAccessToken();
       if (!success) {
         if (typeof window !== "undefined") {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          localStorage.removeItem("csrf_token");
+          clearSession();
         }
         setUser(null);
       }
@@ -248,6 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const { user: userData } = await api.auth.login(email, otp);
+    markSessionStart();
     const normalizedUser = await withEffectivePlanTier(userData);
     setUser(normalizedUser);
   };
@@ -273,6 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       name,
     );
+    markSessionStart();
     const normalizedUser = await withEffectivePlanTier(userData);
     setUser(normalizedUser);
   };

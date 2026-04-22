@@ -98,10 +98,13 @@ function DotMatrixText({
   )
 }
 
-function PlaneIcon({ className }: { className?: string }) {
+function PlaneIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+    <svg className={className} style={style} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M22 16.21v-1.895L14 8.84V3.21c0-.795-.672-1.421-1.5-1.421S11 2.415 11 3.21v5.63L3 14.316v1.895l8-2.369v5.263l-2 1.421v1.421L12.5 21l3.5.947v-1.421l-2-1.421v-5.263l8 2.369z"
+        fill="currentColor"
+      />
     </svg>
   )
 }
@@ -149,52 +152,92 @@ function FlightStatusCardAdaptive({
       )}
     >
       <div className="px-4 py-3 sm:px-5 sm:py-4">
-        <div className="flex items-center justify-between gap-4 mb-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex flex-col items-start gap-0.5">
-              <DotMatrixText
-                text={departureCode}
-                dotSize={2.5} gap={1} charGap={2.5}
-                activeColor="var(--flight-dot-active, #2d7a2d)"
-                inactiveColor="var(--flight-dot-inactive, rgba(45,122,45,0.1))"
-              />
-              <span className="text-muted-foreground text-[10px] font-medium leading-none mt-1">{departureCity}</span>
-              <span className="text-muted-foreground/60 text-[9px] uppercase tracking-wider leading-none">{departureTime}</span>
-            </div>
-
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
-              className="shrink-0 self-start mt-1"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-orange-500">
-                <path d="M5 12h14m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </motion.div>
-
-            <div className="flex flex-col items-start gap-0.5">
-              <DotMatrixText
-                text={arrivalCode}
-                dotSize={2.5} gap={1} charGap={2.5}
-                activeColor="var(--flight-dot-active, #2d7a2d)"
-                inactiveColor="var(--flight-dot-inactive, rgba(45,122,45,0.1))"
-              />
-              <span className="text-muted-foreground text-[10px] font-medium leading-none mt-1">{arrivalCity}</span>
-              <span className="text-muted-foreground/60 text-[9px] uppercase tracking-wider leading-none">{arrivalTime}</span>
-            </div>
+        <div className="flex items-start gap-3 mb-3">
+          <div className="flex flex-col items-start gap-0.5 shrink-0">
+            <DotMatrixText
+              text={departureCode}
+              dotSize={2.5} gap={1} charGap={2.5}
+              activeColor="var(--flight-dot-active, #2d7a2d)"
+              inactiveColor="var(--flight-dot-inactive, rgba(45,122,45,0.1))"
+            />
+            <span className="text-muted-foreground text-[10px] font-medium leading-none mt-1">{departureCity}</span>
+            <span className="text-muted-foreground/60 text-[9px] uppercase tracking-wider leading-none">{departureTime}</span>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col items-end gap-0.5 shrink-0"
-          >
-            <span className="text-foreground text-sm font-semibold tabular-nums leading-none">{eta}</span>
-            <span className="text-muted-foreground/60 text-[9px] leading-none mt-0.5">{timezone}</span>
-            <span className="text-orange-500 text-[9px] font-bold tracking-wider leading-none mt-1">{nextEvent} {nextEventTime}</span>
-          </motion.div>
+          <div className="flex-1 min-w-0 pt-1">
+            <div className="relative h-[20px] flex items-center">
+              <svg width="100%" height="20" className="absolute inset-0">
+                <motion.line
+                  x1="0%" y1={10} x2="100%" y2={10}
+                  stroke="var(--flight-dot-active, #2d7a2d)"
+                  strokeWidth={1.2}
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 0.3 }}
+                  transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+                />
+              </svg>
+
+              <motion.div
+                className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                initial={{ left: "0%", opacity: 0 }}
+                animate={{
+                  left: ["0%", "95%"],
+                  opacity: [0, 1, 1, 1, 0],
+                }}
+                transition={{
+                  duration: 3.5,
+                  repeat: Infinity,
+                  repeatDelay: 1,
+                  ease: [0.22, 0.68, 0.36, 1],
+                  times: [0, 0.05, 0.5, 0.9, 1],
+                }}
+              >
+                <motion.div
+                  className="relative"
+                  animate={{ y: [0, -1, 0, 0.5, 0] }}
+                  transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 1, ease: "easeInOut" }}
+                >
+                  <div
+                    className="absolute top-1/2 right-full -translate-y-1/2 h-[1px] w-6 origin-right"
+                    style={{
+                      background: "linear-gradient(to left, var(--flight-dot-active, #2d7a2d), transparent)",
+                      opacity: 0.3,
+                    }}
+                  />
+                  <PlaneIcon
+                    className="w-5 h-5 -translate-x-1/2 rotate-90"
+                    style={{
+                      color: "var(--flight-dot-active, #2d7a2d)",
+                      filter: "drop-shadow(0 0 2px var(--flight-dot-active, rgba(45,122,45,0.5)))",
+                    }}
+                  />
+                </motion.div>
+              </motion.div>
+            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="flex items-center justify-center gap-1.5 mt-1.5"
+            >
+              <span className="text-foreground text-[11px] font-semibold tabular-nums leading-none">{eta}</span>
+              <span className="text-muted-foreground/50 text-[9px] leading-none">{timezone}</span>
+            </motion.div>
+          </div>
+
+          <div className="flex flex-col items-end gap-0.5 shrink-0">
+            <DotMatrixText
+              text={arrivalCode}
+              dotSize={2.5} gap={1} charGap={2.5}
+              activeColor="var(--flight-dot-active, #2d7a2d)"
+              inactiveColor="var(--flight-dot-inactive, rgba(45,122,45,0.1))"
+              className="justify-end"
+            />
+            <span className="text-muted-foreground text-[10px] font-medium leading-none mt-1">{arrivalCity}</span>
+            <span className="text-muted-foreground/60 text-[9px] uppercase tracking-wider leading-none">{arrivalTime}</span>
+          </div>
         </div>
 
         <div className="relative">
@@ -214,7 +257,7 @@ function FlightStatusCardAdaptive({
                 animate={{ y: [0, -0.5, 0] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               >
-                <PlaneIcon className="w-2.5 h-2.5 text-white rotate-45" />
+                <PlaneIcon className="w-3 h-3 text-white rotate-90" />
               </motion.div>
             </motion.div>
           </div>

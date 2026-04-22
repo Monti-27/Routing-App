@@ -161,6 +161,9 @@ async function fetchApi<T>(
             if (data.csrf_token) {
               localStorage.setItem("csrf_token", data.csrf_token);
             }
+            if (!localStorage.getItem("session_start")) {
+              localStorage.setItem("session_start", String(Date.now()));
+            }
           }
           onTokenRefreshed(data.access_token);
           
@@ -185,6 +188,7 @@ async function fetchApi<T>(
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             localStorage.removeItem("csrf_token");
+            localStorage.removeItem("session_start");
           }
           throw new Error("Session expired");
         }
@@ -243,6 +247,7 @@ export const api = {
       if (typeof window !== "undefined") {
         localStorage.setItem("access_token", loginResponse.access_token);
         localStorage.setItem("refresh_token", loginResponse.refresh_token);
+        localStorage.setItem("session_start", String(Date.now()));
       }
       return { user: loginResponse.user };
     },
@@ -255,6 +260,7 @@ export const api = {
       if (typeof window !== "undefined") {
         localStorage.setItem("access_token", loginResponse.access_token);
         localStorage.setItem("refresh_token", loginResponse.refresh_token);
+        localStorage.setItem("session_start", String(Date.now()));
       }
       return { user: loginResponse.user };
     },
@@ -283,6 +289,7 @@ export const api = {
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("csrf_token");
+          localStorage.removeItem("session_start");
         }
       }
     },
