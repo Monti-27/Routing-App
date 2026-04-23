@@ -81,7 +81,7 @@ const DEV_USER_DATA: UserData = {
   upgrade_expires_at: null,
 };
 
-const PLAN_LIMITS: Record<string, number> = {
+const PLAN_LIMITS_FALLBACK: Record<string, number> = {
   free: 20,
   lite: 400,
   premium: 1000,
@@ -156,7 +156,7 @@ export default function DashboardPage() {
   }, [isDevBypassEnabled]);
 
   const dailyLimit = plan
-    ? PLAN_LIMITS[plan.plan_tier?.toLowerCase()] || 20
+    ? plan.requests_per_day || PLAN_LIMITS_FALLBACK[plan.plan_tier?.toLowerCase()] || 20
     : 20;
   const requestsUsedToday =
     plan?.requests_used_today || usage?.daily_requests_used || 0;
