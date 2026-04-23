@@ -326,7 +326,20 @@ export const api = {
 
   models: {
     list: async () => {
-      return fetchApi<{ data: Array<{ id: string; name: string; provider: string }> }>("/v1/models");
+      return fetchApi<{
+        data: Array<{
+          id: string;
+          object: string;
+          created: number;
+          owned_by: string;
+          tier: string;
+          context_window: number;
+          max_output_tokens: number;
+          request_multiplier?: number;
+          input_price?: number;
+          output_price?: number;
+        }>;
+      }>("/v1/models");
     },
   },
 

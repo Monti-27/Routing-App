@@ -33,13 +33,6 @@ const footerItems: SidebarMenuItem[] = [
   { href: "/dashboard/settings", name: "Settings", icon: GearSix },
 ];
 
-const PLAN_LIMITS: Record<string, number> = {
-  free: 20,
-  lite: 400,
-  premium: 1000,
-  max: 2500,
-};
-
 const DEV_TOP_MODELS: SidebarModelUsage[] = [
   {
     id: "route/kimi-k2.5",
@@ -75,6 +68,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { user, isDevBypassEnabled, logout } = useAuth();
   const [topModels, setTopModels] = useState<SidebarModelUsage[]>([]);
   const [requestsRemaining, setRequestsRemaining] = useState<number | undefined>();
+  const [requestsLimit, setRequestsLimit] = useState<number | undefined>();
 
   useEffect(() => {
     if (isDevBypassEnabled) {
@@ -101,19 +95,18 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
         setTopModels(modelEntries);
         setRequestsRemaining(requestsData.requests_remaining);
+        setRequestsLimit(requestsData.requests_limit_today);
       })
       .catch(() => {});
   }, [isDevBypassEnabled]);
 
-  const tier = user?.plan_tier?.toLowerCase() ?? "free";
-  const planLimit = PLAN_LIMITS[tier] ?? 20;
   const effectiveTopModels = isDevBypassEnabled ? DEV_TOP_MODELS : topModels;
   const effectiveRequestsRemaining = isDevBypassEnabled
     ? 2188
-    : Math.min(requestsRemaining ?? 0, planLimit);
+    : requestsRemaining ?? 0;
   const effectiveRequestsLimit = isDevBypassEnabled
     ? 2500
-    : planLimit;
+    : requestsLimit ?? 20;
 
   return (
     <SidebarWithSubmenu

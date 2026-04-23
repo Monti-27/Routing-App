@@ -81,12 +81,6 @@ const DEV_USER_DATA: UserData = {
   upgrade_expires_at: null,
 };
 
-const PLAN_LIMITS_FALLBACK: Record<string, number> = {
-  free: 20,
-  lite: 400,
-  premium: 1000,
-  max: 2500,
-};
 
 function formatUpgradeExpiry(dateStr: string | null): string {
   if (!dateStr) return "";
@@ -156,7 +150,7 @@ export default function DashboardPage() {
   }, [isDevBypassEnabled]);
 
   const dailyLimit = plan
-    ? plan.requests_per_day || PLAN_LIMITS_FALLBACK[plan.plan_tier?.toLowerCase()] || 20
+    ? plan.requests_per_day || 20
     : 20;
   const requestsUsedToday =
     plan?.requests_used_today || usage?.daily_requests_used || 0;
