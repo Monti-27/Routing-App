@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Sidebar } from "@/components/layout/sidebar";
 
@@ -30,12 +30,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7] dark:bg-[#0f0f10]">
-        <div className="text-center space-y-4">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-zinc-400" />
-          <p className="text-zinc-500">Loading...</p>
-        </div>
-      </div>
+      <div className="min-h-screen bg-[#f7f7f7] dark:bg-[#0f0f10]" />
     );
   }
 

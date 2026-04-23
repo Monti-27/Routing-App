@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import {
   BarChart3,
-  Loader2,
   TrendingUp,
 } from "lucide-react";
 
@@ -14,6 +13,7 @@ import {
   SurfaceCard,
 } from "@/components/dashboard/page-ui";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UsageSummaryCard } from "@/components/dashboard/usage-summary-card";
 import { OverviewUsageByModel } from "@/components/dashboard/overview-usage-by-model";
 import { api } from "@/lib/api";
@@ -220,14 +220,36 @@ export default function UsagePage() {
       </div>
 
       {loading ? (
-        <SurfaceCard
-          title="Loading usage"
-          description="Fetching your current analytics snapshot."
-        >
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-[#18181b]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-8 w-20 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            ))}
           </div>
-        </SurfaceCard>
+          <div className="grid gap-4 sm:gap-6 xl:grid-cols-2">
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-[#18181b]">
+              <Skeleton className="h-5 w-28 mb-2" />
+              <Skeleton className="h-4 w-48 mb-6" />
+              <Skeleton className="h-[200px] w-full rounded-xl" />
+            </div>
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-[#18181b]">
+              <Skeleton className="h-5 w-36 mb-2" />
+              <Skeleton className="h-4 w-56 mb-6" />
+              <div className="flex items-end gap-3 h-[200px]">
+                {[40, 65, 50, 80, 55].map((h, i) => (
+                  <Skeleton key={i} className="flex-1 rounded-md" style={{ height: `${h}%` }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
       ) : error ? (
         <SurfaceCard
           title="Usage unavailable"

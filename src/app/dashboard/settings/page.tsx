@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -184,8 +185,18 @@ export default function SettingsPage() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="space-y-6">
+        <PageHeader title="Settings" description="Manage your account, billing, and preferences." />
+        <Skeleton className="h-11 w-full rounded-lg" />
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-[#18181b] space-y-4">
+          <Skeleton className="h-5 w-20" />
+          <Skeleton className="h-4 w-40" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Skeleton className="h-10 w-full rounded-md" />
+            <Skeleton className="h-10 w-full rounded-md" />
+          </div>
+          <Skeleton className="h-9 w-28 rounded-md" />
+        </div>
       </div>
     );
   }

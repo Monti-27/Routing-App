@@ -276,16 +276,16 @@ export default function KeysPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
 
-  const fetchKeys = async () => {
+  const fetchKeys = async (showLoading = true) => {
     try {
-      setIsLoading(true);
+      if (showLoading) setIsLoading(true);
       const res = await api.keys.list();
       setKeys(res.data);
       setError(null);
     } catch {
       setError("Failed to load API keys.");
     } finally {
-      setIsLoading(false);
+      if (showLoading) setIsLoading(false);
     }
   };
 
@@ -298,7 +298,7 @@ export default function KeysPage() {
     try {
       const res = await api.keys.create(newKeyName || undefined);
       setCreatedKey(res.key);
-      void fetchKeys();
+      void fetchKeys(false);
     } catch {
       setError("Failed to create key.");
     } finally {

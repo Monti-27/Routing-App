@@ -156,13 +156,21 @@ export default function DashboardPage() {
     plan?.requests_used_today || usage?.daily_requests_used || 0;
   const requestsRemaining = Math.max(0, dailyLimit - requestsUsedToday);
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageHeader
-          title={`Welcome back, ${user?.name?.split(" ")[0] || "User"}`}
-          description="The workspace could not load your latest usage snapshot."
-        />
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title={`Welcome back, ${user?.name?.split(" ")[0] || "User"}`}
+        description={error ? "The workspace could not load your latest usage snapshot." : "A concise view of today’s request limits, monthly volume, and the models driving your traffic."}
+        meta={
+          userData?.is_upgraded && userData?.upgrade_expires_at ? (
+            <SubtleBadge>
+              Upgrade active: {formatUpgradeExpiry(userData.upgrade_expires_at)}
+            </SubtleBadge>
+          ) : null
+        }
+      />
+
+      {error ? (
         <SurfaceCard
           title="Dashboard unavailable"
           description="Check your API connection and try again."
@@ -177,38 +185,24 @@ export default function DashboardPage() {
             </div>
           </div>
         </SurfaceCard>
-      </div>
-    );
-  }
+      ) : (
+        <>
+          <RequestFlightCard
+            requestsUsed={requestsUsedToday}
+            requestsTotal={dailyLimit}
+            planTier={plan?.plan_tier || "free"}
+            loading={loading}
+          />
 
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title={`Welcome back, ${user?.name?.split(" ")[0] || "User"}`}
-        description="A concise view of today’s request limits, monthly volume, and the models driving your traffic."
-        meta={
-          userData?.is_upgraded && userData?.upgrade_expires_at ? (
-            <SubtleBadge>
-              Upgrade active: {formatUpgradeExpiry(userData.upgrade_expires_at)}
-            </SubtleBadge>
-          ) : null
-        }
-      />
+          <OverviewPerformanceTrends
+            loading={loading}
+            remainingRequests={requestsRemaining}
+            usage={usage}
+          />
 
-      <RequestFlightCard
-        requestsUsed={requestsUsedToday}
-        requestsTotal={dailyLimit}
-        planTier={plan?.plan_tier || "free"}
-        loading={loading}
-      />
-
-      <OverviewPerformanceTrends
-        loading={loading}
-        remainingRequests={requestsRemaining}
-        usage={usage}
-      />
-
-      <OverviewUsageByModel models={usage?.models ?? null} loading={loading} />
+          <OverviewUsageByModel models={usage?.models ?? null} loading={loading} />
+        </>
+      )}
     </div>
   );
 }

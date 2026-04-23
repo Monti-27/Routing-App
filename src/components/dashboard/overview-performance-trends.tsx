@@ -8,6 +8,7 @@ import {
   ChartTooltip,
   type ChartConfig,
 } from "@/components/ui/line-charts-6";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 type UsageData = {
@@ -170,7 +171,15 @@ export function OverviewPerformanceTrends({
 
       <div className="px-2 py-4 sm:px-3 sm:py-6">
         {loading ? (
-          <div className="h-64 w-full animate-pulse rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-[#18181b] sm:h-96" />
+          <div className="flex items-end gap-3 h-64 sm:h-96 px-4">
+            {[45, 62, 38, 71, 55, 80, 48, 67, 42, 73, 58, 65].map((h, i) => (
+              <Skeleton
+                key={i}
+                className="flex-1 rounded-md"
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
         ) : (
           <ChartContainer
             className="h-64 w-full overflow-visible sm:h-96 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-initial"
