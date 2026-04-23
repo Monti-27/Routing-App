@@ -15,11 +15,20 @@ import {
 } from "@/components/dashboard/page-ui";
 import { Button } from "@/components/ui/button";
 import { UsageSummaryCard } from "@/components/dashboard/usage-summary-card";
+import { OverviewUsageByModel } from "@/components/dashboard/overview-usage-by-model";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
 type Period = "daily" | "hourly" | "monthly";
 
+type ModelMetrics = Record<string, { requests?: number; image_requests?: number; input_tokens?: number; output_tokens?: number; is_image_model?: number }>;
+
+const DEV_MODELS: ModelMetrics = {
+  "route/llama-3.1-70b": { requests: 6420, input_tokens: 422000, output_tokens: 264000 },
+  "route/mistral-large": { requests: 5180, input_tokens: 356000, output_tokens: 241000 },
+  "route/qwen-2.5-72b": { requests: 4030, input_tokens: 288000, output_tokens: 205000 },
+  "route/deepseek-v3": { requests: 2790, input_tokens: 188000, output_tokens: 136000 },
+};
 
 const DEV_USAGE_CHARTS: Record<Period, { date: string; requests: number }[]> = {
   daily: [
@@ -115,6 +124,7 @@ export default function UsagePage() {
   const [chartData, setChartData] = useState<
     { date: string; requests: number }[]
   >([]);
+  const [models, setModels] = useState<Record<string, Record<string, number>> | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -132,6 +142,7 @@ export default function UsagePage() {
           setTotalOutputTokens,
           setTotalRequests,
         });
+        setModels(DEV_MODELS);
         setLoading(false);
         return;
       }
@@ -153,6 +164,7 @@ export default function UsagePage() {
           setTotalOutputTokens,
           setTotalRequests,
         });
+        setModels(usageData.models || null);
       } catch (err) {
         if (process.env.NODE_ENV === "development") {
           applyUsageSnapshot({
@@ -166,6 +178,7 @@ export default function UsagePage() {
             setTotalRequests,
           });
           setError(null);
+          setModels(DEV_MODELS);
         } else {
           setError(err instanceof Error ? err.message : "Failed to load usage");
         }
@@ -312,6 +325,8 @@ export default function UsagePage() {
               </div>
             </SurfaceCard>
           </div>
+
+          <OverviewUsageByModel models={models} loading={false} />
         </>
       )}
     </div>
