@@ -114,7 +114,7 @@ export default function DashboardPage() {
       }
 
       try {
-        const [usageData, , requestsData, userInfo] =
+        const [usageData, dailyUsageData, requestsData, userInfo] =
           await Promise.all([
             api.usage.get("monthly"),
             api.usage.get("daily"),
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         setPlan({
           plan_tier: requestsData.plan_tier,
           requests_per_day: requestsData.requests_limit_today,
-          requests_used_today: requestsData.requests_used_today,
+          requests_used_today: dailyUsageData.total_requests ?? 0,
         });
         setUserData({
           plan_tier: userInfo.plan_tier,
