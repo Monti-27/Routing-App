@@ -53,6 +53,7 @@ const modelLogos: Record<string, string> = {
   "route/grok-4.20-multi-agent-beta": "/model-logos/route-xai.png",
   "route/mimo-v2-omni": "/model-logos/route-xiaomi.png",
   "route/mimo-v2-pro": "/model-logos/route-xiaomi.png",
+  "route/mimo-v2.5": "/model-logos/route-xiaomi.png",
   "route/mimo-v2.5-pro": "/model-logos/route-xiaomi.png",
   "route/mimo-v2-flash": "/model-logos/route-xiaomi.png",
   "route/minimax-image-1": "/model-logos/route-minimax.png",
@@ -461,6 +462,14 @@ const staticModelPricing: ModelPricing[] = [
     request_multiplier: 2,
   },
   {
+    model: "route/mimo-v2.5",
+    display_name: "MiMo-V2.5",
+    tier: "pro",
+    input_per_million: 0.45,
+    output_per_million: 1.35,
+    request_multiplier: 2,
+  },
+  {
     model: "route/mimo-v2.5-pro",
     display_name: "Mimo-V2.5-Pro",
     tier: "pro",
@@ -714,6 +723,14 @@ const staticModelPricing: ModelPricing[] = [
   {
     model: "route/mimo-v2-pro",
     display_name: "Mimo-V2-Pro",
+    tier: "max",
+    input_per_million: 0.45,
+    output_per_million: 1.35,
+    request_multiplier: 2,
+  },
+  {
+    model: "route/mimo-v2.5",
+    display_name: "MiMo-V2.5",
     tier: "max",
     input_per_million: 0.45,
     output_per_million: 1.35,

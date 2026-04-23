@@ -117,6 +117,12 @@ const modelLogos: Record<
     provider: "Xiaomi",
     requestMultiplier: 2,
   },
+  "route/mimo-v2.5": {
+    logo: "/model-logos/route-xiaomi.png",
+    name: "MiMo-V2.5",
+    provider: "Xiaomi",
+    requestMultiplier: 2,
+  },
   "route/mimo-v2.5-pro": {
     logo: "/model-logos/route-xiaomi.png",
     name: "MiMo-V2.5-Pro",
@@ -205,6 +211,7 @@ const plans = [
       "route/deepseek-v3.2",
       "route/mimo-v2-omni",
       "route/mimo-v2-pro",
+      "route/mimo-v2.5",
       "route/mimo-v2.5-pro",
     ],
   },
