@@ -4,14 +4,12 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   ArrowUpRight,
-  Building2,
   Check,
   ChevronUp,
   Copy,
   Fingerprint,
   Layers,
   Search,
-  Server,
   Tag,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -25,18 +23,6 @@ import {
   type DashboardModel,
   type PlanTier,
 } from "@/lib/dashboard-model-catalog";
-
-const providerLabels: Record<string, string> = {
-  chutes: "Chutes",
-  deepseek: "DeepSeek",
-  google: "Google",
-  kimi: "Kimi",
-  minimax: "MiniMax",
-  opencode: "OpenCode",
-  qwen: "Qwen",
-  xiaomi: "Xiaomi",
-  zai: "ZAI",
-};
 
 const springConfig = { type: "spring", stiffness: 300, damping: 30 } as const;
 
@@ -63,7 +49,6 @@ function DataRow({
 }
 
 function CardContent({ model, onCopy, isCopied }: { model: DashboardModel; onCopy: (e: MouseEvent) => void; isCopied: boolean }) {
-  const host = providerLabels[model.provider] ?? model.provider;
   return (
     <div className="space-y-4 p-5">
       <DataRow icon={<Fingerprint size={16} />} label="Model ID">
@@ -82,20 +67,10 @@ function CardContent({ model, onCopy, isCopied }: { model: DashboardModel; onCop
         </button>
       </DataRow>
 
-      <DataRow icon={<Server size={16} />} label="Host">
-        <span className="text-[14px] font-semibold text-foreground/80">{host}</span>
-      </DataRow>
-
       <DataRow icon={<Layers size={16} />} label="Context">
         <div className="flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[12px] font-bold text-emerald-600 dark:text-emerald-400">
           {model.context_length} <ArrowUpRight size={14} strokeWidth={2} />
         </div>
-      </DataRow>
-
-      <DataRow icon={<Building2 size={16} />} label="Provider">
-        <span className="ml-2 truncate text-right text-[14px] font-semibold text-foreground/80">
-          {host}
-        </span>
       </DataRow>
 
       <DataRow icon={<Tag size={16} />} label="Tiers">
@@ -177,9 +152,16 @@ function ModelCard({ model }: { model: DashboardModel }) {
                 </span>
               )}
             </div>
-            <span className="truncate text-[15px] font-semibold text-foreground">
-              {model.name}
-            </span>
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="truncate text-[15px] font-semibold text-foreground">
+                {model.name}
+              </span>
+              {model.request_multiplier ? (
+                <span className="shrink-0 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold whitespace-nowrap text-amber-600 dark:text-amber-400">
+                  {model.request_multiplier}x requests
+                </span>
+              ) : null}
+            </div>
           </div>
 
           <div className="flex shrink-0 items-center gap-2.5">
