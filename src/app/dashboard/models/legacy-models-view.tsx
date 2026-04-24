@@ -147,7 +147,7 @@ export function LegacyModelsView() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Models</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {allModels.length} models available. Use the{" "}
+          {allModels.length} models available, including Kimi and GLM. Use the{" "}
           <code className="rounded bg-accent px-1.5 py-0.5 text-[11px]">route/</code>{" "}
           prefix in API calls.
         </p>
