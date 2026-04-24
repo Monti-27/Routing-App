@@ -111,12 +111,6 @@ const modelLogos: Record<
     name: "DeepSeek-R1",
     provider: "DeepSeek",
   },
-  "route/mimo-v2-pro": {
-    logo: "/model-logos/route-xiaomi.png",
-    name: "MiMo-V2-Pro",
-    provider: "Xiaomi",
-    requestMultiplier: 2,
-  },
   "route/mimo-v2.5": {
     logo: "/model-logos/route-xiaomi.png",
     name: "MiMo-V2.5",
@@ -126,12 +120,6 @@ const modelLogos: Record<
   "route/mimo-v2.5-pro": {
     logo: "/model-logos/route-xiaomi.png",
     name: "MiMo-V2.5-Pro",
-    provider: "Xiaomi",
-    requestMultiplier: 2,
-  },
-  "route/mimo-v2-omni": {
-    logo: "/model-logos/route-xiaomi.png",
-    name: "MiMo-V2-Omni",
     provider: "Xiaomi",
     requestMultiplier: 2,
   },
@@ -209,8 +197,6 @@ const plans = [
       "route/qwen3.5-plus",
       "route/qwen3.6-plus",
       "route/deepseek-v3.2",
-      "route/mimo-v2-omni",
-      "route/mimo-v2-pro",
       "route/mimo-v2.5",
       "route/mimo-v2.5-pro",
     ],
