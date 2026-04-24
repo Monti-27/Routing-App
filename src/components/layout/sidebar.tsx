@@ -102,7 +102,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   const effectiveTopModels = isDevBypassEnabled ? DEV_TOP_MODELS : topModels;
   const effectiveRequestsRemaining = isDevBypassEnabled
-    ? 2188
+    ? 1786
     : requestsRemaining ?? 0;
   const effectiveRequestsLimit = isDevBypassEnabled
     ? 2500

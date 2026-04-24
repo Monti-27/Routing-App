@@ -31,6 +31,7 @@ interface PlanData {
   plan_tier: string;
   requests_per_day: number;
   requests_used_today: number;
+  requests_remaining: number;
 }
 
 interface UserData {
@@ -72,7 +73,8 @@ const DEV_USAGE_DATA: UsageData = {
 const DEV_PLAN_DATA: PlanData = {
   plan_tier: "max",
   requests_per_day: 2500,
-  requests_used_today: 312,
+  requests_used_today: 714,
+  requests_remaining: 1786,
 };
 
 const DEV_USER_DATA: UserData = {
@@ -114,10 +116,9 @@ export default function DashboardPage() {
       }
 
       try {
-        const [usageData, dailyUsageData, requestsData, userInfo] =
+        const [usageData, requestsData, userInfo] =
           await Promise.all([
             api.usage.get("monthly"),
-            api.usage.get("daily"),
             api.requests.get(),
             api.auth.me(),
           ]);
@@ -126,7 +127,8 @@ export default function DashboardPage() {
         setPlan({
           plan_tier: requestsData.plan_tier,
           requests_per_day: requestsData.requests_limit_today,
-          requests_used_today: dailyUsageData.total_requests ?? 0,
+          requests_used_today: requestsData.requests_used_today,
+          requests_remaining: requestsData.requests_remaining,
         });
         setUserData({
           plan_tier: userInfo.plan_tier,
@@ -153,8 +155,8 @@ export default function DashboardPage() {
     ? plan.requests_per_day || 20
     : 20;
   const requestsUsedToday =
-    plan?.requests_used_today || usage?.daily_requests_used || 0;
-  const requestsRemaining = Math.max(0, dailyLimit - requestsUsedToday);
+    plan?.requests_used_today || 0;
+  const requestsRemaining = plan?.requests_remaining ?? Math.max(0, dailyLimit - requestsUsedToday);
 
   return (
     <div className="space-y-6">
