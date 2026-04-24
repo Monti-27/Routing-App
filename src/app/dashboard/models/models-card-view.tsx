@@ -218,8 +218,8 @@ export function ModelsCardView() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Models</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Connect to {allModels.length} AI models, including Kimi and GLM, through
-          a single, unified endpoint. We handle provider failover automatically.
+          Connect to {allModels.length} AI models through a single, unified endpoint.
+          We handle provider failover automatically.
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           Qwen 3.5 Plus, Qwen 3.6 Plus, and MiMo models use a 2x request multiplier.
