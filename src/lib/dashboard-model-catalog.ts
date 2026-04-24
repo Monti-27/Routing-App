@@ -100,7 +100,7 @@ export const dashboardModels: DashboardModel[] = [
     input_price: 0.462,
     output_price: 2.42,
     request_multiplier: 2,
-    tiers: ["premium", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "purple",
     logo: "/model-logos/route-kimi.png",
   },
