@@ -13,6 +13,7 @@ interface ModelPricing {
   display_name: string;
   tier: string;
   input_per_million: number;
+  cached_input_per_million?: number;
   output_per_million: number;
   request_multiplier?: number;
 }
@@ -45,6 +46,7 @@ const modelLogos: Record<string, string> = {
   "route/llama-3.2-3b-instruct": "/model-logos/route-meta.png",
   "route/gemma-3-27b-it": "/model-logos/route-google.png",
   "route/deepseek-v3.2": "/model-logos/route-deepseek.png",
+  "route/deepseek-v4-pro": "/model-logos/route-deepseek.png",
   "route/deepseek-v3.2-speciale": "/model-logos/route-deepseek.png",
   "route/deepseek-r1": "/model-logos/route-deepseek.png",
   "route/gemma-4-31b-it": "/model-logos/route-google.svg",
@@ -130,6 +132,14 @@ const staticModelPricing: ModelPricing[] = [
     tier: "free",
     input_per_million: 0.4928,
     output_per_million: 0.7392,
+  },
+  {
+    model: "route/deepseek-v4-pro",
+    display_name: "DeepSeek-V4-Pro",
+    tier: "free",
+    input_per_million: 1.15,
+    cached_input_per_million: 0.23,
+    output_per_million: 3,
   },
   {
     model: "route/qwen3.5-9b",
@@ -388,6 +398,14 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 0.418,
   },
   {
+    model: "route/deepseek-v4-pro",
+    display_name: "DeepSeek-V4-Pro",
+    tier: "pro",
+    input_per_million: 1.15,
+    cached_input_per_million: 0.23,
+    output_per_million: 3,
+  },
+  {
     model: "route/qwen3-coder",
     display_name: "Qwen3-Coder",
     tier: "pro",
@@ -627,6 +645,14 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 0.418,
   },
   {
+    model: "route/deepseek-v4-pro",
+    display_name: "DeepSeek-V4-Pro",
+    tier: "max",
+    input_per_million: 1.15,
+    cached_input_per_million: 0.23,
+    output_per_million: 3,
+  },
+  {
     model: "route/deepseek-v3.2-speciale",
     display_name: "DeepSeek-V3.2-Speciale",
     tier: "max",
@@ -792,7 +818,7 @@ const plans = [
     features: [
       "All free models",
       "glm-5 & glm-5-turbo",
-      "DeepSeek-V3.2",
+      "DeepSeek-V3.2 & DeepSeek-V4-Pro",
       "Qwen3-32B",
       "Qwen3-Next-80B",
       "Qwen3.6-Plus-Preview (free)",
@@ -842,6 +868,7 @@ const plans = [
       "MiniMax-M2.7 Highspeed (~100 tps)",
       "MiMo-V2-Omni/Pro/Flash (2x requests)",
       "Qwen3.5 Plus & Qwen3.6 Plus (2x requests)",
+      "DeepSeek-V4-Pro",
       "DeepSeek-V3.2-Speciale",
       "DeepSeek-R1",
       "Grok-4.20-Beta & Multi-Agent",
@@ -1170,7 +1197,9 @@ export default function PricingPage() {
                           </span>
                         </div>
                         <p className="text-[10px] text-muted-foreground">
-                          in / out
+                          {m.cached_input_per_million
+                            ? `in / cache $${m.cached_input_per_million.toFixed(2)} / out`
+                            : "in / out"}
                         </p>
                       </div>
                     </div>

@@ -101,6 +101,11 @@ const modelLogos: Record<
     name: "DeepSeek-V3.2",
     provider: "DeepSeek",
   },
+  "route/deepseek-v4-pro": {
+    logo: "/model-logos/route-deepseek.png",
+    name: "DeepSeek-V4-Pro",
+    provider: "DeepSeek",
+  },
   "route/deepseek-v3.2-speciale": {
     logo: "/model-logos/route-deepseek.png",
     name: "DeepSeek-V3.2-Speciale",
@@ -148,6 +153,7 @@ const plans = [
       "route/kimi-k2.5",
       "route/glm-5",
       "route/deepseek-v3.2",
+      "route/deepseek-v4-pro",
       "route/qwen3.5-9b",
       "route/qwen3.5-397b-a17b",
       "route/gemma-4-31b-it",
@@ -171,6 +177,7 @@ const plans = [
       "route/qwen3.5-9b",
       "route/qwen3.5-397b-a17b",
       "route/deepseek-v3.2",
+      "route/deepseek-v4-pro",
     ],
   },
   {
@@ -197,6 +204,7 @@ const plans = [
       "route/qwen3.5-plus",
       "route/qwen3.6-plus",
       "route/deepseek-v3.2",
+      "route/deepseek-v4-pro",
       "route/mimo-v2.5",
       "route/mimo-v2.5-pro",
     ],

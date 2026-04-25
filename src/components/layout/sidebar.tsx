@@ -41,8 +41,8 @@ const DEV_TOP_MODELS: SidebarModelUsage[] = [
     requests: 6420,
   },
   {
-    id: "route/deepseek-v3.2",
-    name: "DeepSeek V3.2",
+    id: "route/deepseek-v4-pro",
+    name: "DeepSeek V4 Pro",
     logo: "/model-logos/route-deepseek.png",
     requests: 5180,
   },

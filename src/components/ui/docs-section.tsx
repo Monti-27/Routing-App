@@ -1,4 +1,6 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -111,7 +113,7 @@ const docContent: Record<string, { title: string; content: React.ReactNode }> = 
     content: (
       <div className="space-y-6">
         <p className="text-gray-300">
-          Get started with routing.run in under a minute. Here's a simple example using curl:
+          Get started with routing.run in under a minute. Here&apos;s a simple example using curl:
         </p>
         <CodeBlock 
           code={`curl https://api.routing.run/v1/chat/completions \\
@@ -129,7 +131,7 @@ const docContent: Record<string, { title: string; content: React.ReactNode }> = 
           <p className="text-sm text-gray-400 mb-3">Use any of these model IDs in your requests:</p>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="text-gray-300">route/minimax-m2.7</div>
-            <div className="text-gray-300">route/deepseek-v3.2</div>
+            <div className="text-gray-300">route/deepseek-v4-pro</div>
             <div className="text-gray-300">route/glm-5</div>
             <div className="text-gray-300">route/qwen3-coder-next</div>
             <div className="text-gray-300">route/grok-4-fast</div>
@@ -270,7 +272,7 @@ Headers:
             </li>
             <li className="flex gap-3">
               <span className="text-indigo-400 font-bold">2.</span>
-              Set API Type to "OpenAI"
+              Set API Type to &quot;OpenAI&quot;
             </li>
             <li className="flex gap-3">
               <span className="text-indigo-400 font-bold">3.</span>
@@ -292,7 +294,7 @@ Headers:
             <div className="text-gray-300">route/minimax-m2.7 - Best overall</div>
             <div className="text-gray-300">route/kimi-k2.5 - Great for long context</div>
             <div className="text-gray-300">route/glm-5 - Excellent quality</div>
-            <div className="text-gray-300">route/deepseek-v3.2 - Fast responses</div>
+            <div className="text-gray-300">route/deepseek-v4-pro - 1M context</div>
           </div>
         </div>
       </div>
@@ -500,9 +502,9 @@ export default function DocsPage() {
         sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         <div className="p-6">
-          <a href="/" className="flex items-center gap-2 mb-8">
-            <img src="/transparent_white_logo.PNG" alt="routing.run" className="h-8" />
-          </a>
+          <Link href="/" className="flex items-center gap-2 mb-8">
+            <Image src="/transparent_white_logo.PNG" alt="routing.run" width={128} height={32} className="h-8 w-auto" />
+          </Link>
           
           <nav className="space-y-6">
             {sidebarItems.map((section) => (

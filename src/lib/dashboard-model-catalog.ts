@@ -9,6 +9,7 @@ export interface DashboardModel {
   context_size?: number;
   max_output_tokens?: number;
   input_price: number;
+  cached_input_price?: number;
   output_price: number;
   request_multiplier?: number;
   tiers: PlanTier[];
@@ -234,6 +235,21 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "164K",
     input_price: 0.4928,
     output_price: 0.7392,
+    tiers: ["free", "lite", "premium", "max"],
+    gradient: "coral",
+    logo: "/model-logos/route-deepseek.png",
+  },
+  {
+    id: "route/deepseek-v4-pro",
+    name: "DeepSeek V4 Pro",
+    description: "Next-generation DeepSeek model with 1M-token context",
+    provider: "deepseek",
+    context_length: "1M",
+    context_size: 1000000,
+    max_output_tokens: 131000,
+    input_price: 1.15,
+    cached_input_price: 0.23,
+    output_price: 3,
     tiers: ["free", "lite", "premium", "max"],
     gradient: "coral",
     logo: "/model-logos/route-deepseek.png",
