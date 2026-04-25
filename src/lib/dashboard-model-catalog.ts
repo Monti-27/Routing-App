@@ -283,7 +283,7 @@ export const dashboardModels: DashboardModel[] = [
     context_length: "256000",
     input_price: 0.45,
     output_price: 1.35,
-    request_multiplier: 3,
+    request_multiplier: 4,
     tiers: ["premium", "max"],
     gradient: "amber",
     logo: "/model-logos/route-xiaomi.png",
