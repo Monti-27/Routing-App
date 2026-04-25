@@ -250,7 +250,7 @@ export const dashboardModels: DashboardModel[] = [
     input_price: 1.15,
     cached_input_price: 0.23,
     output_price: 3,
-    tiers: ["free", "lite", "premium", "max"],
+    tiers: ["lite", "premium", "max"],
     gradient: "coral",
     logo: "/model-logos/route-deepseek.png",
   },

@@ -134,14 +134,6 @@ const staticModelPricing: ModelPricing[] = [
     output_per_million: 0.7392,
   },
   {
-    model: "route/deepseek-v4-pro",
-    display_name: "DeepSeek-V4-Pro",
-    tier: "free",
-    input_per_million: 1.15,
-    cached_input_per_million: 0.23,
-    output_per_million: 3,
-  },
-  {
     model: "route/qwen3.5-9b",
     display_name: "Qwen3.5-9B",
     tier: "free",

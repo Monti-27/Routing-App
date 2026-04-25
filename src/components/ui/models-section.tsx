@@ -153,7 +153,6 @@ const plans = [
       "route/kimi-k2.5",
       "route/glm-5",
       "route/deepseek-v3.2",
-      "route/deepseek-v4-pro",
       "route/qwen3.5-9b",
       "route/qwen3.5-397b-a17b",
       "route/gemma-4-31b-it",

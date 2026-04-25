@@ -20,7 +20,7 @@ const plans = [
     badge: "bg-zinc-600",
     features: [
       "20 requests/day",
-      "DeepSeek-V4-Pro, Qwen3.5, Gemma-4-31B",
+      "DeepSeek-V3.2, Qwen3.5, Gemma-4-31B",
       "MiniMax-M2.7 & M2.5",
       "Kimi-K2.5",
       "GPT-OSS-120B",
