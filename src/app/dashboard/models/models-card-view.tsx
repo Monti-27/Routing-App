@@ -223,7 +223,7 @@ export function ModelsCardView() {
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           Qwen 3.5 Plus, Qwen 3.6 Plus, and MiMo models use a 2x request multiplier.
-          Kimi K2.6 Precision uses Q8_O quantization and a 2x request multiplier.
+          Kimi K2.6 Precision uses INT4 quantization and a 2x request multiplier.
         </p>
       </div>
 

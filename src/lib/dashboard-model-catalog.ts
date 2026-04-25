@@ -44,8 +44,8 @@ export const dashboardModels: DashboardModel[] = [
   },
   {
     id: "route/kimi-k2.6-precision",
-    name: "Kimi K2.6 Precision (Q8_O)",
-    description: "Kimi K2.6 precision variant with Q8_O quantization",
+    name: "Kimi K2.6 Precision (INT4)",
+    description: "Kimi K2.6 precision variant with INT4 quantization",
     provider: "kimi",
     context_length: "262144",
     context_size: 262144,
